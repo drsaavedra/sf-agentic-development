@@ -1,0 +1,49 @@
+GitHub Copilot CLI — Mandatory Prerequisites
+=============================================
+
+These steps must be completed before using the Salesforce agent skills and subagents
+in this template. Run them once per machine / Copilot CLI installation.
+
+
+0. GitHub Copilot CLI
+   -------------------
+   The CLI that powers Copilot outside the IDE. Required for skill and plugin commands.
+
+   npm install -g @github/copilot
+
+
+1. Salesforce Skills (forcedotcom/sf-skills)
+   ------------------------------------------
+   Official Salesforce-maintained procedural skills: generating-apex, generating-apex-test,
+   generating-lwc-components, deploying-metadata, querying-soql, running-apex-tests,
+   running-code-analyzer, handling-sf-data, building-sf-integrations, generating-flow,
+   fetching-salesforce-docs, and 50+ more. Referenced in the copilot-instructions.md
+   routing table and invoked by all four agents.
+
+   https://github.com/forcedotcom/sf-skills
+
+   npx skills add forcedotcom/sf-skills
+
+
+2. Andrej Karpathy Behavioral Guidelines (karpathy-guidelines)
+   -------------------------------------------------------------
+   Behavioral rules loaded by Priority 1 of copilot-instructions.md — reduces common LLM
+   coding mistakes: no overcomplication, surgical changes, surface assumptions, verifiable
+   success criteria.
+
+   https://github.com/multica-ai/andrej-karpathy-skills/blob/main/README.md
+
+   /plugin marketplace add forrestchang/andrej-karpathy-skills
+   /plugin install andrej-karpathy-skills@karpathy-skills
+
+
+Notes
+-----
+- The five authored instruction files in .github/instructions/ are local to this repo and
+  are automatically applied by Copilot based on the active file type (applyTo: front
+  matter) — no install step needed.
+- The four agent definitions in .github/agents/ are auto-discovered by Copilot — no
+  install step needed.
+- The baseline in .github/copilot-instructions.md is always-on for every request in
+  this workspace.
+- See claude-setup.txt for the Claude Code equivalent setup.

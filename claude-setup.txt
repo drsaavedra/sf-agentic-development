@@ -1,0 +1,42 @@
+Claude Code — Mandatory Prerequisites
+======================================
+
+These steps must be completed before using the Salesforce agent skills and subagents
+in this template. Run them once per machine / Claude Code installation.
+
+1. Salesforce Skills (forcedotcom/sf-skills)
+   ------------------------------------------
+   Installs the official Salesforce-maintained procedural skills: generating-apex,
+   generating-apex-test, generating-lwc-components, deploying-metadata, querying-soql,
+   running-apex-tests, running-code-analyzer, handling-sf-data, building-sf-integrations,
+   generating-flow, and 50+ more.
+
+   https://github.com/forcedotcom/sf-skills
+
+   npx skills add forcedotcom/sf-skills
+
+
+2. Andrej Karpathy Behavioral Guidelines (karpathy-guidelines)
+   -------------------------------------------------------------
+   Provides the behavioral rules invoked by Priority 1 of CLAUDE.md.
+
+   https://github.com/multica-ai/andrej-karpathy-skills/blob/main/README.md
+
+   /plugin marketplace add forrestchang/andrej-karpathy-skills
+   /plugin install andrej-karpathy-skills@karpathy-skills
+
+
+3. Superpowers (optional — recommended)
+   --------------------------------------
+   Provides brainstorming, plan-writing, TDD, debugging, and other workflow skills
+   used throughout the development lifecycle.
+
+   https://superpowers.ai  (or install through the Claude Code plugin marketplace)
+
+
+Notes
+-----
+- The five authored skills in .claude/skills/ are local to this repo and are
+  automatically discovered by Claude Code — no install step needed.
+- The four subagents in .claude/agents/ are also local and auto-discovered.
+- See github-cli-setup.txt for the GitHub Copilot CLI equivalent setup.

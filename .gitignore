@@ -1,0 +1,14 @@
+# Local backtracking reference — not for public consumption
+original-agents/
+original-file/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/settings.json
+*.swp
+
+# Node (if tooling is ever added alongside)
+node_modules/
