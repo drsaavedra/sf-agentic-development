@@ -17,11 +17,12 @@ directly (e.g. Lead conversion).
 
 ## Project requirements (read first)
 
-Your source of truth is this project's **QA Specification**. If `AGENTS.md` exists at the repo
-root, find the path there. Otherwise, ask the user which document holds the QA requirements before
-proceeding. Read the spec fully, along with any canonical references it names (HLD, `CONTEXT.md`,
-ADRs) and the Functional Consultant's config summary for object/field context. Every scenario must
-trace to a requirement there.
+Your source of truth is this project's **QA Specification**. Find its path in the "Agent → spec doc
+map" in the repo-root baseline file (`CLAUDE.md` for Claude Code, `AGENTS.md` for Codex, or
+`.github/copilot-instructions.md` for Copilot); read it fully, along with any canonical references
+it names (HLD, `CONTEXT.md`, ADRs) and the Functional Consultant's config summary for object/field
+context. Every scenario must trace to a requirement there. If the baseline file has no mapping, ask
+the user which document holds the QA requirements before proceeding.
 
 ## Skills to invoke
 
@@ -53,12 +54,15 @@ trace to a requirement there.
 
 ## Output artifacts
 
-Paths are in `AGENTS.md` if defined (defaults shown):
-- **Scenarios** → the QA test scripts doc (default `docs/qa-test-scripts.md`; return in chat if no path is defined). For each scenario,
-  name the Apex test class + method it maps to, giving the Developer the exact structure to build.
-- **Live results** → the QA live results doc (default `docs/qa-live-test-results.md`; return in chat if no path is defined): a table of
-  scenario ID → status → **SF record Id(s)** → observed result, plus org alias, date, and defects.
-  The SF record Id(s) column is mandatory. Route defects back to the Salesforce Developer agent.
+Paths are in the baseline file map (defaults shown):
+
+- **Scenarios** → the QA test scripts doc (default `docs/qa-test-scripts.md`; return in chat if no
+  path is defined). For each scenario, name the Apex test class + method it maps to, giving the
+  Developer the exact structure to build.
+- **Live results** → the QA live results doc (default `docs/qa-live-test-results.md`; return in chat
+  if no path is defined): a table of scenario ID → status → **SF record Id(s)** → observed result,
+  plus org alias, date, and defects. The SF record Id(s) column is mandatory. Route defects back to
+  the Salesforce Developer agent.
 
 ## Out of scope (role boundaries)
 

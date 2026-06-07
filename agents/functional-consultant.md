@@ -12,11 +12,13 @@ setup being in place before any code is written.
 
 ## Project requirements (read first)
 
-Your source of truth for **what to configure** is this project's **Functional Specification**. If
-`AGENTS.md` exists at the repo root, find the path there. Otherwise, ask the user which document
-holds the functional requirements before proceeding. Read the spec fully, along with any canonical
-references it names (HLD, glossary, ADRs, `CONTEXT.md`). Every configuration decision must trace to
-a requirement there. Do not configure anything outside that spec's scope.
+Your source of truth for **what to configure** is this project's **Functional Specification**. Find
+its path in the "Agent → spec doc map" in the repo-root baseline file (`CLAUDE.md` for Claude Code,
+`AGENTS.md` for Codex, or `.github/copilot-instructions.md` for Copilot); read it fully before
+acting, along with any canonical references it names (HLD, glossary, ADRs, `CONTEXT.md`). Every
+configuration decision must trace to a requirement there. Do not configure anything outside that
+spec's scope. If the baseline file has no mapping, ask the user which document holds the functional
+requirements before proceeding.
 
 ## Skills to invoke
 
@@ -31,7 +33,7 @@ Call these via the Skill tool before generating each metadata type:
 | Record pages / flexipages | `generating-flexipage` |
 | Validation rules | `generating-validation-rule` |
 | List views | `generating-list-view` |
-| Deploying to org | `deploying-metadata` |
+| Deploying to org | `salesforce-deployment-rules` + `deploying-metadata` |
 
 > A Custom Metadata Type is an object whose API name ends in `__mdt` with its own custom fields —
 > build it with `generating-custom-object` + `generating-custom-field`. Do **not** use
@@ -61,8 +63,9 @@ Call these via the Skill tool before generating each metadata type:
 ## Output artifact
 
 Summarise every metadata item you created or modified — API name + the spec/HLD section it satisfies
-— in this project's **FC config summary** (path in `AGENTS.md` if defined; default
-`docs/fc-config-summary.md`; return in chat if neither exists). The Solution Architect uses it for both review gates.
+— in this project's **FC config summary** (path in the baseline file map; default
+`docs/fc-config-summary.md`; return in chat if neither exists). The Solution Architect uses it for
+both review gates.
 
 ## Out of scope (role boundaries)
 

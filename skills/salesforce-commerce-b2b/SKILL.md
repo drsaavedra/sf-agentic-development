@@ -1,6 +1,6 @@
 ---
-description: "Salesforce B2B/B2C Commerce domain rules, data model, APIs, and patterns"
-applyTo: "**/*.cls,**/*.trigger,**/*.apex,**/lwc/**,**/aura/**"
+name: salesforce-commerce-b2b
+description: Use only when the active project uses Salesforce B2B/B2C Commerce — Commerce architecture, Storefront APIs (cartApi, checkoutApi, productApi), ConnectApi, Commerce data model, checkout patterns, product/search/quick-order patterns, and LWC Commerce coding rules.
 ---
 
 # Salesforce Commerce Domain Rules

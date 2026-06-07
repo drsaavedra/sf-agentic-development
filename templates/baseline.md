@@ -1,18 +1,26 @@
+# Salesforce Project — Baseline Template
+
 <!--
-  SALESFORCE PROJECT TEMPLATE — Claude Code baseline
-  Rendered from: templates/baseline.md
-  Companion files (same Priority content, assistant-specific syntax):
-    AGENTS.md                        (Codex)
-    .github/copilot-instructions.md  (GitHub Copilot)
-  Canonical skills:  skills/*/SKILL.md   (installed into .claude/skills/ at setup)
-  Canonical agents:  agents/*.md         (installed into .claude/agents/ at setup)
+  This is the single-source template for all three assistant baseline files.
+  Edit this file, then re-render the three outputs:
+
+    CLAUDE.md                           (Claude Code)
+    AGENTS.md                           (Codex / OpenAI Codex CLI)
+    .github/copilot-instructions.md     (GitHub Copilot — VS Code, GitHub.com)
+
+  Substitution tokens:
+    {{ASSISTANT_NAME}}   → "Claude Code" | "GitHub Copilot" | "Codex"
+    {{ROOT_FILE}}        → "CLAUDE.md" | ".github/copilot-instructions.md" | "AGENTS.md"
+    {{SKILL_INVOKE}}     → "invoke the `X` skill" | "use `/skill X`" | "invoke the `X` skill"
+    {{SKILLS_DIR}}       → ".claude/skills" | ".github/skills" | ".agents/skills"
+    {{SKILL_INSTALL}}    → "npx skills add" (same for all three)
+
+  When rendering:
+  - Replace all tokens for the target assistant.
+  - Remove this comment block.
+  - Add the assistant-specific header comment (see each rendered file for format).
+  - Keep all Priority sections and the Agent map in sync across all three renders.
 -->
-
-# Salesforce Project — Claude Baseline
-
-Instructions for Claude Code working on Salesforce, Apex, LWC, Experience Cloud, Salesforce B2B/B2C
-Commerce, Salesforce metadata, and Salesforce CLI projects. Follow these rules unless the user
-explicitly overrides them.
 
 ---
 
@@ -57,9 +65,9 @@ the active context.
 | Reviewing Apex or LWC for quality / anti-patterns | `salesforce-code-quality` |
 
 Skills whose names begin with `salesforce-` are **authored skills** in `skills/` in this repo
-(installed into `.claude/skills/` at setup — see `SETUP.md`).
+(installed into `{{SKILLS_DIR}}` at setup time).
 All other skills are from `forcedotcom/sf-skills`
-(install: `npx skills add forcedotcom/sf-skills`).
+(install: `{{SKILL_INSTALL}} forcedotcom/sf-skills`).
 
 ---
 
