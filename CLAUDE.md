@@ -35,11 +35,12 @@ the active context.
 
 | Context | Skill(s) to invoke first |
 |---|---|
-| Writing / reviewing Apex classes, triggers, services | `generating-apex` · `salesforce-code-quality` |
-| Writing Apex test classes | `generating-apex-test` · `salesforce-code-quality` |
+| Writing / reviewing Apex classes, triggers, services | `generating-apex` · `salesforce-apex-quality` |
+| Writing Apex test classes | `generating-apex-test` · `salesforce-apex-quality` |
 | Running Apex tests / coverage | `running-apex-tests` |
 | Debugging Apex logs | `debugging-apex-logs` |
-| Creating / editing LWC components | `generating-lwc-components` · `salesforce-code-quality` |
+| Creating / editing LWC components | `generating-lwc-components` · `salesforce-lwc-quality` |
+| LWC component with Apex controller | `salesforce-lwc-quality` · `salesforce-apex-quality` |
 | Creating custom objects | `generating-custom-object` |
 | Creating custom fields | `generating-custom-field` |
 | Creating permission sets | `generating-permission-set` |
@@ -50,11 +51,14 @@ the active context.
 | Querying org data (SOQL) | `querying-soql` |
 | Handling org data (import/export) | `handling-sf-data` |
 | Named Credentials / External Services / callouts | `building-sf-integrations` |
-| Creating / reviewing Flows | `generating-flow` · `salesforce-code-quality` |
+| Creating / reviewing Flows | `generating-flow` · `salesforce-flow-quality` |
+| Flow with Apex invocable actions | `salesforce-flow-quality` · `salesforce-apex-quality` |
 | Running code analysis (PMD/CodeAnalyzer) | `running-code-analyzer` |
 | Building a complete Lightning app | `generating-lightning-app` |
 | B2B/B2C Commerce work (any file type) | `salesforce-commerce-domain-rules` |
-| Reviewing Apex or LWC for quality / anti-patterns | `salesforce-code-quality` |
+| Reviewing Apex for quality / anti-patterns | `salesforce-apex-quality` |
+| Reviewing LWC for quality / anti-patterns | `salesforce-lwc-quality` |
+| Reviewing Flows for quality / anti-patterns | `salesforce-flow-quality` |
 
 Skills whose names begin with `salesforce-` are **authored skills** in `skills/` in this repo
 (installed into `.claude/skills/` at setup — see `SETUP.md`).
