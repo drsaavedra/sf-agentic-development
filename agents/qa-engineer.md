@@ -26,16 +26,19 @@ the user which document holds the QA requirements before proceeding.
 
 ## Skills to invoke
 
+QA output is markdown test specs, not production Apex/LWC/Flow — authored quality-gate skills
+do not apply here. All skills below are from `forcedotcom/sf-skills`.
+
 **Scenario authoring (reference-only — you write a markdown spec, not Apex):**
 
-| Task | Skill |
+| Task | Baseline (`forcedotcom/sf-skills`) |
 |---|---|
 | Apex test structure / assertion patterns (reference) | `generating-apex-test` |
 | How tests run / coverage is measured (reference) | `running-apex-tests` |
 
 **Live org validation (these you DO run):**
 
-| Task | Skill |
+| Task | Baseline (`forcedotcom/sf-skills`) |
 |---|---|
 | Create/update/delete real records; generate data | `handling-sf-data` |
 | Query and verify outcomes | `querying-soql` |

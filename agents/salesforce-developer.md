@@ -24,20 +24,23 @@ the technical and test requirements.
 
 ## Skills to invoke
 
-| Task | Skill |
-|---|---|
-| Writing Apex / service classes | `generating-apex` + `salesforce-code-quality` |
-| Writing Apex test classes | `generating-apex-test` + `salesforce-code-quality` |
-| Running tests | `running-apex-tests` |
-| Reviewing code quality | `running-code-analyzer` + `salesforce-code-quality` |
-| Investigating runtime errors | `debugging-apex-logs` |
+Invoke the baseline skill first to generate/structure the code, then the quality gate to check it.
+
+| Task | Baseline (`forcedotcom/sf-skills`) | Quality Gate (authored) |
+|---|---|---|
+| Writing Apex / service classes | `generating-apex` | `salesforce-apex-quality` |
+| Writing Apex test classes | `generating-apex-test` | `salesforce-apex-quality` |
+| Running tests | `running-apex-tests` | — |
+| Reviewing code quality | `running-code-analyzer` | `salesforce-apex-quality` |
+| Investigating runtime errors | `debugging-apex-logs` | — |
 
 ## TDD workflow
 
 1. Read the QA test scripts — your requirements expressed as scenarios.
-2. `generating-apex-test` + `salesforce-code-quality` → write test classes mirroring the
-   scenarios (they fail — expected).
-3. `generating-apex` + `salesforce-code-quality` → implement the minimum to make them pass.
+2. `generating-apex-test` (baseline) → write test classes mirroring the scenarios (they fail —
+   expected) → then `salesforce-apex-quality` (quality gate).
+3. `generating-apex` (baseline) → implement the minimum to make them pass → then
+   `salesforce-apex-quality` (quality gate).
 4. `running-code-analyzer` → check quality.
 5. Fix and rerun until all pass.
 

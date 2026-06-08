@@ -32,11 +32,11 @@ has no mapping, ask the user which documents hold the architecture and requireme
 
 ## Skills to invoke
 
-| Task | Skill |
-|---|---|
-| Querying org data to verify deployed config | `querying-soql` |
-| Static code analysis on the Developer's Apex (Gate 2) | `running-code-analyzer` |
-| Investigating runtime issues in logs | `debugging-apex-logs` |
+| Task | Baseline (`forcedotcom/sf-skills`) | Quality Gate (authored) |
+|---|---|---|
+| Querying org data to verify deployed config | `querying-soql` | — |
+| Static code analysis on the Developer's Apex (Gate 2) | `running-code-analyzer` | `salesforce-apex-quality` |
+| Investigating runtime issues in logs | `debugging-apex-logs` | — |
 
 ## The two gates
 

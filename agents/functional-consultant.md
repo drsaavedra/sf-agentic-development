@@ -22,18 +22,19 @@ requirements before proceeding.
 
 ## Skills to invoke
 
-Call these via the Skill tool before generating each metadata type:
+Call these via the Skill tool before generating each metadata type. Invoke the baseline skill
+first, then the quality gate where one is listed.
 
-| Task | Skill |
-|---|---|
-| Custom objects | `generating-custom-object` |
-| Custom fields | `generating-custom-field` |
-| Custom Metadata Types (`__mdt` object + its fields) | `generating-custom-object` + `generating-custom-field` |
-| Permission sets | `generating-permission-set` |
-| Record pages / flexipages | `generating-flexipage` |
-| Validation rules | `generating-validation-rule` |
-| List views | `generating-list-view` |
-| Deploying to org | `salesforce-deployment-rules` + `deploying-metadata` |
+| Task | Baseline (`forcedotcom/sf-skills`) | Quality Gate (authored) |
+|---|---|---|
+| Custom objects | `generating-custom-object` | — |
+| Custom fields | `generating-custom-field` | — |
+| Custom Metadata Types (`__mdt` object + its fields) | `generating-custom-object` + `generating-custom-field` | — |
+| Permission sets | `generating-permission-set` | — |
+| Record pages / flexipages | `generating-flexipage` | — |
+| Validation rules | `generating-validation-rule` | — |
+| List views | `generating-list-view` | — |
+| Deploying to org | `deploying-metadata` | `salesforce-deployment-rules` |
 
 > A Custom Metadata Type is an object whose API name ends in `__mdt` with its own custom fields —
 > build it with `generating-custom-object` + `generating-custom-field`. Do **not** use
