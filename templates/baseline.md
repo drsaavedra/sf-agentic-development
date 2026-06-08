@@ -43,11 +43,12 @@ the active context.
 
 | Context | Skill(s) to invoke first |
 |---|---|
-| Writing / reviewing Apex classes, triggers, services | `generating-apex` · `salesforce-code-quality` |
-| Writing Apex test classes | `generating-apex-test` · `salesforce-code-quality` |
+| Writing / reviewing Apex classes, triggers, services | `generating-apex` · `salesforce-apex-quality` |
+| Writing Apex test classes | `generating-apex-test` · `salesforce-apex-quality` |
 | Running Apex tests / coverage | `running-apex-tests` |
 | Debugging Apex logs | `debugging-apex-logs` |
-| Creating / editing LWC components | `generating-lwc-components` · `salesforce-code-quality` |
+| Creating / editing LWC components | `generating-lwc-components` · `salesforce-lwc-quality` |
+| LWC component with Apex controller | `salesforce-lwc-quality` · `salesforce-apex-quality` |
 | Creating custom objects | `generating-custom-object` |
 | Creating custom fields | `generating-custom-field` |
 | Creating permission sets | `generating-permission-set` |
@@ -58,11 +59,14 @@ the active context.
 | Querying org data (SOQL) | `querying-soql` |
 | Handling org data (import/export) | `handling-sf-data` |
 | Named Credentials / External Services / callouts | `building-sf-integrations` |
-| Creating / reviewing Flows | `generating-flow` · `salesforce-code-quality` |
+| Creating / reviewing Flows | `generating-flow` · `salesforce-flow-quality` |
+| Flow with Apex invocable actions | `salesforce-flow-quality` · `salesforce-apex-quality` |
 | Running code analysis (PMD/CodeAnalyzer) | `running-code-analyzer` |
 | Building a complete Lightning app | `generating-lightning-app` |
-| B2B/B2C Commerce work (any file type) | `salesforce-commerce-domain-rules` |
-| Reviewing Apex or LWC for quality / anti-patterns | `salesforce-code-quality` |
+| B2B/B2C Commerce work (any file type) | `salesforce-commerce-b2b` |
+| Reviewing Apex for quality / anti-patterns | `salesforce-apex-quality` |
+| Reviewing LWC for quality / anti-patterns | `salesforce-lwc-quality` |
+| Reviewing Flows for quality / anti-patterns | `salesforce-flow-quality` |
 
 Skills whose names begin with `salesforce-` are **authored skills** in `skills/` in this repo
 (installed into `{{SKILLS_DIR}}` at setup time).
@@ -136,7 +140,7 @@ before applying any rule.
 
 > **Per-project setup:** Fill in the paths in the table below when you deploy this template to a
 > real project repo. The four agents (`functional-consultant`, `qa-engineer`,
-> `salesforce-developer`, `solution-architect`) read this map to locate the specification and
+> `salesforce-developer`, `architect`) read this map to locate the specification and
 > summary documents they depend on. If a path is not set here, each agent will ask the user which
 > document to use before proceeding.
 
@@ -145,9 +149,9 @@ before applying any rule.
 | functional-consultant | Functional Specification (input) | *(set per project)* |
 | qa-engineer | QA Specification (input) | *(set per project)* |
 | salesforce-developer | Technical Specification (input) | *(set per project)* |
-| solution-architect | Solution Architecture doc (input) | *(set per project)* |
+| architect | Solution Architecture doc (input) | *(set per project)* |
 | functional-consultant | FC config summary (output) | `docs/fc-config-summary.md` |
 | qa-engineer | QA test scripts (output / Dev TDD input) | `docs/qa-test-scripts.md` |
 | qa-engineer | QA live test results (output) | `docs/qa-live-test-results.md` |
 | salesforce-developer | Build summary (output) | `docs/dev-build-summary.md` |
-| solution-architect | SA review report (output) | `docs/sa-review-report.md` |
+| architect | SA review report (output) | `docs/sa-review-report.md` |
