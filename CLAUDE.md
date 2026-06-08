@@ -55,7 +55,7 @@ the active context.
 | Flow with Apex invocable actions | `salesforce-flow-quality` · `salesforce-apex-quality` |
 | Running code analysis (PMD/CodeAnalyzer) | `running-code-analyzer` |
 | Building a complete Lightning app | `generating-lightning-app` |
-| B2B/B2C Commerce work (any file type) | `salesforce-commerce-domain-rules` |
+| B2B/B2C Commerce work (any file type) | `salesforce-commerce-b2b` |
 | Reviewing Apex for quality / anti-patterns | `salesforce-apex-quality` |
 | Reviewing LWC for quality / anti-patterns | `salesforce-lwc-quality` |
 | Reviewing Flows for quality / anti-patterns | `salesforce-flow-quality` |
@@ -132,7 +132,7 @@ before applying any rule.
 
 > **Per-project setup:** Fill in the paths in the table below when you deploy this template to a
 > real project repo. The four agents (`functional-consultant`, `qa-engineer`,
-> `salesforce-developer`, `solution-architect`) read this map to locate the specification and
+> `salesforce-developer`, `architect`) read this map to locate the specification and
 > summary documents they depend on. If a path is not set here, each agent will ask the user which
 > document to use before proceeding.
 
@@ -141,9 +141,9 @@ before applying any rule.
 | functional-consultant | Functional Specification (input) | *(set per project)* |
 | qa-engineer | QA Specification (input) | *(set per project)* |
 | salesforce-developer | Technical Specification (input) | *(set per project)* |
-| solution-architect | Solution Architecture doc (input) | *(set per project)* |
+| architect | Solution Architecture doc (input) | *(set per project)* |
 | functional-consultant | FC config summary (output) | `docs/fc-config-summary.md` |
 | qa-engineer | QA test scripts (output / Dev TDD input) | `docs/qa-test-scripts.md` |
 | qa-engineer | QA live test results (output) | `docs/qa-live-test-results.md` |
 | salesforce-developer | Build summary (output) | `docs/dev-build-summary.md` |
-| solution-architect | SA review report (output) | `docs/sa-review-report.md` |
+| architect | SA review report (output) | `docs/sa-review-report.md` |

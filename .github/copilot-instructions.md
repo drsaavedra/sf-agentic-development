@@ -1,16 +1,16 @@
 <!--
-  SALESFORCE PROJECT TEMPLATE — Codex baseline
+  SALESFORCE PROJECT TEMPLATE — GitHub Copilot baseline
   Rendered from: templates/baseline.md
   Companion files (same Priority content, assistant-specific syntax):
     CLAUDE.md                        (Claude Code)
-    .github/copilot-instructions.md  (GitHub Copilot)
-  Canonical skills:  skills/*/SKILL.md   (installed into .agents/skills/ at setup)
-  Canonical agents:  agents/*.md         (installed into .agents/agents/ at setup)
+    AGENTS.md                        (Codex)
+  Canonical skills:  skills/*/SKILL.md   (installed into .github/skills/ at setup)
+  Canonical agents:  agents/*.md         (installed into .github/agents/ at setup)
 -->
 
-# Salesforce Project — Codex Baseline
+# Salesforce Project — GitHub Copilot Baseline
 
-Instructions for Codex working on Salesforce, Apex, LWC, Experience Cloud, Salesforce B2B/B2C
+Instructions for GitHub Copilot working on Salesforce, Apex, LWC, Experience Cloud, Salesforce B2B/B2C
 Commerce, Salesforce metadata, and Salesforce CLI projects. Follow these rules unless the user
 explicitly overrides them.
 
@@ -18,7 +18,7 @@ explicitly overrides them.
 
 ## Priority 1: Behavioral Guidelines
 
-Before responding, invoke the `karpathy-guidelines` skill to load the latest behavioral rules.
+Before responding, use `/skill karpathy-guidelines` to load the latest behavioral rules.
 
 > Install the plugin if not already active:
 > ```
@@ -30,38 +30,38 @@ Before responding, invoke the `karpathy-guidelines` skill to load the latest beh
 
 ## Priority 2: Skill Routing
 
-Invoke the appropriate skill **before** generating any artifact. Use the skill that best matches
+Use the appropriate skill **before** generating any artifact. Use the skill that best matches
 the active context.
 
 | Context | Skill(s) to invoke first |
 |---|---|
-| Writing / reviewing Apex classes, triggers, services | `generating-apex` · `salesforce-apex-quality` |
-| Writing Apex test classes | `generating-apex-test` · `salesforce-apex-quality` |
-| Running Apex tests / coverage | `running-apex-tests` |
-| Debugging Apex logs | `debugging-apex-logs` |
-| Creating / editing LWC components | `generating-lwc-components` · `salesforce-lwc-quality` |
-| LWC component with Apex controller | `salesforce-lwc-quality` · `salesforce-apex-quality` |
-| Creating custom objects | `generating-custom-object` |
-| Creating custom fields | `generating-custom-field` |
-| Creating permission sets | `generating-permission-set` |
-| Creating Lightning pages (FlexiPages) | `generating-flexipage` |
-| Creating validation rules | `generating-validation-rule` |
-| Creating list views | `generating-list-view` |
-| Deploying metadata / CI-CD | `salesforce-deployment-rules` · `deploying-metadata` |
-| Querying org data (SOQL) | `querying-soql` |
-| Handling org data (import/export) | `handling-sf-data` |
-| Named Credentials / External Services / callouts | `building-sf-integrations` |
-| Creating / reviewing Flows | `generating-flow` · `salesforce-flow-quality` |
-| Flow with Apex invocable actions | `salesforce-flow-quality` · `salesforce-apex-quality` |
-| Running code analysis (PMD/CodeAnalyzer) | `running-code-analyzer` |
-| Building a complete Lightning app | `generating-lightning-app` |
-| B2B/B2C Commerce work (any file type) | `salesforce-commerce-b2b` |
-| Reviewing Apex for quality / anti-patterns | `salesforce-apex-quality` |
-| Reviewing LWC for quality / anti-patterns | `salesforce-lwc-quality` |
-| Reviewing Flows for quality / anti-patterns | `salesforce-flow-quality` |
+| Writing / reviewing Apex classes, triggers, services | `/skill generating-apex` · `/skill salesforce-apex-quality` |
+| Writing Apex test classes | `/skill generating-apex-test` · `/skill salesforce-apex-quality` |
+| Running Apex tests / coverage | `/skill running-apex-tests` |
+| Debugging Apex logs | `/skill debugging-apex-logs` |
+| Creating / editing LWC components | `/skill generating-lwc-components` · `/skill salesforce-lwc-quality` |
+| LWC component with Apex controller | `/skill salesforce-lwc-quality` · `/skill salesforce-apex-quality` |
+| Creating custom objects | `/skill generating-custom-object` |
+| Creating custom fields | `/skill generating-custom-field` |
+| Creating permission sets | `/skill generating-permission-set` |
+| Creating Lightning pages (FlexiPages) | `/skill generating-flexipage` |
+| Creating validation rules | `/skill generating-validation-rule` |
+| Creating list views | `/skill generating-list-view` |
+| Deploying metadata / CI-CD | `/skill salesforce-deployment-rules` · `/skill deploying-metadata` |
+| Querying org data (SOQL) | `/skill querying-soql` |
+| Handling org data (import/export) | `/skill handling-sf-data` |
+| Named Credentials / External Services / callouts | `/skill building-sf-integrations` |
+| Creating / reviewing Flows | `/skill generating-flow` · `/skill salesforce-flow-quality` |
+| Flow with Apex invocable actions | `/skill salesforce-flow-quality` · `/skill salesforce-apex-quality` |
+| Running code analysis (PMD/CodeAnalyzer) | `/skill running-code-analyzer` |
+| Building a complete Lightning app | `/skill generating-lightning-app` |
+| B2B/B2C Commerce work (any file type) | `/skill salesforce-commerce-b2b` |
+| Reviewing Apex for quality / anti-patterns | `/skill salesforce-apex-quality` |
+| Reviewing LWC for quality / anti-patterns | `/skill salesforce-lwc-quality` |
+| Reviewing Flows for quality / anti-patterns | `/skill salesforce-flow-quality` |
 
 Skills whose names begin with `salesforce-` are **authored skills** in `skills/` in this repo
-(installed into `.agents/skills/` at setup — see `SETUP.md`).
+(installed into `.github/skills/` at setup — see `SETUP.md`).
 All other skills are from `forcedotcom/sf-skills`
 (install: `npx skills add forcedotcom/sf-skills`).
 
