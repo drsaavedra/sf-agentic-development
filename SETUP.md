@@ -32,7 +32,7 @@ right directory per assistant (see below).
 
 ## Planned Installer (coming soon)
 
-> **Future:** `npx skills-agents add drsaavedra/salesforce-skills-agents`
+> **Future:** `npx skills-agents add drsaavedra/sf-agentic-development`
 >
 > An interactive CLI that will:
 > 1. Show the skill list — pick which ones to install (or install all).
