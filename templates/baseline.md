@@ -34,6 +34,10 @@ Before responding, invoke the `karpathy-guidelines` skill to load the latest beh
 > /plugin install andrej-karpathy-skills@karpathy-skills
 > ```
 
+**Git safety**
+- Always ask for explicit user confirmation before running `git commit`, `git push`, or any
+  variant (amend, force-push, rebase). Never commit or push autonomously.
+
 ---
 
 ## Priority 2: Skill Routing
@@ -79,21 +83,7 @@ All other skills are from `forcedotcom/sf-skills`
 
 These rules apply to every request, whether or not a skill fires.
 
-**Apex and LWC identity**
-- Treat Apex as Apex, not Java. Do not assume Java libraries, Java collection behaviour, or Java
-  language features exist in Apex.
-- Treat Lightning Web Components as Salesforce LWC running in Lightning Web Security and Experience
-  Cloud/LWR, not plain browser JavaScript.
-
-**Bulk safety**
-- Bulkify all Apex. Never place SOQL, DML, or callouts inside loops.
-- Always assume `Trigger.new` holds 200 records. Collect IDs/fields before any query or DML, then
-  issue one query/DML operation outside the loop.
-
-**Security**
-- Default every Apex class to `with sharing`. Document and isolate any `without sharing` in a
-  dedicated helper gated behind a Custom Permission check.
-- Enforce CRUD and FLS: `WITH USER_MODE` in SOQL, `AccessLevel.USER_MODE` in `Database` DML (API 56+).
+**Secrets and hardcoding**
 - Never hardcode Record IDs, Record Type IDs, or Profile IDs. Resolve dynamically via
   `Schema.describe` or source from Custom Metadata / Custom Labels.
 - Never hardcode secrets, credentials, session IDs, or tokens. Use Named Credentials or protected
@@ -112,13 +102,6 @@ These rules apply to every request, whether or not a skill fires.
   approval.
 - Do not include secrets, session IDs, cookies, access tokens, org credentials, or real customer
   data in code, tests, logs, or generated files.
-
-**Documentation and parsing**
-- Before starting development or deployment, retrieve the latest stable Salesforce documentation
-  from an up-to-date source (the `fetching-salesforce-docs` skill, or a docs MCP such as Context7)
-  when the behaviour, API, CLI command, metadata format, limits, or best practice could have changed.
-- When parsing files, prefer (1) a model API, then (2) a skill or plugin. Fall back to ad-hoc shell
-  string manipulation only as a last resort.
 
 ---
 
