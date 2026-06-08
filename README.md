@@ -17,7 +17,7 @@ This repo evolves continuously: new Salesforce releases, better agentic patterns
 | `salesforce-apex-quality` | Governor limits, trigger design, security, architecture, async, error handling, testing |
 | `salesforce-lwc-quality` | Component architecture, data sourcing, directives, async/events, performance, Jest |
 | `salesforce-flow-quality` | Fault handling, DML-in-loop, hardcoded IDs, recursion, complexity, naming |
-| `salesforce-deployment` | Deployment safety rules and CI/CD patterns |
+| `salesforce-deployment-rules` | Deployment safety rules and CI/CD patterns |
 | `salesforce-commerce-b2b` | B2B Commerce domain rules |
 
 ### Agents
@@ -25,7 +25,7 @@ This repo evolves continuously: new Salesforce releases, better agentic patterns
 | Agent | Role |
 |---|---|
 | `functional-consultant` | Translates requirements into a configuration summary |
-| `solution-architect` | Reviews architecture and produces a design report |
+| `architect` | Reviews architecture and produces a design report |
 | `salesforce-developer` | Builds from a technical spec; produces a build summary |
 | `qa-engineer` | Writes and runs test scripts; produces live test results |
 
@@ -105,7 +105,7 @@ The baseline routes to the right skill automatically based on context. Cross-dom
 | Flows | `generating-flow` · `salesforce-flow-quality` |
 | Flow + Apex invocable | `salesforce-flow-quality` · `salesforce-apex-quality` |
 | Deployment / CI-CD | `salesforce-deployment-rules` · `deploying-metadata` |
-| B2B/B2C Commerce | `salesforce-commerce-domain-rules` |
+| B2B/B2C Commerce | `salesforce-commerce-b2b` |
 
 ---
 
