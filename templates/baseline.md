@@ -66,7 +66,7 @@ the active context.
 | Creating Lightning pages (FlexiPages) | `generating-flexipage` |
 | Creating validation rules | `generating-validation-rule` |
 | Creating list views | `generating-list-view` |
-| Deploying metadata / CI-CD | `salesforce-deployment-rules` · `deploying-metadata` |
+| Deploying metadata, generating a `package.xml` / manifest, building a git delta (sgd) from a commit or range, CI/CD | `salesforce-deployment` · `deploying-metadata` |
 | Querying org data (SOQL) | `querying-soql` |
 | Handling org data (import/export) | `handling-sf-data` |
 | Named Credentials / External Services / callouts | `building-sf-integrations` |

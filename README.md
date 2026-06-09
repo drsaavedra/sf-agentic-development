@@ -17,7 +17,7 @@ This repo evolves continuously: new Salesforce releases, better agentic patterns
 | `salesforce-apex-quality` | Governor limits, trigger design, security, architecture, async, error handling, testing |
 | `salesforce-lwc-quality` | Component architecture, data sourcing, directives, async/events, performance, Jest |
 | `salesforce-flow-quality` | Fault handling, DML-in-loop, hardcoded IDs, recursion, complexity, naming |
-| `salesforce-deployment-rules` | Deployment safety rules and CI/CD patterns |
+| `salesforce-deployment` | Deployment safety rules, `package.xml` / git-delta generation, and CI/CD patterns |
 | `salesforce-commerce-b2b` | B2B Commerce domain rules |
 
 ### Agents
@@ -102,7 +102,7 @@ The baseline routes to the right skill automatically based on context. Cross-dom
 | LWC + Apex controller | `salesforce-lwc-quality` · `salesforce-apex-quality` |
 | Flows | `generating-flow` · `salesforce-flow-quality` |
 | Flow + Apex invocable | `salesforce-flow-quality` · `salesforce-apex-quality` |
-| Deployment / CI-CD | `salesforce-deployment-rules` · `deploying-metadata` |
+| Deployment / package.xml / CI-CD | `salesforce-deployment` · `deploying-metadata` |
 | B2B/B2C Commerce | `salesforce-commerce-b2b` |
 
 ---
