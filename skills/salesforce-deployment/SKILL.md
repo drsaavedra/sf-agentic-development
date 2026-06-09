@@ -1,5 +1,5 @@
 ---
-name: salesforce-deployment-rules
+name: salesforce-deployment
 description: Use when deploying Salesforce metadata or generating package.xml — deployment safety rules and deployment commands.
 ---
 
