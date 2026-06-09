@@ -2,7 +2,9 @@
 
 A developer productivity toolkit for **Claude Code**, **GitHub Copilot**, and **Codex** — skills and agents that keep you in the driver's seat while AI handles the heavy lifting.
 
-The skills encode hard-won Salesforce quality rules (bulk safety, security, architecture patterns, anti-patterns) that fire automatically based on what you're building. The agents provide on-demand specialisation: the main agent handles config planning and QA reasoning inline (it already has your conversation context); the `salesforce-developer` agent takes on focused Apex work; the `architect` agent gives you an independent technical review when you want one.
+The skills encode hard-won Salesforce quality rules (bulk safety, security, architecture patterns, anti-patterns) that fire automatically based on what you're building. The agents provide on-demand specialisation: the main agent handles config planning and QA reasoning inline (it already has your conversation context); the `salesforce-developer` agent runs Apex work in an isolated context (parallelizable across several at once), drawing its quality rules from the skills rather than baked-in conventions; the `architect` agent gives you an independent technical review when you want one.
+
+Agents are deliberately thin — the domain knowledge lives in the skills, which every agent shares. Project-specific constraints (e.g. additive-only, or reusing an existing logging framework) are passed in the work brief, not hardcoded into the agents.
 
 This repo evolves continuously: new Salesforce releases, better agentic patterns, and improved practices get folded in over time.
 
@@ -24,8 +26,8 @@ This repo evolves continuously: new Salesforce releases, better agentic patterns
 
 | Agent | Role |
 |---|---|
-| `salesforce-developer` | Receives a brief from the main agent; builds Apex following TDD; produces a build summary |
-| `architect` | On-demand independent review — pre-implementation, post-implementation, or both; produces a gap-analysis report |
+| `salesforce-developer` | Receives a brief from the main agent; builds Apex following TDD in an isolated, parallelizable context; quality rules and project constraints come from the skills and brief; produces a build summary |
+| `architect` | On-demand independent review — pre-implementation, post-implementation, or both; flags project-specific constraint violations (e.g. additive-only) only when the spec/brief/ADRs impose them; produces a gap-analysis report |
 
 ### Baselines
 

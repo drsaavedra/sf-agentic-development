@@ -60,9 +60,12 @@ something that hasn't been built yet.
   normalisation order, brand resolution, idempotency, defaults, bulk-safety, logging, coverage
   targets).
 - **Scope guard** — flag as out of scope any work that touches systems/objects the project excludes,
-  modifies read-only/seeded data, adds fields/objects not in the spec, or refactors unrelated
-  pre-existing automation (additive-only violation). Settled project deviations recorded in the ADRs
-  are **not** violations — do not re-litigate them.
+  modifies read-only/seeded data, or adds fields/objects not in the spec. Where the brief, spec, or
+  ADRs impose a project-specific constraint — e.g. additive-only ("extend in place, don't break
+  existing features"), or "reuse the existing logging/utility framework" — flag work that violates
+  it, citing the requirement. Do **not** treat such constraints as defaults: if no spec/brief/ADR
+  imposes them, a refactor of pre-existing automation is not by itself a violation. Settled project
+  deviations recorded in the ADRs are **not** violations — do not re-litigate them.
 
 ## Output artifact
 
