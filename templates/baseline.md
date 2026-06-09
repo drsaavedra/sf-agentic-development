@@ -35,8 +35,9 @@ Before responding, invoke the `karpathy-guidelines` skill to load the latest beh
 > ```
 
 **Git safety**
-- Always ask for explicit user confirmation before running `git commit`, `git push`, or any
-  variant (amend, force-push, rebase). Never commit or push autonomously.
+- Never run `git commit`, `git push`, or any variant (amend, force-push, rebase, tag push)
+  unless the user has explicitly asked for it in the current message. Do not infer intent from
+  context or plan approval — wait for an explicit instruction each time.
 
 ---
 
@@ -103,6 +104,13 @@ These rules apply to every request, whether or not a skill fires.
 - Do not include secrets, session IDs, cookies, access tokens, org credentials, or real customer
   data in code, tests, logs, or generated files.
 
+**Salesforce deployment commands**
+- Before running any `sf project deploy` or `sf project validate` command, display the full
+  command and wait for explicit user confirmation.
+- After submitting a deploy or validate job, return the job ID only — do not poll for status.
+  The user monitors progress in the org. Only poll when the user explicitly requests it (e.g.,
+  "wait for completion", "monitor the deploy", or for a CI/CD or automation workflow).
+
 ---
 
 ## Priority 4: Project Conventions
@@ -122,19 +130,13 @@ before applying any rule.
 ## Priority 5: Agent → Spec Doc Map
 
 > **Per-project setup:** Fill in the paths in the table below when you deploy this template to a
-> real project repo. The four agents (`functional-consultant`, `qa-engineer`,
-> `salesforce-developer`, `architect`) read this map to locate the specification and
-> summary documents they depend on. If a path is not set here, each agent will ask the user which
-> document to use before proceeding.
+> real project repo. Config planning and QA scenario authoring are handled inline by the main
+> agent — only the `salesforce-developer` and `architect` agents read this map. If a path is not
+> set here, each agent will ask the user which document to use before proceeding.
 
 | Agent | Document | Path (fill in per project) |
 |---|---|---|
-| functional-consultant | Functional Specification (input) | *(set per project)* |
-| qa-engineer | QA Specification (input) | *(set per project)* |
 | salesforce-developer | Technical Specification (input) | *(set per project)* |
 | architect | Solution Architecture doc (input) | *(set per project)* |
-| functional-consultant | FC config summary (output) | `docs/fc-config-summary.md` |
-| qa-engineer | QA test scripts (output / Dev TDD input) | `docs/qa-test-scripts.md` |
-| qa-engineer | QA live test results (output) | `docs/qa-live-test-results.md` |
 | salesforce-developer | Build summary (output) | `docs/dev-build-summary.md` |
 | architect | SA review report (output) | `docs/sa-review-report.md` |

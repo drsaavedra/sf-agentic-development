@@ -1,8 +1,8 @@
 # sf-agentic-development
 
-A living toolkit of Salesforce skills and agents for **Claude Code**, **GitHub Copilot**, and **Codex** — built around the idea that one person, paired with the right AI setup, can operate as a full Salesforce consulting team.
+A developer productivity toolkit for **Claude Code**, **GitHub Copilot**, and **Codex** — skills and agents that keep you in the driver's seat while AI handles the heavy lifting.
 
-The skills encode hard-won quality rules (bulk safety, security, architecture patterns, anti-patterns). The agents act as team roles — functional consultant, solution architect, developer, QA engineer — each with a defined scope and output. Together they cover the delivery lifecycle from requirements through deployment.
+The skills encode hard-won Salesforce quality rules (bulk safety, security, architecture patterns, anti-patterns) that fire automatically based on what you're building. The agents provide on-demand specialisation: the main agent handles config planning and QA reasoning inline (it already has your conversation context); the `salesforce-developer` agent takes on focused Apex work; the `architect` agent gives you an independent technical review when you want one.
 
 This repo evolves continuously: new Salesforce releases, better agentic patterns, and improved practices get folded in over time.
 
@@ -24,10 +24,8 @@ This repo evolves continuously: new Salesforce releases, better agentic patterns
 
 | Agent | Role |
 |---|---|
-| `functional-consultant` | Translates requirements into a configuration summary |
-| `architect` | Reviews architecture and produces a design report |
-| `salesforce-developer` | Builds from a technical spec; produces a build summary |
-| `qa-engineer` | Writes and runs test scripts; produces live test results |
+| `salesforce-developer` | Receives a brief from the main agent; builds Apex following TDD; produces a build summary |
+| `architect` | On-demand independent review — pre-implementation, post-implementation, or both; produces a gap-analysis report |
 
 ### Baselines
 

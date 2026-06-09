@@ -10,7 +10,7 @@ three assistant targets.
 
 ```
 skills/<name>/SKILL.md      ← 5 authored Salesforce skills (canonical source)
-agents/<name>.md            ← 4 Salesforce agents (canonical source)
+agents/<name>.md            ← 2 Salesforce agents (canonical source)
 templates/baseline.md       ← single-source template for the three root files below
 CLAUDE.md                   ← Claude Code baseline (rendered from template)
 AGENTS.md                   ← Codex baseline (rendered from template)
@@ -36,7 +36,7 @@ right directory per assistant (see below).
 >
 > An interactive CLI that will:
 > 1. Show the skill list — pick which ones to install (or install all).
-> 2. Show the agent list — pick which ones to install (or install all).
+> 2. Show the agent list (`salesforce-developer`, `architect`) — pick which ones to install (or install all).
 > 3. Ask which assistant you use: Claude Code / Copilot / Codex.
 > 4. Copy skills and agents into the correct per-assistant directories.
 > 5. Generate the appropriate root baseline file
@@ -122,7 +122,7 @@ https://superpowers.ai
 
 ## Maintaining This Template
 
-The five skills in `skills/` and four agents in `agents/` are the **only** source of truth.
+The five skills in `skills/` and two agents in `agents/` are the **only** source of truth.
 Do not edit the `.claude/skills/`, `.github/skills/`, or `.agents/skills/` copies directly —
 changes will be lost on the next install. Edit `skills/<name>/SKILL.md` and re-run Step 1.
 
