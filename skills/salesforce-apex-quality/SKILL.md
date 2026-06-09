@@ -1,6 +1,6 @@
 ---
 name: salesforce-apex-quality
-description: Use when reviewing or auditing Apex code after generation, or when the task is explicitly a code review or refactor. Covers governor limits, trigger design, security, architecture, async patterns, error handling, and test quality. If the Apex includes @AuraEnabled methods, also load salesforce-lwc-quality. For writing new Apex, use generating-apex or generating-apex-test instead.
+description: Use when reviewing or auditing Apex code after generation, or when the task is explicitly a code review. Covers governor limits, trigger design, security, architecture, async patterns, error handling, and test quality. If the Apex includes @AuraEnabled methods, also load salesforce-lwc-quality. For writing or refactoring Apex, use generating-apex or generating-apex-test instead.
 ---
 
 # Salesforce Apex Quality

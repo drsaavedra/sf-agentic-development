@@ -43,7 +43,7 @@ the active context.
 
 | Context | Skill(s) to invoke first |
 |---|---|
-| Writing, editing, or fixing Apex classes, triggers, services | `/skill generating-apex` |
+| Writing, editing, refactoring, or fixing Apex classes, triggers, services | `/skill generating-apex` |
 | Writing or editing Apex test classes | `/skill generating-apex-test` |
 | Reviewing Apex classes, triggers, services, or test classes | `/skill salesforce-apex-quality` |
 | Reviewing Apex that includes `@AuraEnabled` methods | `/skill salesforce-apex-quality` · `/skill salesforce-lwc-quality` |
@@ -86,6 +86,14 @@ These rules apply to every request, whether or not a skill fires.
 - Never hardcode secrets, credentials, session IDs, or tokens. Use Named Credentials or protected
   Custom Metadata for all external authentication.
 - Never expose PII or internal error detail in debug logs, error messages, or API responses.
+
+**Bulk and security floor**
+- Bulkify all Apex: never put SOQL, DML, or callouts inside loops; assume `Trigger.new` holds 200
+  records. Collect IDs/fields first, then run one query/DML outside the loop.
+- Default every Apex class to `with sharing`; isolate any `without sharing` in a dedicated helper.
+- Enforce CRUD/FLS: `WITH USER_MODE` in SOQL and `AccessLevel.USER_MODE` in `Database` DML (API 56+).
+- Treat Apex as Apex (not Java) and LWC as Salesforce LWC under Lightning Web Security (not plain
+  browser JavaScript).
 
 **Trigger design**
 - One trigger per SObject (managed-package triggers are the only accepted exception).
