@@ -1,6 +1,6 @@
 ---
 name: salesforce-lwc-quality
-description: Use when creating, editing, or reviewing Lightning Web Components. Covers component architecture, LDS/Apex/GraphQL data sourcing, template directives, async/event patterns, performance, and Jest testing. If the component has an Apex controller, also load salesforce-apex-quality for the Apex-side rules.
+description: Use when reviewing or auditing Lightning Web Components after generation, or when the task is explicitly a code review. Covers component architecture, LDS/Apex/GraphQL data sourcing, template directives, async/event patterns, performance, and Jest testing. If the component has an Apex controller, also load salesforce-apex-quality. For creating or editing LWC, use generating-lwc-components instead.
 ---
 
 # Salesforce LWC Quality

@@ -38,14 +38,20 @@ Before responding, invoke the `karpathy-guidelines` skill to load the latest beh
 Invoke the appropriate skill **before** generating any artifact. Use the skill that best matches
 the active context.
 
+> `generating-*` skills are for authoring — new files and edits including bug fixes.
+> `salesforce-*-quality` skills are for review — invoke them after generation completes or when the task is explicitly a review.
+
 | Context | Skill(s) to invoke first |
 |---|---|
-| Writing / reviewing Apex classes, triggers, services | `generating-apex` · `salesforce-apex-quality` |
-| Writing Apex test classes | `generating-apex-test` · `salesforce-apex-quality` |
+| Writing, editing, or fixing Apex classes, triggers, services | `generating-apex` |
+| Writing or editing Apex test classes | `generating-apex-test` |
+| Reviewing Apex classes, triggers, services, or test classes | `salesforce-apex-quality` |
+| Reviewing Apex that includes `@AuraEnabled` methods | `salesforce-apex-quality` · `salesforce-lwc-quality` |
 | Running Apex tests / coverage | `running-apex-tests` |
 | Debugging Apex logs | `debugging-apex-logs` |
-| Creating / editing LWC components | `generating-lwc-components` · `salesforce-lwc-quality` |
-| LWC component with Apex controller | `salesforce-lwc-quality` · `salesforce-apex-quality` |
+| Creating / editing LWC components | `generating-lwc-components` |
+| Reviewing LWC components | `salesforce-lwc-quality` |
+| Reviewing LWC component backed by an Apex controller | `salesforce-lwc-quality` · `salesforce-apex-quality` |
 | Creating custom objects | `generating-custom-object` |
 | Creating custom fields | `generating-custom-field` |
 | Creating permission sets | `generating-permission-set` |
@@ -56,14 +62,12 @@ the active context.
 | Querying org data (SOQL) | `querying-soql` |
 | Handling org data (import/export) | `handling-sf-data` |
 | Named Credentials / External Services / callouts | `building-sf-integrations` |
-| Creating / reviewing Flows | `generating-flow` · `salesforce-flow-quality` |
-| Flow with Apex invocable actions | `salesforce-flow-quality` · `salesforce-apex-quality` |
+| Creating or editing Flows | `generating-flow` |
+| Reviewing Flows | `salesforce-flow-quality` |
+| Reviewing Flow that calls an Apex invocable action | `salesforce-flow-quality` · `salesforce-apex-quality` |
 | Running code analysis (PMD/CodeAnalyzer) | `running-code-analyzer` |
 | Building a complete Lightning app | `generating-lightning-app` |
 | B2B/B2C Commerce work (any file type) | `salesforce-commerce-b2b` |
-| Reviewing Apex for quality / anti-patterns | `salesforce-apex-quality` |
-| Reviewing LWC for quality / anti-patterns | `salesforce-lwc-quality` |
-| Reviewing Flows for quality / anti-patterns | `salesforce-flow-quality` |
 
 Skills whose names begin with `salesforce-` are **authored skills** in `skills/` in this repo
 (installed into `.claude/skills/` at setup — see `SETUP.md`).

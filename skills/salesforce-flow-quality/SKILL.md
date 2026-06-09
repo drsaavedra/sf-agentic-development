@@ -1,6 +1,6 @@
 ---
 name: salesforce-flow-quality
-description: Use when creating or reviewing Salesforce Flows (record-triggered, screen, autolaunched, or scheduled). Covers fault handling, DML-in-loop prevention, hardcoded ID elimination, recursion guards, complexity limits, and naming conventions. If the Flow invokes Apex actions, also load salesforce-apex-quality.
+description: Use when reviewing or auditing Salesforce Flows after generation, or when the task is explicitly a code review. Covers fault handling, DML-in-loop prevention, hardcoded ID elimination, recursion guards, complexity limits, and naming conventions. If the Flow invokes Apex actions, also load salesforce-apex-quality. For creating new Flows, use generating-flow instead.
 ---
 
 # Salesforce Flow Quality
