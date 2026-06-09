@@ -19,6 +19,6 @@ description: Use when deploying Salesforce metadata or generating package.xml â€
 
 ## Deployment Commands
 
-- Use `sf sgd` to generate `package.xml` from a git delta when the user provides a commit hash or range.
+- Use `sf sgd` (sfdx-git-delta) to generate `package.xml` from a git delta when the user provides a commit hash or range. When only a single ref is given (e.g. "from `<hash>`"), pass it as `--from <hash>` and omit `--to` â€” sfdx-git-delta defaults `--to` to `HEAD`. Only set `--to` explicitly when the user supplies an end ref.
 - Use `sf project deploy validate` when validating; default to `RunLocalTests` unless the user specifies a different test level.
 - Fetch current SF CLI docs when command syntax or behavior may have changed.
