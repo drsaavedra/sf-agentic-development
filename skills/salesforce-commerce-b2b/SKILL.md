@@ -30,8 +30,8 @@ description: "Overlay on the LWC/Apex/Flow skill — load it ALONGSIDE them (nev
 |---|---|
 | Storefront LWC vs Apex choice, ConnectApi patterns, Einstein/tracking, Commerce testing | `references/architecture.md` |
 | Commerce objects, product/pricing/buyer/order data, SKU and address fields, integrations | `references/data-model.md` |
-| Choosing a `commerce/*` Storefront API or `ConnectApi`/`CartExtension` surface | `references/api-usage.md` |
-| Cart, checkout, delivery methods, shipping calculators, addresses | `references/checkout.md` |
+| Choosing a `commerce/*` Storefront API (incl. `actionApi`) or `ConnectApi`/`CartExtension` surface | `references/api-usage.md` |
+| Cart, checkout, delivery methods, shipping calculators, addresses, guest carts, large-cart limits | `references/checkout.md` |
 | Product listing/search, quick order, CSV upload, quantity rules, site publish | `references/product-search.md` |
 | Caching, Apex call budget, permissions, images, third-party scripts, store perf settings, perf testing | `references/performance.md` |
 
