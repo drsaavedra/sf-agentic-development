@@ -150,7 +150,8 @@ https://superpowers.ai
 
 The five skills in `skills/` and two agents in `agents/` are the **only** source of truth.
 Do not edit the `.claude/skills/`, `.github/skills/`, or `.agents/skills/` copies directly —
-changes will be lost on the next install. Edit `skills/<name>/SKILL.md` and re-run Step 1.
+changes will be lost on the next install. Edit the skill folder under `skills/<name>/` (the
+`SKILL.md` and any `references/` files it contains) and re-run Step 1.
 
 The three root files (`CLAUDE.md`, `AGENTS.md`, `.github/copilot-instructions.md`) are all
 rendered from `templates/baseline.md`. If you change the baseline content, update all three
