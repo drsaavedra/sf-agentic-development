@@ -1,6 +1,6 @@
 ---
 name: salesforce-lwc-quality
-description: Use when reviewing or auditing Lightning Web Components after generation, or when the task is explicitly a code review. Covers component architecture, LDS/Apex/GraphQL data sourcing, template directives, async/event patterns, performance, and Jest testing. If the component has an Apex controller, also load salesforce-apex-quality. For creating or editing LWC, use generating-lwc-components instead.
+description: Use when reviewing or auditing Lightning Web Components after generation, or when the task is explicitly a code review. Covers component architecture, LDS/Apex/GraphQL data sourcing, template directives, async/event patterns, performance, and Jest testing. If the component has an Apex controller, also load salesforce-apex-quality. If this project is configured as a Commerce org (baseline Priority 4 Commerce flag set), also load salesforce-commerce-b2b. For creating or editing LWC, use generating-lwc-components instead.
 ---
 
 # Salesforce LWC Quality
@@ -8,6 +8,8 @@ description: Use when reviewing or auditing Lightning Web Components after gener
 Invoke after generating any `lwc/**` or `aura/**` file and when reviewing LWC components. These are the patterns that work in a developer sandbox but fail in Lightning Web Security, Experience Cloud/LWR, or at scale.
 
 **Cross-domain:** If this component has `@AuraEnabled` Apex methods backing it, also load `salesforce-apex-quality`. That skill covers the Apex side of the contract (§5 of `salesforce-apex-quality` covers `@AuraEnabled` rules); this skill covers the LWC consumer side.
+
+**Commerce:** If this project is configured as a Commerce org (baseline Priority 4 Commerce flag set, or the Commerce `UserPromptSubmit` hook installed), also load `salesforce-commerce-b2b` for Commerce architecture and Storefront-API rules. It overlays this skill — it does not replace it. Gated on the project flag, not on `commerce/*` imports or other file signals.
 
 This skill complements `generating-lwc-components` (which covers how to produce a component) by specifying the quality bar it must meet.
 

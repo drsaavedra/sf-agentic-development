@@ -67,7 +67,13 @@ the active context.
 | Reviewing Flow that calls an Apex invocable action | `salesforce-flow-quality` · `salesforce-apex-quality` |
 | Running code analysis (PMD/CodeAnalyzer) | `running-code-analyzer` |
 | Building a complete Lightning app | `generating-lightning-app` |
-| B2B/B2C Commerce work (any file type) | `salesforce-commerce-b2b` |
+| B2B/B2C Commerce work — **only when** the project is configured as a Commerce org: the Priority 4 Commerce flag is set, or the Commerce `UserPromptSubmit` hook is installed. When active it applies to **all** Apex/LWC/Flow work (authoring and review). It is **not** triggered by file content | `salesforce-commerce-b2b` **(overlay — add to the LWC/Apex/Flow skill, never replace it)** |
+
+> **`salesforce-commerce-b2b` is an overlay, not a replacement.** When the Commerce flag (Priority 4)
+> is set, it co-fires *alongside* whichever generating/quality skill already applies (e.g.
+> `generating-lwc-components` + `salesforce-commerce-b2b`, or `salesforce-apex-quality` +
+> `salesforce-commerce-b2b`), adding Commerce domain rules on top — it never substitutes for the base
+> skill.
 
 Skills whose names begin with `salesforce-` are **authored skills** in `skills/` in this repo
 (installed into `.agents/skills/` at setup — see `SETUP.md`).
@@ -128,6 +134,18 @@ before applying any rule.
   invent them.
 - Inspect the existing repository before introducing any new class, helper, naming style, or
   abstraction. Follow established patterns.
+- **Commerce project flag** — this flag is the **trigger** for `salesforce-commerce-b2b`; the skill is
+  gated on project configuration, never on file content. Set it when the repo is a Salesforce B2B/B2C
+  Commerce storefront:
+  - **Set:** state it plainly here, e.g. *"This **is** a Commerce org."* Then load
+    `salesforce-commerce-b2b` on **every** Apex/LWC/Flow task — authoring **and** review — as a mandatory
+    overlay. Setting this flag or installing the hook below are the two valid triggers; for a
+    deterministic per-turn guarantee that does not depend on the agent re-reading this file, also install
+    the `UserPromptSubmit` hook documented in `SETUP.md`.
+  - **Unset (template default):** `salesforce-commerce-b2b` does **not** fire — it is not triggered by
+    file content. Leave unset for non-Commerce orgs. For a mixed CRM+Commerce org, either set the flag
+    and accept the overlay on all Apex/LWC/Flow work, or leave it unset and invoke
+    `salesforce-commerce-b2b` manually on the Commerce pieces.
 
 ---
 

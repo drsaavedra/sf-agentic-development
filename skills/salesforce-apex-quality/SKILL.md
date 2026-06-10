@@ -1,6 +1,6 @@
 ---
 name: salesforce-apex-quality
-description: Use when reviewing or auditing Apex code after generation, or when the task is explicitly a code review. Covers governor limits, trigger design, security, architecture, async patterns, error handling, and test quality. If the Apex includes @AuraEnabled methods, also load salesforce-lwc-quality. For writing or refactoring Apex, use generating-apex or generating-apex-test instead.
+description: Use when reviewing or auditing Apex code after generation, or when the task is explicitly a code review. Covers governor limits, trigger design, security, architecture, async patterns, error handling, and test quality. If the Apex includes @AuraEnabled methods, also load salesforce-lwc-quality. If this project is configured as a Commerce org (baseline Priority 4 Commerce flag set), also load salesforce-commerce-b2b. For writing or refactoring Apex, use generating-apex or generating-apex-test instead.
 ---
 
 # Salesforce Apex Quality
@@ -8,6 +8,8 @@ description: Use when reviewing or auditing Apex code after generation, or when 
 Invoke after generating any `.cls` or `.trigger` file and when reviewing Apex. These are the patterns that compile and pass a single-record test but fail at scale, under a non-admin profile, or after deployment. When in doubt, prefer the GOOD form even for "just a quick" request.
 
 **Cross-domain:** If this class exposes `@AuraEnabled` methods (§5), also load `salesforce-lwc-quality`. This skill covers the Apex side of that contract; `salesforce-lwc-quality` covers the LWC side.
+
+**Commerce:** If this project is configured as a Commerce org (baseline Priority 4 Commerce flag set, or the Commerce `UserPromptSubmit` hook installed), also load `salesforce-commerce-b2b`. It overlays this skill with Commerce data-model and Storefront/ConnectApi rules — it does not replace it. Gated on the project flag, not on `ConnectApi`/`CartExtension` usage or other file signals.
 
 This skill complements `generating-apex` and `generating-apex-test` (which cover how to produce an artifact) by specifying the quality bar those artifacts must meet.
 

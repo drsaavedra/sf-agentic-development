@@ -1,12 +1,16 @@
 ---
 name: salesforce-commerce-b2b
-description: Use only when the active project uses Salesforce B2B/B2C Commerce — Commerce architecture, Storefront APIs (cartApi, checkoutApi, productApi), ConnectApi, Commerce data model, checkout patterns, product/search/quick-order patterns, and LWC Commerce coding rules.
+description: Overlay on the LWC/Apex/Flow skill — load it ALONGSIDE them (never instead of them), gated on project configuration rather than file content. Load this skill only when the project is configured as a Salesforce B2B/B2C Commerce org: the baseline Priority 4 Commerce flag is set, or the Commerce UserPromptSubmit hook is installed. When that gate is met, apply it to all Apex/LWC/Flow work. Covers Commerce architecture, Storefront APIs, ConnectApi, the Commerce data model, checkout, and product/search/quick-order patterns. Do not auto-trigger on commerce/* imports or other code signals — if the flag/hook is not set, skip this skill.
 ---
 
 # Salesforce Commerce Domain Rules
 
-> **Scope:** Apply these rules only when the active project uses Salesforce B2B/B2C Commerce Cloud.
-> If you are working on a non-Commerce Salesforce project, skip this file.
+> **Scope:** This is an **overlay**, not a standalone skill, and it is gated on **project configuration —
+> not file content.** Apply these rules *on top of* the base LWC/Apex/Flow skill only when this project
+> is configured as a Commerce org: the baseline Priority 4 Commerce flag is set, or the Commerce
+> `UserPromptSubmit` hook is installed. When that gate is met, apply the overlay to all Apex/LWC/Flow
+> work. When it is not met, skip this file — do not scan artifacts for `commerce/*` imports or other
+> Commerce signals.
 
 ## Commerce Architecture
 

@@ -1,6 +1,6 @@
 ---
 name: salesforce-flow-quality
-description: Use when reviewing or auditing Salesforce Flows after generation, or when the task is explicitly a code review. Covers fault handling, DML-in-loop prevention, hardcoded ID elimination, recursion guards, complexity limits, and naming conventions. If the Flow invokes Apex actions, also load salesforce-apex-quality. For creating new Flows, use generating-flow instead.
+description: Use when reviewing or auditing Salesforce Flows after generation, or when the task is explicitly a code review. Covers fault handling, DML-in-loop prevention, hardcoded ID elimination, recursion guards, complexity limits, and naming conventions. If the Flow invokes Apex actions, also load salesforce-apex-quality. If this project is configured as a Commerce org (baseline Priority 4 Commerce flag set), also load salesforce-commerce-b2b. For creating new Flows, use generating-flow instead.
 ---
 
 # Salesforce Flow Quality
@@ -8,6 +8,8 @@ description: Use when reviewing or auditing Salesforce Flows after generation, o
 Invoke after generating any `flow-meta.xml` file and when reviewing Flows. These are the patterns that work in a developer sandbox but fail in production with real data volumes, non-admin profiles, or after deployment to a different org.
 
 **Cross-domain:** If this Flow calls an Apex action (`@InvocableMethod`), also load `salesforce-apex-quality` to apply Apex bulk safety, security, and testing rules to that action class.
+
+**Commerce:** If this project is configured as a Commerce org (baseline Priority 4 Commerce flag set, or the Commerce `UserPromptSubmit` hook installed), also load `salesforce-commerce-b2b`. It overlays this skill with Commerce domain rules — it does not replace it. Gated on the project flag, not on Flow content.
 
 This skill complements `generating-flow` (which covers how to build a Flow) by specifying the quality bar it must meet.
 

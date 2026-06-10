@@ -110,6 +110,49 @@ Copy the appropriate root file from this repo into the root of your Salesforce p
 
 Then fill in the **Agent → Spec Doc Map** in Priority 5 with your project's spec document paths.
 
+If this project is a Commerce org, also set the **Commerce project flag** in Priority 4 (see the next
+step for always-on enforcement).
+
+### Step 5a (optional) — Always-on Commerce enforcement (Commerce orgs only)
+
+The Priority 4 **Commerce project flag** makes `salesforce-commerce-b2b` load on every Apex/LWC/Flow
+task — but as a written instruction, it relies on the agent re-reading the baseline. For a **hard,
+per-turn guarantee** that does not depend on that, add a `UserPromptSubmit` hook so the harness injects
+the directive into context on every prompt.
+
+> **Claude Code only.** Hooks live in `settings.json`. Codex and Copilot have no equivalent here, so
+> on those assistants the hardened Priority 4 flag (instruction-based) is the enforcement mechanism.
+
+Add this to your project's `.claude/settings.json` (merge into any existing `hooks` block; or add it
+interactively with the `/hooks` command or the `update-config` skill):
+
+```json
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"[Commerce org] This project is a Salesforce B2B/B2C Commerce storefront. Load the salesforce-commerce-b2b skill for ALL Apex, LWC, and Flow work - authoring and review.\""
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+The hook's stdout is appended to context every turn, so the Commerce directive is always present even
+if the skill never auto-fires. (On Windows `cmd` the message prints with surrounding quotes — harmless;
+the directive text is what matters. Skills are still model-invoked — the hook guarantees the
+*instruction* is present, not the Skill-tool call itself.)
+
+Leave this out for non-Commerce orgs. For a mixed CRM+Commerce org, follow the Priority 4 flag
+guidance: either set the flag (and accept the overlay on all Apex/LWC/Flow work) or leave it unset and
+invoke `salesforce-commerce-b2b` manually on the Commerce pieces. `salesforce-commerce-b2b` is gated on
+the flag/hook — it never auto-triggers on `commerce/*` imports or other file content.
+
 ### Step 6 (optional) — Superpowers
 
 For brainstorming, plan-writing, TDD, debugging, and other workflow skills:
