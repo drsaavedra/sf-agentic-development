@@ -10,7 +10,7 @@
 
 # Salesforce Project — Claude Baseline
 
-Instructions for Claude Code working on Salesforce, Apex, LWC, Experience Cloud, Salesforce B2B/B2C
+Instructions for Claude Code working on Salesforce, Apex, LWC, Experience Cloud, Salesforce B2B
 Commerce, Salesforce metadata, and Salesforce CLI projects. Follow these rules unless the user
 explicitly overrides them.
 
@@ -67,7 +67,7 @@ the active context.
 | Reviewing Flow that calls an Apex invocable action | `salesforce-flow-quality` · `salesforce-apex-quality` |
 | Running code analysis (PMD/CodeAnalyzer) | `running-code-analyzer` |
 | Building a complete Lightning app | `generating-lightning-app` |
-| B2B/B2C Commerce work — **only when** the Priority 4 Commerce flag is set. When set, it applies to **all** Apex/LWC/Flow work: overlay `salesforce-commerce-b2b` during authoring (alongside the `generating-*` skill), then chain it as a Commerce-domain review pass after the matching `salesforce-*-quality` skill. It is **not** triggered by file content | `salesforce-commerce-b2b` **(overlay + review chain — add to the LWC/Apex/Flow skill, never replace it)** |
+| B2B Commerce work — **only when** the Priority 4 Commerce flag is set. When set, it applies to **all** Apex/LWC/Flow work: overlay `salesforce-commerce-b2b` during authoring (alongside the `generating-*` skill), then chain it as a Commerce-domain review pass after the matching `salesforce-*-quality` skill. It is **not** triggered by file content | `salesforce-commerce-b2b` **(overlay + review chain — add to the LWC/Apex/Flow skill, never replace it)** |
 
 > **`salesforce-commerce-b2b` is an overlay + review chain, never a replacement.** When the Commerce
 > flag (Priority 4) is set:
@@ -139,7 +139,7 @@ before applying any rule.
 - Inspect the existing repository before introducing any new class, helper, naming style, or
   abstraction. Follow established patterns.
 - **Commerce project flag** — this flag is the **trigger** for `salesforce-commerce-b2b`; the skill is
-  gated on project configuration, never on file content. Set it when the repo is a Salesforce B2B/B2C
+  gated on project configuration, never on file content. Set it when the repo is a Salesforce B2B
   Commerce storefront:
   - **Set:** state it plainly here, e.g. *"This **is** a Commerce org."* When set, `salesforce-commerce-b2b`
     applies to **every** Apex/LWC/Flow task: overlay it during authoring (alongside the `generating-*`

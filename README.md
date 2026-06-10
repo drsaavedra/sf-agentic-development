@@ -92,7 +92,16 @@ Then fill in the **Agent → Spec Doc Map** in Priority 5 with your project's do
 
 ### 6. (Commerce orgs only) Set the Commerce flag
 
-If this is a Salesforce B2B/B2C Commerce project, tell the agent **"This is a Commerce project"** (or edit the **Commerce project flag** in Priority 4 of the baseline yourself). The agent then loads `salesforce-commerce-b2b` on every Apex/LWC/Flow task — as an overlay during authoring and as a review pass after the quality skills. One-time setup; leave it unset for non-Commerce orgs. *(A future `npx` installer may offer this as a checkbox.)*
+If this is a Salesforce B2B Commerce project, paste this once into your agent. It edits the **Commerce project flag** in your baseline file so the setting persists across sessions:
+
+```text
+This is a Commerce project. Set the Priority 4 "Commerce project flag" to SET in my baseline
+instructions file — CLAUDE.md (Claude Code), AGENTS.md (Codex), or
+.github/copilot-instructions.md (Copilot) — so the salesforce-commerce-b2b skill applies to all
+Apex/LWC/Flow work from now on.
+```
+
+One prompt covers all three assistants — each edits the baseline file it already auto-loads, so no per-agent variant is needed. After that, the agent loads `salesforce-commerce-b2b` on every Apex/LWC/Flow task — as an overlay during authoring and a review pass after the quality skills. Leave the flag unset for non-Commerce orgs. *(A future `npx` installer may offer this as a checkbox.)*
 
 ---
 
@@ -109,7 +118,7 @@ The baseline routes to the right skill automatically based on context. Cross-dom
 | Flows | `generating-flow` · `salesforce-flow-quality` |
 | Flow + Apex invocable | `salesforce-flow-quality` · `salesforce-apex-quality` |
 | Deployment / package.xml / CI-CD | `salesforce-deployment` · `deploying-metadata` |
-| B2B/B2C Commerce *(when the Commerce flag is set)* | `salesforce-commerce-b2b` — overlay during authoring + review pass after the quality skill |
+| B2B Commerce *(when the Commerce flag is set)* | `salesforce-commerce-b2b` — overlay during authoring + review pass after the quality skill |
 
 ---
 
