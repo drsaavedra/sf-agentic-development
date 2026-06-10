@@ -18,7 +18,7 @@ Additional rules:
 - Dependency injection via constructor or method parameters for testability without org state.
 - ApexDoc on the class header and every `public` or `global` method.
 - Choose the smallest correct pattern: SOQL in a Selector, SObject behavior in a Domain, orchestration in a Service, pure helpers in a Utility.
-- Design sharing deliberately. Default `with sharing`; treat `without sharing` as an architectural decision, not a quick fix.
+- Design sharing deliberately. Default `with sharing`; treat `without sharing` as an architectural decision, not a quick fix. Declare sharing explicitly even though API v67+ classes without a declaration default to `with sharing` — an explicit keyword survives API bumps and states intent (see `references/security.md` for the v67 baseline).
 - In Selector field lists, prefer compile-time field references (`Schema.Account.Name` or a `Schema.SObjectField` constant) over string literals — field deletion is then caught at deploy time instead of failing at runtime.
 - Static analysis is part of the quality gate. Pair with `running-code-analyzer`: `ApexCRUDViolation`, `ApexSharingViolations`, `ExcessiveClassLength`, `ExcessivePublicCount`, and `ExcessiveNestedBlockDepth` should be in the enforced rule set.
 

@@ -14,25 +14,9 @@
 - Delegate all record creation to a `TestDataFactory` inside `@TestSetup`. `SeeAllData=false` — no org data dependency, no hardcoded IDs.
 - Assert exact expected values derived from test setup. Include a failure message on every assertion.
 - Mock external boundaries: `HttpCalloutMock` for callouts (set before `Test.startTest()`), `Test.setFixedSearchResults` for SOSL.
+- Mock class dependencies with the official Stub API — `System.StubProvider` + `Test.createStub()` — behind the dependency-injection seams, instead of hand-rolled fake subclasses or `Test.isRunningTest()` branches in production code.
 - Verify sharing-sensitive entry points. For any class with `inherited sharing` or `without sharing`, add a `System.runAs` test as a restricted user that asserts records are filtered (or deliberately exposed) as intended.
 - Make Custom Metadata-driven logic testable without org dependence. Inject in-memory `__mdt` instances via a `@TestVisible` setter or constructor so the assertion is deterministic.
 - Coverage: 75% minimum to deploy; 90% working target; 100% on business-critical paths. Coverage is a floor, not the goal — assertions are what matter.
 
-```apex
-// BAD — runs the method, verifies nothing
-@isTest static void testSetRating() { AccountService.setDefaults(accounts); }
-```
-
-```apex
-// GOOD — asserts the actual outcome
-@isTest static void testSetRating() {
-    Test.startTest();
-    AccountService.setDefaults(accounts);
-    Test.stopTest();
-    for (Account acc : accounts) {
-        Assert.areEqual('Warm', acc.Rating, 'Rating should default to Warm');
-    }
-}
-```
-
-**Test anti-patterns to reject:** SOQL or DML inside test loops, magic numbers in assertions, god test classes past ~500 lines, overlong test methods, catching generic `Exception` instead of the specific expected type.
+**Test anti-patterns to reject:** a test that runs the method but verifies nothing (coverage without assertions — every test must assert the actual outcome, e.g., `Assert.areEqual('Warm', acc.Rating, 'Rating should default to Warm')` after `Test.stopTest()`), SOQL or DML inside test loops, magic numbers in assertions, god test classes past ~500 lines, overlong test methods, catching generic `Exception` instead of the specific expected type.
