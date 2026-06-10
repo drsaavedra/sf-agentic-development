@@ -75,13 +75,17 @@ the active context.
 | Reviewing Flow that calls an Apex invocable action | `salesforce-flow-quality` · `salesforce-apex-quality` |
 | Running code analysis (PMD/CodeAnalyzer) | `running-code-analyzer` |
 | Building a complete Lightning app | `generating-lightning-app` |
-| B2B/B2C Commerce work — **only when** the project is configured as a Commerce org: the Priority 4 Commerce flag is set, or the Commerce `UserPromptSubmit` hook is installed. When active it applies to **all** Apex/LWC/Flow work (authoring and review). It is **not** triggered by file content | `salesforce-commerce-b2b` **(overlay — add to the LWC/Apex/Flow skill, never replace it)** |
+| B2B/B2C Commerce work — **only when** the Priority 4 Commerce flag is set. When set, it applies to **all** Apex/LWC/Flow work: overlay `salesforce-commerce-b2b` during authoring (alongside the `generating-*` skill), then chain it as a Commerce-domain review pass after the matching `salesforce-*-quality` skill. It is **not** triggered by file content | `salesforce-commerce-b2b` **(overlay + review chain — add to the LWC/Apex/Flow skill, never replace it)** |
 
-> **`salesforce-commerce-b2b` is an overlay, not a replacement.** When the Commerce flag (Priority 4)
-> is set, it co-fires *alongside* whichever generating/quality skill already applies (e.g.
-> `generating-lwc-components` + `salesforce-commerce-b2b`, or `salesforce-apex-quality` +
-> `salesforce-commerce-b2b`), adding Commerce domain rules on top — it never substitutes for the base
-> skill.
+> **`salesforce-commerce-b2b` is an overlay + review chain, never a replacement.** When the Commerce
+> flag (Priority 4) is set:
+> - **Authoring** — co-fire it *alongside* the generating skill (e.g. `generating-apex` +
+>   `salesforce-commerce-b2b`) so generated code is Commerce-aware from the start.
+> - **Review** — after the matching quality skill runs (e.g. `salesforce-apex-quality`), chain
+>   `salesforce-commerce-b2b` as a Commerce-domain review pass over the generated artifact.
+>
+> It adds Commerce domain rules on top of the base skill — it never substitutes for it. The chain is a
+> routing instruction gated on the flag, not a trigger on file content.
 
 Skills whose names begin with `salesforce-` are **authored skills** in `skills/` in this repo
 (installed into `{{SKILLS_DIR}}` at setup time).
@@ -145,14 +149,14 @@ before applying any rule.
 - **Commerce project flag** — this flag is the **trigger** for `salesforce-commerce-b2b`; the skill is
   gated on project configuration, never on file content. Set it when the repo is a Salesforce B2B/B2C
   Commerce storefront:
-  - **Set:** state it plainly here, e.g. *"This **is** a Commerce org."* Then load
-    `salesforce-commerce-b2b` on **every** Apex/LWC/Flow task — authoring **and** review — as a mandatory
-    overlay. Setting this flag or installing the hook below are the two valid triggers; for a
-    deterministic per-turn guarantee that does not depend on the agent re-reading this file, also install
-    the `UserPromptSubmit` hook documented in `SETUP.md`.
+  - **Set:** state it plainly here, e.g. *"This **is** a Commerce org."* When set, `salesforce-commerce-b2b`
+    applies to **every** Apex/LWC/Flow task: overlay it during authoring (alongside the `generating-*`
+    skill) and chain it as a Commerce-domain review pass after the matching `salesforce-*-quality` skill
+    (see Priority 2). To set the flag, a user can simply tell the agent *"This is a Commerce project"* and
+    the agent updates this section.
   - **Unset (template default):** `salesforce-commerce-b2b` does **not** fire — it is not triggered by
     file content. Leave unset for non-Commerce orgs. For a mixed CRM+Commerce org, either set the flag
-    and accept the overlay on all Apex/LWC/Flow work, or leave it unset and invoke
+    and accept the overlay + review chain on all Apex/LWC/Flow work, or leave it unset and invoke
     `salesforce-commerce-b2b` manually on the Commerce pieces.
 
 ---

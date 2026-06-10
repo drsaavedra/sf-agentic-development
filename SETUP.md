@@ -111,47 +111,30 @@ Copy the appropriate root file from this repo into the root of your Salesforce p
 Then fill in the **Agent → Spec Doc Map** in Priority 5 with your project's spec document paths.
 
 If this project is a Commerce org, also set the **Commerce project flag** in Priority 4 (see the next
-step for always-on enforcement).
+step).
 
-### Step 5a (optional) — Always-on Commerce enforcement (Commerce orgs only)
+### Step 5a (optional) — Commerce projects (set the Commerce flag)
 
-The Priority 4 **Commerce project flag** makes `salesforce-commerce-b2b` load on every Apex/LWC/Flow
-task — but as a written instruction, it relies on the agent re-reading the baseline. For a **hard,
-per-turn guarantee** that does not depend on that, add a `UserPromptSubmit` hook so the harness injects
-the directive into context on every prompt.
+`salesforce-commerce-b2b` is **gated on the Priority 4 Commerce flag**, never on file content. Setting
+the flag turns the skill on for the whole project, in two ways:
 
-> **Claude Code only.** Hooks live in `settings.json`. Codex and Copilot have no equivalent here, so
-> on those assistants the hardened Priority 4 flag (instruction-based) is the enforcement mechanism.
+- **Authoring** — it overlays the `generating-*` skill so generated Apex/LWC/Flow is Commerce-aware from
+  the start.
+- **Review** — it chains after the matching `salesforce-*-quality` skill as a Commerce-domain review
+  pass over the generated artifact.
 
-Add this to your project's `.claude/settings.json` (merge into any existing `hooks` block; or add it
-interactively with the `/hooks` command or the `update-config` skill):
+**To set the flag**, either edit the **Commerce project flag** bullet in Priority 4 of your baseline file
+(`CLAUDE.md` / `AGENTS.md` / `.github/copilot-instructions.md`) to declare *"This **is** a Commerce
+org."*, or simply tell the agent **"This is a Commerce project"** and let it update that section for you.
+This is a one-time setup — once the flag is set, the routing applies on every Apex/LWC/Flow task.
 
-```json
-{
-  "hooks": {
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "echo \"[Commerce org] This project is a Salesforce B2B/B2C Commerce storefront. Load the salesforce-commerce-b2b skill for ALL Apex, LWC, and Flow work - authoring and review.\""
-          }
-        ]
-      }
-    ]
-  }
-}
-```
+> The flag is a routing instruction the agent follows; it works the same across Claude Code, Codex, and
+> Copilot — no hooks or per-assistant configuration required. (A future `npx` installer may offer this as
+> a setup checkbox.)
 
-The hook's stdout is appended to context every turn, so the Commerce directive is always present even
-if the skill never auto-fires. (On Windows `cmd` the message prints with surrounding quotes — harmless;
-the directive text is what matters. Skills are still model-invoked — the hook guarantees the
-*instruction* is present, not the Skill-tool call itself.)
-
-Leave this out for non-Commerce orgs. For a mixed CRM+Commerce org, follow the Priority 4 flag
-guidance: either set the flag (and accept the overlay on all Apex/LWC/Flow work) or leave it unset and
-invoke `salesforce-commerce-b2b` manually on the Commerce pieces. `salesforce-commerce-b2b` is gated on
-the flag/hook — it never auto-triggers on `commerce/*` imports or other file content.
+Leave the flag unset for non-Commerce orgs — `salesforce-commerce-b2b` then never fires. For a mixed
+CRM+Commerce org, either set the flag (and accept the overlay + review chain on all Apex/LWC/Flow work)
+or leave it unset and invoke `salesforce-commerce-b2b` manually on the Commerce pieces.
 
 ### Step 6 (optional) — Superpowers
 

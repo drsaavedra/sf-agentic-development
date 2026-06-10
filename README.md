@@ -90,6 +90,10 @@ Copy the appropriate root file into your Salesforce project:
 
 Then fill in the **Agent → Spec Doc Map** in Priority 5 with your project's document paths.
 
+### 6. (Commerce orgs only) Set the Commerce flag
+
+If this is a Salesforce B2B/B2C Commerce project, tell the agent **"This is a Commerce project"** (or edit the **Commerce project flag** in Priority 4 of the baseline yourself). The agent then loads `salesforce-commerce-b2b` on every Apex/LWC/Flow task — as an overlay during authoring and as a review pass after the quality skills. One-time setup; leave it unset for non-Commerce orgs. *(A future `npx` installer may offer this as a checkbox.)*
+
 ---
 
 ## Skill Routing
@@ -105,7 +109,7 @@ The baseline routes to the right skill automatically based on context. Cross-dom
 | Flows | `generating-flow` · `salesforce-flow-quality` |
 | Flow + Apex invocable | `salesforce-flow-quality` · `salesforce-apex-quality` |
 | Deployment / package.xml / CI-CD | `salesforce-deployment` · `deploying-metadata` |
-| B2B/B2C Commerce | `salesforce-commerce-b2b` |
+| B2B/B2C Commerce *(when the Commerce flag is set)* | `salesforce-commerce-b2b` — overlay during authoring + review pass after the quality skill |
 
 ---
 
