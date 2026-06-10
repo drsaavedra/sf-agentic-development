@@ -1,6 +1,6 @@
 ---
 name: salesforce-deployment
-description: Use when deploying Salesforce metadata or generating package.xml — deployment safety rules and deployment commands.
+description: Use when deploying Salesforce metadata, generating package.xml or a git delta (sfdx-git-delta), running validate/quick-deploy, planning CI/CD promotion, or deploying reference data with SFDMU — deployment safety rules and deployment commands.
 ---
 
 # Salesforce Deployment Rules
@@ -17,8 +17,36 @@ description: Use when deploying Salesforce metadata or generating package.xml �
 - Never deploy to any Salesforce org without explicit user approval, unless the user clearly instructs you to deploy. You can validate deployments anytime to support test driven development.
 - After submitting a deploy or validate job, return the job ID only — do not poll for status unless the user explicitly asks.
 
-## Deployment Commands
+## Delta Manifests with sfdx-git-delta (sgd)
 
-- Use `sf sgd` (sfdx-git-delta) to generate `package.xml` from a git delta when the user provides a commit hash or range. When only a single ref is given (e.g. "from `<hash>`"), pass it as `--from <hash>` and omit `--to` — sfdx-git-delta defaults `--to` to `HEAD`. Only set `--to` explicitly when the user supplies an end ref.
+- Generate deltas with `sf sgd source delta --from <ref> [--to <ref>] --output-dir <dir>`. When only a single ref is given (e.g. "from `<hash>`"), pass it as `--from <hash>` and omit `--to` — sgd defaults `--to` to `HEAD`. Only set `--to` explicitly when the user supplies an end ref.
+- sgd produces two outputs: `package/package.xml` (additions/modifications) and `destructiveChanges/destructiveChanges.xml` (deletions). Add `--generate-delta` (`-d`) to also copy the changed source files for a source-dir deploy.
+- **sgd is a pure git diff — it does not detect metadata dependencies.** A delta deploy can fail on components it didn't include (a new field's parent object, a referenced class). Review the generated manifest for missing dependencies, and fall back to a full deploy when dependency risk is high.
+- **Check the generated `package.xml` has members before submitting** — an empty package can fail the deploy.
+- **Flows cannot be deleted via `destructiveChanges.xml`** (platform limitation) — deactivate/handle through `FlowDefinition` instead, and exclude flow deletions from the destructive manifest.
+- In CI, reference branches with the `origin/` prefix (e.g. `--from origin/main`) and ensure the pipeline fetches enough git history — shallow clones break the diff.
+- Use `--ignore-file` / `--ignore-destructive-file` for permanent exclusions instead of hand-editing every generated manifest.
+- sgd is community-maintained, not Salesforce-supported — always review generated manifests before deploying them.
+
+## Validate, Quick Deploy, and Destructive Changes
+
 - Use `sf project deploy validate` when validating; default to `RunLocalTests` unless the user specifies a different test level.
+- **Prefer the validate → quick-deploy pattern for production:** `sf project deploy validate` returns a job ID; `sf project deploy quick --job-id <id>` deploys that validation within **10 days** without re-running tests. Tests must have run during validation — `NoTestRun` is incompatible with quick deploy. Record the validation job ID when validating so the quick deploy can reference it.
+- Deploy sgd's deletions in the same job as the additive package with `--post-destructive-changes destructiveChanges.xml` (or `--pre-destructive-changes` when deletes must precede the additions) on `sf project deploy start|validate` — destructive members still require the explicit user confirmation above.
+- For non-delta manifests, generate with `sf project generate manifest` rather than writing `package.xml` by hand.
 - Fetch current SF CLI docs when command syntax or behavior may have changed.
+
+## CI/CD Practices (sfdx-hardis-derived — apply even without the tool)
+
+- **Delta for PR validation, full deploy as the baseline:** validate the sgd delta between the source and target branch on every PR; use full deploys for initial pipeline bring-up and whenever delta dependency risk is high.
+- **Promotion model:** one org per major branch (integration → uat → production), promotion by merge — validate on PR, quick-deploy the stored validation job ID on merge.
+- **Overwrite management:** maintain a no-overwrite list for metadata that admins own in the target org (reports, dashboards, list views) and exclude it from deployments unless overwriting is explicitly intended (sfdx-hardis: `packageNoOverwritePath`).
+- **Bounded test skipping:** skip test execution only when the delta contains exclusively non-impacting metadata types — and never against production.
+
+## Data Deployments with SFDMU
+
+- Use SFDMU (`sf sfdmu run`) for reference/configuration data migrations — org-to-org or CSV — and version-control the `export.json` like code; review its diff like a manifest diff.
+- **Upsert with external IDs, never blind inserts** that duplicate reference data. Any unique field works as the external ID — including formula and composite keys — so a dedicated External ID field is not required.
+- **Production safety:** SFDMU refuses to modify a production org unless `--canmodify <instanceUrl>` is passed. Treat that flag exactly like a metadata deploy — explicit user approval required. Run a simulation first and review the planned insert/update/delete counts before the real run.
+- When seeding sandboxes from production data, use SFDMU's built-in anonymization to mask sensitive fields — never copy production PII as-is.
+- Prefer SFDMU's automatic relationship and circular-reference handling over hand-rolled CSV sequences when records reference each other.
