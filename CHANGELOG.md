@@ -2,6 +2,21 @@
 
 Notable changes to the toolkit, newest first. For full detail see `git log`.
 
+## 2026-06-11 (checkpoint mode)
+
+- **Checkpoint mode added to the Git safety rule** — an opt-in, per-task exception to the
+  "never commit without an explicit request" rule, modeled on the TDD validate-loop exception
+  (one explicit grant, then automatic iteration). When the user grants it (*"checkpoint as you
+  go"*), the main agent commits on a dedicated `checkpoint/<task-slug>` branch at stable points
+  only — green validate, completed work item (with its build summary), or just before a
+  risky/hard-to-undo step — so long multi-brief runs always have a known-good state to roll
+  back to. Push, merge-back, rollback, and branch cleanup stay explicit-request-only; the grant
+  expires when the task ends. The user's original branch is never committed to.
+- **Orchestration updated to match** — Priority 4 names the main agent as the only committer
+  (parallel dispatches checkpoint only at merge points); *"checkpoint as you go"* joins the
+  steering phrases; the README's Agent Orchestration guide gained a "Checkpoint commits
+  (opt-in)" subsection; `salesforce-developer` role boundaries now state it never runs git.
+
 ## 2026-06-11 (agent orchestration)
 
 - **Agent Orchestration guide added to the README** — full lifecycle for the main agent +

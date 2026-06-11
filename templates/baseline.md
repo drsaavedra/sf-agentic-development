@@ -61,6 +61,29 @@ skip it because the task looks trivial.
 - Never run `git commit`, `git push`, or any variant (amend, force-push, rebase, tag push)
   unless the user has explicitly asked for it in the current message. Do not infer intent from
   context or plan approval — wait for an explicit instruction each time.
+- Exception — **checkpoint mode** (per-task grant). When the user explicitly enables it for a
+  task (e.g. *"checkpoint as you go"*, *"enable checkpoint commits"* — exact phrases are not
+  required, any clearly explicit enablement counts, and a narrowed grant such as *"only
+  checkpoint completed work items"* is honored as stated), commit automatically for that task
+  only, under these constraints. Plan approval alone is **not** a grant, and never infer the
+  grant — a long-running or multi-task run is not, by itself, permission to enable it.
+  - At grant time, create a dedicated branch `checkpoint/<task-slug>` from the current HEAD and
+    commit only there — never on the user's original branch. If the working tree is dirty at
+    grant time, ask once whether to record a `checkpoint: baseline (pre-task state)` commit
+    first; never silently fold pre-existing changes into a later checkpoint.
+  - Commit only at stable points: a **green validate** (tests pass), a **completed work item**
+    (include its build summary in the commit), or **immediately before a risky or hard-to-undo
+    operation** (the message must say so).
+  - Message convention: `checkpoint: <work item> — <state>`
+    (e.g. `checkpoint: RollupService green — validate 0Af...`).
+  - Only the main (orchestrating) agent commits; subagents never run git. With parallel
+    developer instances, checkpoint only at merge points (after the combined validate) so a
+    commit never captures another instance's partial work.
+  - `git push`, amend, rebase, force-push, merging the checkpoint branch back, deleting it, and
+    any rollback (`git reset --hard`, `git checkout <commit> -- .`) remain explicit-user-request
+    actions — the grant covers checkpoint commits only.
+  - The grant expires when the task completes. At task end, report the branch name and the list
+    of checkpoints; merging, squashing, and cleanup are the user's call.
 
 **Deployment, install, and filesystem safety (always on, even when no skill fires)**
 - Never deploy to any Salesforce org without explicit user approval. Validate anytime.
@@ -195,9 +218,12 @@ before applying any rule.
 - `architect` reviews are on-demand. A **BLOCKED** report re-briefs `salesforce-developer` with
   the report's Recommended Actions; the architect then re-reviews and appends a new dated section.
 - The user steers the dispatch shape in the prompt when they want to (e.g. *"run in parallel"*,
-  *"pin the contracts first"*, *"one at a time"*, *"architect design review before any code"*) —
-  honor it. Absent explicit steering, derive the shape from the dependency structure of the work
-  and invoke no architect review.
+  *"pin the contracts first"*, *"one at a time"*, *"architect design review before any code"*,
+  *"checkpoint as you go"*) — honor it. Absent explicit steering, derive the shape from the
+  dependency structure of the work and invoke no architect review.
+- When the user grants **checkpoint mode** (see Git safety, Priority 1), the main agent commits
+  at stable points — green validate, completed work item — on the dedicated checkpoint branch.
+  Developer and architect agents never commit.
 
 > **Per-project setup:** Fill in the paths in the table below when you deploy this template to a
 > real project repo. Config planning and QA scenario authoring are handled inline by the main

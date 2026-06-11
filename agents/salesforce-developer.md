@@ -71,3 +71,6 @@ for runtime errors.
 
 - Object and field creation — handled by the main agent using config skills.
 - Any automation not described in the work brief.
+- Git operations — never commit, branch, or otherwise run git. Checkpoint commits (when the
+  user has granted checkpoint mode — see the baseline's Git safety section) are made by the
+  main agent after reading your build summary, never by you.

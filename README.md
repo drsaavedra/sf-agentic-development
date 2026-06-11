@@ -266,6 +266,34 @@ inventing requirements — write them before dispatching.
   and embedded in both briefs. Integration is then verified with one combined validate at the
   merge point.
 
+### Checkpoint commits (opt-in)
+
+The baseline's git safety rule means a long multi-brief run normally accumulates everything in
+the working tree — if work item four goes sideways, there is no stable point to roll back to.
+**Checkpoint mode** trades a single explicit grant for rollback safety, the same shape as the
+TDD validate-loop exception (confirm once, then iterate automatically):
+
+1. **Grant** — you enable it in the prompt for one task: *"checkpoint as you go"*, *"enable
+   checkpoint commits"*, or any equally explicit wording — exact phrases aren't required, and
+   you can narrow the grant (e.g. *"only checkpoint completed work items, not every validate"*).
+   What never activates it: plan approval alone, or the agent inferring it because the run is
+   long — the agent never turns checkpoint mode on by itself. The grant expires when the task
+   completes; the next task needs a fresh one.
+2. **Branch** — the main agent creates `checkpoint/<task-slug>` from the current HEAD and
+   commits only there; your original branch is never committed to. If the working tree is dirty
+   at grant time, the agent asks once whether to record a `checkpoint: baseline (pre-task
+   state)` commit first.
+3. **Stable points** — commits happen only at: a green validate, a completed work item (the
+   commit includes its build summary), or immediately before a risky/hard-to-undo step. Messages
+   follow `checkpoint: <work item> — <state>`. Only the main agent commits — developer and
+   architect agents never run git — and parallel dispatches checkpoint only at merge points, so
+   a commit never captures another instance's partial work.
+4. **Wrap-up** — at task end the agent reports the branch name and the checkpoint list. Rolling
+   back to a checkpoint, merging or squashing the branch into your branch, pushing, and deleting
+   the branch all remain explicit requests from you.
+
+The full rule lives in the baseline's Git safety section (Priority 1).
+
 ### Prompting a pattern
 
 You never have to name a pattern. Describe the build, and the main agent derives the dispatch
@@ -288,7 +316,7 @@ architect gate** (it is on-demand, never automatic). Example prompts:
 
 The italicized phrases are the levers: *"in parallel where the pieces allow it"*, *"pin the
 contracts first"*, *"from the build summary"*, *"one at a time"*, *"before any code is
-written"*. Leave them out and the main agent still picks a sane shape — sequential, briefed,
+written"*, *"checkpoint as you go"*. Leave them out and the main agent still picks a sane shape — sequential, briefed,
 no review — and you can redirect at any checkpoint. Each worked example below opens with its
 kickoff prompt.
 
