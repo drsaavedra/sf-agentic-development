@@ -58,7 +58,7 @@ the active context.
 | Creating Lightning pages (FlexiPages) | `/skill generating-flexipage` |
 | Creating validation rules | `/skill generating-validation-rule` |
 | Creating list views | `/skill generating-list-view` |
-| Deploying metadata, generating a `package.xml` / manifest, building a git delta (sgd) from a commit or range, CI/CD | `/skill salesforce-deployment` · `/skill deploying-metadata` |
+| Deploying metadata, generating a `package.xml` / manifest, building a git delta (sgd) from a commit or range, deploying reference data (SFDMU), CI/CD | `/skill salesforce-deployment` · `/skill deploying-metadata` |
 | Querying org data (SOQL) | `/skill querying-soql` |
 | Handling org data (import/export) | `/skill handling-sf-data` |
 | Named Credentials / External Services / callouts | `/skill building-sf-integrations` |

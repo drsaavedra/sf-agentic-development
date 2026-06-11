@@ -9,7 +9,7 @@ three assistant targets.
 ## Repository Layout
 
 ```
-skills/<name>/SKILL.md      ← 5 authored Salesforce skills (canonical source)
+skills/<name>/              ← 5 authored Salesforce skills (canonical source: SKILL.md + references/)
 agents/<name>.md            ← 2 Salesforce agents (canonical source)
 templates/baseline.md       ← single-source template for the three root files below
 CLAUDE.md                   ← Claude Code baseline (rendered from template)

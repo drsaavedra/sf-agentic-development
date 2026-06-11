@@ -18,8 +18,8 @@ This repo evolves continuously: new Salesforce releases, better agentic patterns
 |---|---|
 | `salesforce-apex-quality` | Governor limits, trigger design, security, architecture, async, error handling, testing |
 | `salesforce-lwc-quality` | Component architecture, data sourcing, directives, async/events, performance, Jest |
-| `salesforce-flow-quality` | Fault handling, DML-in-loop, hardcoded IDs, recursion, complexity, naming |
-| `salesforce-deployment` | Deployment safety rules, `package.xml` / git-delta generation, and CI/CD patterns |
+| `salesforce-flow-quality` | Entry-condition discipline, loop/collection/Transform optimization, fault handling and Custom Error, async paths, recursion, hardcoded IDs, complexity, flow tests, naming |
+| `salesforce-deployment` | Deployment safety rules, `package.xml` / git-delta (sgd) generation, validate → quick-deploy, CI/CD patterns, and SFDMU data deployments |
 | `salesforce-commerce-b2b` | B2B Commerce domain rules |
 
 ### Agents
