@@ -108,14 +108,14 @@ Copy the appropriate root file from this repo into the root of your Salesforce p
 | GitHub Copilot | `.github/copilot-instructions.md` |
 | Codex | `AGENTS.md` |
 
-Then fill in the **Agent → Spec Doc Map** in Priority 5 with your project's spec document paths.
+Then fill in the **Agent → Spec Doc Map** in Priority 4 with your project's spec document paths.
 
-If this project is a Commerce org, also set the **Commerce project flag** in Priority 4 (see the next
+If this project is a Commerce org, also set the **Commerce project flag** in Priority 3 (see the next
 step).
 
 ### Step 5a (optional) — Commerce projects (set the Commerce flag)
 
-`salesforce-commerce-b2b` is **gated on the Priority 4 Commerce flag**, never on file content. Setting
+`salesforce-commerce-b2b` is **gated on the Priority 3 Commerce flag**, never on file content. Setting
 the flag turns the skill on for the whole project, in two ways:
 
 - **Authoring** — it overlays the `generating-*` skill so generated Apex/LWC/Flow is Commerce-aware from
@@ -123,7 +123,7 @@ the flag turns the skill on for the whole project, in two ways:
 - **Review** — it chains after the matching `salesforce-*-quality` skill as a Commerce-domain review
   pass over the generated artifact.
 
-**To set the flag**, either edit the **Commerce project flag** bullet in Priority 4 of your baseline file
+**To set the flag**, either edit the **Commerce project flag** bullet in Priority 3 of your baseline file
 (`CLAUDE.md` / `AGENTS.md` / `.github/copilot-instructions.md`) to declare *"This **is** a Commerce
 org."*, or simply tell the agent **"This is a Commerce project"** and let it update that section for you.
 This is a one-time setup — once the flag is set, the routing applies on every Apex/LWC/Flow task.

@@ -88,14 +88,14 @@ Copy the appropriate root file into your Salesforce project:
 | GitHub Copilot | `.github/copilot-instructions.md` |
 | Codex | `AGENTS.md` |
 
-Then fill in the **Agent → Spec Doc Map** in Priority 5 with your project's document paths.
+Then fill in the **Agent → Spec Doc Map** in Priority 4 with your project's document paths.
 
 ### 6. (Commerce orgs only) Set the Commerce flag
 
 If this is a Salesforce B2B Commerce project, paste this once into your agent. It edits the **Commerce project flag** in your baseline file so the setting persists across sessions:
 
 ```text
-This is a Commerce project. Set the Priority 4 "Commerce project flag" to SET in my baseline
+This is a Commerce project. Set the Priority 3 "Commerce project flag" to SET in my baseline
 instructions file — CLAUDE.md (Claude Code), AGENTS.md (Codex), or
 .github/copilot-instructions.md (Copilot) — so the salesforce-commerce-b2b skill applies to all
 Apex/LWC/Flow work from now on.

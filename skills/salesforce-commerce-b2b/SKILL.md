@@ -1,11 +1,11 @@
 ---
 name: salesforce-commerce-b2b
-description: "Overlay on the LWC/Apex/Flow skill — load it ALONGSIDE them (never instead of them), gated on project configuration rather than file content. Load this skill only when the project is configured as a Salesforce B2B Commerce org via the baseline Priority 4 Commerce flag. When that flag is set, apply it to all Apex/LWC/Flow work: overlay it during authoring and run it as a Commerce-domain review pass after the matching salesforce-*-quality skill. Covers Commerce architecture, Storefront APIs, ConnectApi, the Commerce data model, checkout, and product/search/quick-order patterns. Detailed rules live in references/ — read the file(s) matching the task domain. Do not auto-trigger on commerce/* imports or other code signals — if the flag is not set, skip this skill."
+description: "Overlay on the LWC/Apex/Flow skill — load it ALONGSIDE them (never instead of them), gated on project configuration rather than file content. Load this skill only when the project is configured as a Salesforce B2B Commerce org via the baseline Priority 3 Commerce flag. When that flag is set, apply it to all Apex/LWC/Flow work: overlay it during authoring and run it as a Commerce-domain review pass after the matching salesforce-*-quality skill. Covers Commerce architecture, Storefront APIs, ConnectApi, the Commerce data model, checkout, and product/search/quick-order patterns. Detailed rules live in references/ — read the file(s) matching the task domain. Do not auto-trigger on commerce/* imports or other code signals — if the flag is not set, skip this skill."
 ---
 
 # Salesforce Commerce Domain Rules
 
-> **Scope:** Overlay + review chain, gated on the baseline Priority 4 Commerce flag — never on file
+> **Scope:** Overlay + review chain, gated on the baseline Priority 3 Commerce flag — never on file
 > content. When the flag is set, apply these rules *on top of* the base LWC/Apex/Flow skill during
 > authoring, then run them as a Commerce-domain review pass after the matching `salesforce-*-quality`
 > skill. When the flag is not set, skip this skill — do not scan artifacts for Commerce signals.

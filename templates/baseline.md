@@ -24,9 +24,12 @@
 
 ---
 
-## Priority 1: Behavioral Guidelines
+## Priority 1: Behavioral Guidelines & Operational Safety
 
-Before responding, invoke the `karpathy-guidelines` skill to load the latest behavioral rules.
+**Always-on, every task:** before any skill routing (Priority 2) and before generating any
+artifact or response, invoke the `karpathy-guidelines` skill to load the latest behavioral
+rules. This applies to every request — reviews, quick fixes, and questions included. Never
+skip it because the task looks trivial.
 
 > Install the plugin if not already active:
 > ```
@@ -38,6 +41,19 @@ Before responding, invoke the `karpathy-guidelines` skill to load the latest beh
 - Never run `git commit`, `git push`, or any variant (amend, force-push, rebase, tag push)
   unless the user has explicitly asked for it in the current message. Do not infer intent from
   context or plan approval — wait for an explicit instruction each time.
+
+**Deployment, install, and filesystem safety (always on, even when no skill fires)**
+- Never deploy to any Salesforce org without explicit user approval. Validate anytime.
+- Before running any `sf project deploy` or `sf project validate` command, display the full
+  command and wait for explicit user confirmation. After submitting a deploy or validate job,
+  return the job ID only — do not poll for status unless the user explicitly asks (or in a
+  CI/CD / automation workflow).
+- Never install packages, libraries, CLIs, or software without explicit user approval.
+- Never delete files, perform destructive git operations, or modify system files without
+  explicit approval.
+- Never include secrets, session IDs, cookies, tokens, org credentials, or real customer
+  data — and never expose PII or internal error detail — in code, tests, logs, error
+  messages, or generated files.
 
 ---
 
@@ -75,10 +91,10 @@ the active context.
 | Reviewing Flow that calls an Apex invocable action | `salesforce-flow-quality` · `salesforce-apex-quality` |
 | Running code analysis (PMD/CodeAnalyzer) | `running-code-analyzer` |
 | Building a complete Lightning app | `generating-lightning-app` |
-| B2B Commerce work — **only when** the Priority 4 Commerce flag is set. When set, it applies to **all** Apex/LWC/Flow work: overlay `salesforce-commerce-b2b` during authoring (alongside the `generating-*` skill), then chain it as a Commerce-domain review pass after the matching `salesforce-*-quality` skill. It is **not** triggered by file content | `salesforce-commerce-b2b` **(overlay + review chain — add to the LWC/Apex/Flow skill, never replace it)** |
+| B2B Commerce work — **only when** the Priority 3 Commerce flag is set. When set, it applies to **all** Apex/LWC/Flow work: overlay `salesforce-commerce-b2b` during authoring (alongside the `generating-*` skill), then chain it as a Commerce-domain review pass after the matching `salesforce-*-quality` skill. It is **not** triggered by file content | `salesforce-commerce-b2b` **(overlay + review chain — add to the LWC/Apex/Flow skill, never replace it)** |
 
 > **`salesforce-commerce-b2b` is an overlay + review chain, never a replacement.** When the Commerce
-> flag (Priority 4) is set:
+> flag (Priority 3) is set:
 > - **Authoring** — co-fire it *alongside* the generating skill (e.g. `generating-apex` +
 >   `salesforce-commerce-b2b`) so generated code is Commerce-aware from the start.
 > - **Review** — after the matching quality skill runs (e.g. `salesforce-apex-quality`), chain
@@ -94,48 +110,7 @@ All other skills are from `forcedotcom/sf-skills`
 
 ---
 
-## Priority 3: Always-On Safety Floor
-
-These rules apply to every request, whether or not a skill fires.
-
-**Secrets and hardcoding**
-- Never hardcode Record IDs, Record Type IDs, or Profile IDs. Resolve dynamically via
-  `Schema.describe` or source from Custom Metadata / Custom Labels.
-- Never hardcode secrets, credentials, session IDs, or tokens. Use Named Credentials or protected
-  Custom Metadata for all external authentication.
-- Never expose PII or internal error detail in debug logs, error messages, or API responses.
-
-**Bulk and security floor**
-- Bulkify all Apex: never put SOQL, DML, or callouts inside loops; assume `Trigger.new` holds 200
-  records. Collect IDs/fields first, then run one query/DML outside the loop.
-- Default every Apex class to `with sharing`; isolate any `without sharing` in a dedicated helper.
-- Enforce CRUD/FLS: `WITH USER_MODE` in SOQL and `AccessLevel.USER_MODE` in `Database` DML (API 56+).
-- Treat Apex as Apex (not Java) and LWC as Salesforce LWC under Lightning Web Security (not plain
-  browser JavaScript).
-
-**Trigger design**
-- One trigger per SObject (managed-package triggers are the only accepted exception).
-- Trigger body = event routing only. Zero business logic. Delegates to its own Handler — never
-  directly to a service class.
-
-**Deployment and filesystem safety**
-- Never deploy to any Salesforce org without explicit user approval. Validate deployments anytime.
-- Never install packages, libraries, CLIs, or software without explicit user approval.
-- Never delete files, perform destructive git operations, or modify system files without explicit
-  approval.
-- Do not include secrets, session IDs, cookies, access tokens, org credentials, or real customer
-  data in code, tests, logs, or generated files.
-
-**Salesforce deployment commands**
-- Before running any `sf project deploy` or `sf project validate` command, display the full
-  command and wait for explicit user confirmation.
-- After submitting a deploy or validate job, return the job ID only — do not poll for status.
-  The user monitors progress in the org. Only poll when the user explicitly requests it (e.g.,
-  "wait for completion", "monitor the deploy", or for a CI/CD or automation workflow).
-
----
-
-## Priority 4: Project Conventions
+## Priority 3: Project Conventions
 
 These use placeholders because this is a reusable template. Map each one to the active repository
 before applying any rule.
@@ -161,7 +136,7 @@ before applying any rule.
 
 ---
 
-## Priority 5: Agent → Spec Doc Map
+## Priority 4: Agent → Spec Doc Map
 
 > **Per-project setup:** Fill in the paths in the table below when you deploy this template to a
 > real project repo. Config planning and QA scenario authoring are handled inline by the main
