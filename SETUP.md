@@ -12,9 +12,10 @@ three assistant targets.
 skills/<name>/              ← 5 authored Salesforce skills (canonical source: SKILL.md + references/)
 agents/<name>.md            ← 2 Salesforce agents (canonical source)
 templates/baseline.md       ← single-source template for the three root files below
-CLAUDE.md                   ← Claude Code baseline (rendered from template)
-AGENTS.md                   ← Codex baseline (rendered from template)
-.github/copilot-instructions.md ← Copilot baseline (rendered from template)
+scripts/render-baselines.js ← regenerates the three renders from the template
+CLAUDE.md                   ← Claude Code baseline (rendered — do not edit directly)
+AGENTS.md                   ← Codex baseline (rendered — do not edit directly)
+.github/copilot-instructions.md ← Copilot baseline (rendered — do not edit directly)
 ```
 
 **How assistants discover skills**
@@ -78,10 +79,21 @@ This installs 50+ official Salesforce skills (`generating-apex`, `generating-ape
 
 ### Step 3 — Install the Karpathy behavioral guidelines
 
-```bash
+**Claude Code** (plugin — updates flow through automatically):
+
+```
 /plugin marketplace add forrestchang/andrej-karpathy-skills
 /plugin install andrej-karpathy-skills@karpathy-skills
 ```
+
+**Codex / Copilot** (no plugin support — install as a skill):
+
+```bash
+npx skills add forrestchang/andrej-karpathy-skills
+```
+
+(or copy `skills/karpathy-guidelines/` from that repo into `.agents/skills/` for Codex,
+`.github/skills/` for Copilot)
 
 ### Step 4 — Install the agents
 
@@ -108,14 +120,15 @@ Copy the appropriate root file from this repo into the root of your Salesforce p
 | GitHub Copilot | `.github/copilot-instructions.md` |
 | Codex | `AGENTS.md` |
 
-Then fill in the **Agent → Spec Doc Map** in Priority 4 with your project's spec document paths.
+Then fill in the baseline's **Agent → Spec Doc Map** section with your project's spec document paths.
 
-If this project is a Commerce org, also set the **Commerce project flag** in Priority 3 (see the next
-step).
+If this project is a Commerce org, also set the **Commerce project flag** in the baseline's
+**Project Conventions** section (see the next step).
 
 ### Step 5a (optional) — Commerce projects (set the Commerce flag)
 
-`salesforce-commerce-b2b` is **gated on the Priority 3 Commerce flag**, never on file content. Setting
+`salesforce-commerce-b2b` is **gated on the Commerce flag in the baseline's Project Conventions
+section**, never on file content. Setting
 the flag turns the skill on for the whole project, in two ways:
 
 - **Authoring** — it overlays the `generating-*` skill so generated Apex/LWC/Flow is Commerce-aware from
@@ -123,7 +136,8 @@ the flag turns the skill on for the whole project, in two ways:
 - **Review** — it chains after the matching `salesforce-*-quality` skill as a Commerce-domain review
   pass over the generated artifact.
 
-**To set the flag**, either edit the **Commerce project flag** bullet in Priority 3 of your baseline file
+**To set the flag**, either edit the **Commerce project flag** bullet in the **Project Conventions**
+section of your baseline file
 (`CLAUDE.md` / `AGENTS.md` / `.github/copilot-instructions.md`) to declare *"This **is** a Commerce
 org."*, or simply tell the agent **"This is a Commerce project"** and let it update that section for you.
 This is a one-time setup — once the flag is set, the routing applies on every Apex/LWC/Flow task.
@@ -154,5 +168,9 @@ changes will be lost on the next install. Edit the skill folder under `skills/<n
 `SKILL.md` and any `references/` files it contains) and re-run Step 1.
 
 The three root files (`CLAUDE.md`, `AGENTS.md`, `.github/copilot-instructions.md`) are all
-rendered from `templates/baseline.md`. If you change the baseline content, update all three
-files and keep their Priority sections in sync.
+rendered from `templates/baseline.md` — never edit them by hand. Edit the template, then
+regenerate all three:
+
+```bash
+node scripts/render-baselines.js
+```

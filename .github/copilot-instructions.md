@@ -1,6 +1,7 @@
 <!--
   SALESFORCE PROJECT TEMPLATE — GitHub Copilot baseline
-  Rendered from: templates/baseline.md
+  Rendered from: templates/baseline.md — DO NOT EDIT DIRECTLY.
+  Re-render with: node scripts/render-baselines.js
   Companion files (same Priority content, assistant-specific syntax):
     CLAUDE.md                        (Claude Code)
     AGENTS.md                        (Codex)
@@ -23,11 +24,11 @@ artifact or response, use `/skill karpathy-guidelines` to load the latest behavi
 rules. This applies to every request — reviews, quick fixes, and questions included. Never
 skip it because the task looks trivial.
 
-> Install the plugin if not already active:
+> Install if not already available (GitHub Copilot has no plugin support — install as a skill):
 > ```
-> /plugin marketplace add forrestchang/andrej-karpathy-skills
-> /plugin install andrej-karpathy-skills@karpathy-skills
+> npx skills add forrestchang/andrej-karpathy-skills
 > ```
+> (or copy `skills/karpathy-guidelines/` from that repo into `.github/skills/`)
 
 **Git safety**
 - Never run `git commit`, `git push`, or any variant (amend, force-push, rebase, tag push)
@@ -37,9 +38,13 @@ skip it because the task looks trivial.
 **Deployment, install, and filesystem safety (always on, even when no skill fires)**
 - Never deploy to any Salesforce org without explicit user approval. Validate anytime.
 - Before running any `sf project deploy` or `sf project validate` command, display the full
-  command and wait for explicit user confirmation. After submitting a deploy or validate job,
-  return the job ID only — do not poll for status unless the user explicitly asks (or in a
-  CI/CD / automation workflow).
+  command and wait for explicit user confirmation. Exception — a TDD validate loop (see
+  Priority 2): confirm the first validate of the loop (org alias, test level); subsequent
+  iterations in the same loop re-run automatically, each still displaying the full command.
+  Deploys always require confirmation.
+- After submitting a deploy or validate job, return the job ID only — do not poll for status
+  unless the user explicitly asks, it is a CI/CD or automation workflow, or it is a TDD
+  validate loop (where you wait for and read the test results).
 - Never install packages, libraries, CLIs, or software without explicit user approval.
 - Never delete files, perform destructive git operations, or modify system files without
   explicit approval.
@@ -83,10 +88,10 @@ the active context.
 | Reviewing Flow that calls an Apex invocable action | `/skill salesforce-flow-quality` · `/skill salesforce-apex-quality` |
 | Running code analysis (PMD/CodeAnalyzer) | `/skill running-code-analyzer` |
 | Building a complete Lightning app | `/skill generating-lightning-app` |
-| B2B Commerce work — **only when** the Priority 3 Commerce flag is set. When set, it applies to **all** Apex/LWC/Flow work: overlay `/skill salesforce-commerce-b2b` during authoring (alongside the `generating-*` skill), then chain it as a Commerce-domain review pass after the matching `salesforce-*-quality` skill. It is **not** triggered by file content | `/skill salesforce-commerce-b2b` **(overlay + review chain — add to the LWC/Apex/Flow skill, never replace it)** |
+| B2B Commerce work — **only when** the Commerce flag in Project Conventions is set. When set, it applies to **all** Apex/LWC/Flow work: overlay `/skill salesforce-commerce-b2b` during authoring (alongside the `generating-*` skill), then chain it as a Commerce-domain review pass after the matching `salesforce-*-quality` skill. It is **not** triggered by file content | `/skill salesforce-commerce-b2b` **(overlay + review chain — add to the LWC/Apex/Flow skill, never replace it)** |
 
 > **`salesforce-commerce-b2b` is an overlay + review chain, never a replacement.** When the Commerce
-> flag (Priority 3) is set:
+> flag (see Project Conventions) is set:
 > - **Authoring** — co-fire it *alongside* the generating skill (e.g. `generating-apex` +
 >   `salesforce-commerce-b2b`) so generated code is Commerce-aware from the start.
 > - **Review** — after the matching quality skill runs (e.g. `salesforce-apex-quality`), chain
@@ -94,6 +99,23 @@ the active context.
 >
 > It adds Commerce domain rules on top of the base skill — it never substitutes for it. The chain is a
 > routing instruction gated on the flag, not a trigger on file content.
+
+**Test-Driven Development (sequencing rule — the *how* lives in the skills)**
+- New Apex classes or logic changes: author or extend the test class first
+  (`/skill generating-apex-test`), then implement the minimum to make it pass
+  (`/skill generating-apex`).
+- Verify red/green with a **validate deploy — never a real deploy**: include the test class and
+  the implementation class in the payload and run
+  `sf project deploy validate --test-level RunSpecifiedTests --tests <TestClass>`. Assuming the
+  org already holds the required objects, fields, and access, the validate compiles both classes
+  against real metadata and returns test results without changing the org. Wait for and read
+  each validate's test results; iterate until green (confirmation per Priority 1: first validate
+  of the loop confirmed, later iterations re-run automatically).
+- LWC: after generating a component, spot-check it against `/skill salesforce-lwc-quality`.
+  Recommend a Jest spec (sfdx-lwc-jest) to the user and generate one only when the user asks —
+  Jest tests are recommended, not required.
+- Exceptions: metadata-only changes, trivial non-logic edits, and user-declared prototypes or
+  spikes.
 
 Skills whose names begin with `salesforce-` are **authored skills** in `skills/` in this repo
 (installed into `.github/skills/` at setup — see `SETUP.md`).
