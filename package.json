@@ -1,0 +1,19 @@
+{
+  "name": "sf-agentic-development",
+  "version": "1.0.0",
+  "description": "Installer for the sf-agentic-development Salesforce skills, agents, and baselines",
+  "bin": {
+    "sf-agentic-development": "scripts/install.js"
+  },
+  "scripts": {
+    "render": "node scripts/render-baselines.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/drsaavedra/sf-agentic-development.git"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}

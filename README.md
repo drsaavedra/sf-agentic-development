@@ -37,16 +37,108 @@ This repo evolves continuously: new Salesforce releases, better agentic patterns
 
 ---
 
-## Setup (quick start)
+## Setup
 
-Full step-by-step instructions live in **[SETUP.md](SETUP.md)**. The short version:
+### Install (interactive)
 
-1. Copy `skills/*` into your assistant's skills directory — `.claude/skills/` (Claude Code), `.github/skills/` (Copilot), or `.agents/skills/` (Codex).
-2. Install the community Salesforce skills: `npx skills add forcedotcom/sf-skills`.
-3. Install the Karpathy behavioral guidelines — Claude Code via the plugin (`/plugin marketplace add forrestchang/andrej-karpathy-skills`, then `/plugin install andrej-karpathy-skills@karpathy-skills`); Codex/Copilot as a skill (`npx skills add forrestchang/andrej-karpathy-skills`).
-4. Copy `agents/*` into your assistant's agents directory — `.claude/agents/`, `.github/agents/`, or `.agents/agents/`.
-5. Copy the matching baseline into your project root — `CLAUDE.md` (Claude Code), `AGENTS.md` (Codex), or `.github/copilot-instructions.md` (Copilot) — then fill in its **Agent → Spec Doc Map** section.
-6. **Commerce orgs only:** set the **Commerce project flag** in the baseline's Project Conventions section — or just tell the agent *"This is a Commerce project"* and it updates the section for you (details in SETUP.md).
+From the **root of your Salesforce project** (requires Node 18+):
+
+```bash
+npx github:drsaavedra/sf-agentic-development
+```
+
+The installer asks four questions — which assistant you use (Claude Code / GitHub Copilot /
+Codex), which skills to install, which agents to install, and whether this is a B2B Commerce
+project — then copies everything into the right per-assistant directories, drops the matching
+baseline file (`CLAUDE.md`, `.github/copilot-instructions.md`, or `AGENTS.md`) into your
+project root, and sets the Commerce flag in it if you said yes.
+
+### After the installer
+
+1. Install the community Salesforce skills — 50+ official skills (`generating-apex`,
+   `generating-lwc-components`, `deploying-metadata`, `querying-soql`, and more):
+   ```bash
+   npx skills add forcedotcom/sf-skills
+   ```
+2. Install the Karpathy behavioral guidelines:
+   - **Claude Code** (plugin — updates flow through automatically):
+     ```
+     /plugin marketplace add forrestchang/andrej-karpathy-skills
+     /plugin install andrej-karpathy-skills@karpathy-skills
+     ```
+   - **Codex / Copilot** (no plugin support — install as a skill):
+     ```bash
+     npx skills add forrestchang/andrej-karpathy-skills
+     ```
+3. Fill in the baseline's **Agent → Spec Doc Map** section with your project's spec document paths.
+4. *(Optional)* [Superpowers](https://superpowers.ai) for brainstorming, plan-writing, TDD, and
+   debugging workflow skills.
+
+### Commerce projects
+
+`salesforce-commerce-b2b` is **gated on the Commerce flag in the baseline's Project Conventions
+section**, never on file content. When set, it overlays the `generating-*` skill during
+authoring (so generated Apex/LWC/Flow is Commerce-aware from the start) and chains after the
+matching `salesforce-*-quality` skill as a Commerce-domain review pass.
+
+Three ways to set it: answer **yes** to the installer's Commerce question, edit the **Current
+setting** line in the baseline's **Commerce project flag** bullet, or simply tell the agent
+*"This is a Commerce project"* and let it update the section. One-time setup — once set, the
+routing applies on every Apex/LWC/Flow task, the same across all three assistants.
+
+Leave the flag unset for non-Commerce orgs — the skill then never fires. For a mixed
+CRM+Commerce org, either set the flag (and accept the overlay + review chain on all
+Apex/LWC/Flow work) or leave it unset and invoke `salesforce-commerce-b2b` manually on the
+Commerce pieces.
+
+### Repository layout
+
+```
+skills/<name>/              ← 5 authored Salesforce skills (canonical source: SKILL.md + references/)
+agents/<name>.md            ← 2 Salesforce agents (canonical source)
+templates/baseline.md       ← single-source template for the three root files below
+scripts/render-baselines.js ← regenerates the three renders from the template
+scripts/install.js          ← the interactive installer (npx entry point)
+CLAUDE.md                   ← Claude Code baseline (rendered — do not edit directly)
+AGENTS.md                   ← Codex baseline (rendered — do not edit directly)
+.github/copilot-instructions.md ← Copilot baseline (rendered — do not edit directly)
+```
+
+| Assistant | Reads SKILL.md from |
+|---|---|
+| Claude Code | `.claude/skills/<name>/SKILL.md` |
+| Copilot (VS Code) | `.claude/skills/`, `.github/skills/`, or `.agents/skills/` — any one |
+| Codex | `.agents/skills/<name>/SKILL.md` |
+
+All three use the same `name` + `description` frontmatter format.
+
+<details>
+<summary><strong>Manual setup (no installer)</strong></summary>
+
+1. Copy the skills into the assistant-specific directory of your project:
+   ```bash
+   cp -r skills/* .claude/skills/    # Claude Code (Copilot also reads this)
+   cp -r skills/* .github/skills/    # GitHub Copilot
+   cp -r skills/* .agents/skills/    # Codex
+   ```
+2. Copy the agents:
+   ```bash
+   cp -r agents/* .claude/agents/    # Claude Code
+   cp -r agents/* .github/agents/    # GitHub Copilot
+   cp -r agents/* .agents/agents/    # Codex
+   ```
+3. Copy the matching baseline into your project root:
+
+   | Assistant | File to copy |
+   |---|---|
+   | Claude Code | `CLAUDE.md` |
+   | GitHub Copilot | `.github/copilot-instructions.md` |
+   | Codex | `AGENTS.md` |
+
+4. Continue with [After the installer](#after-the-installer) above; for Commerce orgs, set the
+   flag as described in [Commerce projects](#commerce-projects).
+
+</details>
 
 ---
 
@@ -69,8 +161,8 @@ The baseline routes to the right skill automatically based on context. Cross-dom
 
 ## Maintaining
 
-- **Skills** — edit `skills/<name>/` (the `SKILL.md` and its `references/`), then re-copy into the per-assistant directories. Never edit the installed copies.
-- **Baselines** — edit `templates/baseline.md`, then run `node scripts/render-baselines.js` to regenerate the three renders. Never edit `CLAUDE.md`, `AGENTS.md`, or `.github/copilot-instructions.md` by hand.
+- **Skills & agents** — `skills/` and `agents/` are the only source of truth. Edit `skills/<name>/` (the `SKILL.md` and its `references/`) or `agents/<name>.md`, then re-run the installer (or re-copy) into the per-assistant directories. Never edit the installed copies — changes are lost on the next install.
+- **Baselines** — edit `templates/baseline.md` (its header comment documents the template token syntax), then run `node scripts/render-baselines.js` to regenerate the three renders. Never edit `CLAUDE.md`, `AGENTS.md`, or `.github/copilot-instructions.md` by hand.
 
 ## License
 

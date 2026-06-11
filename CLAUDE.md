@@ -118,7 +118,7 @@ the active context.
   spikes.
 
 Skills whose names begin with `salesforce-` are **authored skills** in `skills/` in this repo
-(installed into `.claude/skills/` at setup — see `SETUP.md`).
+(installed into `.claude/skills/` at setup — see the README).
 All other skills are from `forcedotcom/sf-skills`
 (install: `npx skills add forcedotcom/sf-skills`).
 
@@ -147,6 +147,7 @@ before applying any rule.
     file content. Leave unset for non-Commerce orgs. For a mixed CRM+Commerce org, either set the flag
     and accept the overlay + review chain on all Apex/LWC/Flow work, or leave it unset and invoke
     `salesforce-commerce-b2b` manually on the Commerce pieces.
+  - **Current setting:** unset — this is **not** a Commerce org. <!-- commerce-flag -->
 
 ---
 

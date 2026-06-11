@@ -19,6 +19,10 @@
     <!-/- only:claude codex copilot -/-> ... <!-/- end:only -/->   (without the slashes)
                           block kept only for the listed targets
 
+  The <!-/- commerce-flag -/-> comment (without the slashes) in Project Conventions is a
+  sentinel patched by scripts/install.js when the user opts into Commerce — keep it on the
+  "Current setting" line.
+
   Everything below the BODY marker is rendered; everything above it is ignored.
 -->
 
@@ -141,7 +145,7 @@ the active context.
   spikes.
 
 Skills whose names begin with `salesforce-` are **authored skills** in `skills/` in this repo
-(installed into `{{SKILLS_DIR}}/` at setup — see `SETUP.md`).
+(installed into `{{SKILLS_DIR}}/` at setup — see the README).
 All other skills are from `forcedotcom/sf-skills`
 (install: `npx skills add forcedotcom/sf-skills`).
 
@@ -170,6 +174,7 @@ before applying any rule.
     file content. Leave unset for non-Commerce orgs. For a mixed CRM+Commerce org, either set the flag
     and accept the overlay + review chain on all Apex/LWC/Flow work, or leave it unset and invoke
     {{skill:salesforce-commerce-b2b}} manually on the Commerce pieces.
+  - **Current setting:** unset — this is **not** a Commerce org. <!-- commerce-flag -->
 
 ---
 

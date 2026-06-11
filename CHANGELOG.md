@@ -2,6 +2,17 @@
 
 Notable changes to the toolkit, newest first. For full detail see `git log`.
 
+## 2026-06-11 (later)
+
+- **Interactive installer shipped** — `npx github:drsaavedra/sf-agentic-development`, run from
+  the target project root. Prompts for assistant (Claude Code / Copilot / Codex), skills,
+  agents, and the Commerce flag; copies everything into the per-assistant directories, drops
+  the matching baseline, and patches the baseline's new `<!-- commerce-flag -->` sentinel line
+  when Commerce is selected. Zero dependencies (`scripts/install.js` + `package.json` bin).
+- **SETUP.md folded into README.md** — the installer replaced the manual walkthrough as the
+  headline path; manual copy steps survive in a collapsed *Manual setup* block. One document
+  instead of two.
+
 ## 2026-06-11
 
 - **TDD sequencing rule added to the baselines** — Apex: test class first
