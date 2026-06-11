@@ -48,12 +48,22 @@ npx github:drsaavedra/sf-agentic-development
 ```
 
 The installer asks four questions — which assistant you use (Claude Code / GitHub Copilot /
-Codex), which skills to install, which agents to install, and whether this is a B2B Commerce
-project — then copies everything into the right per-assistant directories, drops the matching
+Codex, arrow keys to pick), which skills and which agents to install (spacebar to toggle
+checkboxes, `a` to select all, Enter to confirm), and whether this is a B2B Commerce
+project — then copies your picks into the right per-assistant directories, drops the matching
 baseline file (`CLAUDE.md`, `.github/copilot-instructions.md`, or `AGENTS.md`) into your
 project root, and sets the Commerce flag in it if you said yes.
 
+It then checks whether the two dependencies — `forcedotcom/sf-skills` and the Karpathy
+behavioral guidelines — are already installed (project and user-level skill directories), and
+offers to run `npx skills add` for anything missing. The one thing it can't do for you: the
+Karpathy **plugin** for Claude Code is installed with `/plugin` commands inside Claude Code,
+so it prints those instead.
+
 ### After the installer
+
+Steps 1–2 are only needed if you declined the installer's offers (or it couldn't detect an
+existing install); steps 3–4 always apply:
 
 1. Install the community Salesforce skills — 50+ official skills (`generating-apex`,
    `generating-lwc-components`, `deploying-metadata`, `querying-soql`, and more):

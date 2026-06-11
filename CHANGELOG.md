@@ -2,6 +2,18 @@
 
 Notable changes to the toolkit, newest first. For full detail see `git log`.
 
+## 2026-06-11 (installer v1.1)
+
+- **Keyboard-driven prompts** — assistant choice is an arrow-key picker; skill and agent
+  selection are spacebar checkboxes with `a` = select all (empty selection = install none);
+  confirms are single-key y/N. Piped stdin (tests, CI) falls back to the numbered line
+  prompts, where empty input now means *none* instead of *all*.
+- **Dependency detection + offer** — after copying, the installer checks project and
+  user-level skill directories (and the Claude Code plugin cache) for `forcedotcom/sf-skills`
+  and the Karpathy guidelines, and offers to run `npx skills add` for anything missing. The
+  Claude Code Karpathy plugin can't be installed from a script, so its `/plugin` commands are
+  printed instead. The final "next steps" list only what is still missing.
+
 ## 2026-06-11 (later)
 
 - **Interactive installer shipped** — `npx github:drsaavedra/sf-agentic-development`, run from
