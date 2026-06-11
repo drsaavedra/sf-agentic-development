@@ -40,6 +40,12 @@ them; otherwise follow the existing patterns already in the repo. If the brief i
 ambiguous — in particular if it lacks **test scenarios** or **validation criteria** — ask before
 implementing; do not invent requirements.
 
+If the **schema context** is missing, incomplete, or contradicts the org, verify it yourself
+with the read-only introspection commands in the baseline's "Org introspection & schema truth"
+section (`sf sobject describe`, `sf data query`, `sf api request rest`) — never ask the user to
+run Developer Console or anonymous Apex snippets. Escalate to the main agent or user only when
+introspection cannot resolve it.
+
 ## Skills to invoke
 
 Follow the skill routing in Priority 2 of the repo-root baseline file (`CLAUDE.md`, `AGENTS.md`,

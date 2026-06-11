@@ -242,7 +242,7 @@ path reference forces the agent to rediscover context it can't see from your con
 |---|---|
 | Objective | The unit of work in plain language — what exists when this brief is done |
 | Spec reference | Path to the Technical Specification (also in the baseline's Agent → Spec Doc Map) plus the sections that apply to this task |
-| Schema context | The data model the code touches, written out in the brief. The developer runs isolated — don't make it rediscover the schema |
+| Schema context | The data model the code touches, written out in the brief. The developer runs isolated — don't make it rediscover the schema. Gather it verified, not guessed: `sf sobject describe` and read-only queries against the org (the baseline's "Org introspection & schema truth" rule) |
 | Test scenarios | The TDD requirements. The developer writes these as failing tests first, so they must be concrete enough to assert on |
 | Constraints | Project-specific rules from the spec or your conversation. Constraints live in the brief, never hardcoded in the agent |
 | Dependencies | What earlier briefs produced that this one consumes — paths, signatures, and how to integrate |

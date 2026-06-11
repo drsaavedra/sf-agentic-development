@@ -2,6 +2,23 @@
 
 Notable changes to the toolkit, newest first. For full detail see `git log`.
 
+## 2026-06-11 (org introspection)
+
+- **"Org introspection & schema truth" rule added to Priority 1** — always-on: never guess
+  object/field/relationship API names; verify against local metadata first, then the org (the
+  org wins on divergence) using read-only sf CLI commands the agent runs freely without
+  confirmation (`sf sobject list/describe`, `sf data query` incl. Tooling API,
+  `sf api request rest`, `sf org list metadata`). The agent must **never ask the user to run
+  Developer Console / anonymous Apex snippets** for anything those commands can answer; when
+  anonymous Apex is genuinely required, the agent runs it itself via `sf apex run` after
+  showing the snippet and getting explicit confirmation, read-only unless writes are approved.
+- **TDD sequencing updated** — verify the schema the code touches (per the new rule) before
+  authoring tests, so tests assert against real API names.
+- **`salesforce-developer` fallback** — when a work brief's schema context is missing,
+  incomplete, or contradicts the org, the developer self-serves with the read-only
+  introspection commands instead of asking the user to run console snippets; the README's
+  work-brief table now says schema context is gathered verified (describe/query), not guessed.
+
 ## 2026-06-11 (checkpoint mode)
 
 - **Checkpoint mode added to the Git safety rule** — an opt-in, per-task exception to the

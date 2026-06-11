@@ -75,6 +75,25 @@ skip it because the task looks trivial.
   data — and never expose PII or internal error detail — in code, tests, logs, error
   messages, or generated files.
 
+**Org introspection & schema truth (always on, even when no skill fires)**
+- Never guess object, field, or relationship API names. Before writing Apex, LWC, SOQL, or
+  Flow metadata that touches the schema, verify the names — first against the local metadata
+  in the repo (`force-app/**`) when present, then against the org. When they diverge, the org
+  is the source of truth.
+- Self-serve with **read-only** sf CLI commands — run these freely, no confirmation needed:
+  - `sf sobject list` / `sf sobject describe --sobject <Name>` — object and field API names,
+    types, relationships, picklist values
+  - `sf data query --query "..."` (add `--use-tooling-api` where applicable) — verify SOQL
+    shape and behavior against real data
+  - `sf api request rest '/services/data/vXX.X/...'` — UI API, composite, and anything
+    describe and query don't cover
+  - `sf org list metadata --metadata-type <Type>` — what's actually deployed
+- **Never ask the user to run snippets in the Developer Console or anonymous Apex** for
+  anything the commands above can answer. If anonymous Apex is genuinely required (exercising
+  behavior a query can't reach), run it yourself via `sf apex run`: display the full snippet
+  first and wait for explicit confirmation (it executes code in the org), and keep it
+  read-only unless the user approves writes.
+
 ---
 
 ## Priority 2: Skill Routing
@@ -124,6 +143,8 @@ the active context.
 > routing instruction gated on the flag, not a trigger on file content.
 
 **Test-Driven Development (sequencing rule — the *how* lives in the skills)**
+- Before authoring tests, verify the schema the code touches (per the org introspection rule
+  in Priority 1) so tests assert against real API names — not guessed ones.
 - New Apex classes or logic changes: author or extend the test class first
   (`generating-apex-test`), then implement the minimum to make it pass
   (`generating-apex`).
