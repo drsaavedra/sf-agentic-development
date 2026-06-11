@@ -2,6 +2,35 @@
 
 Notable changes to the toolkit, newest first. For full detail see `git log`.
 
+## 2026-06-11 (agent orchestration)
+
+- **Agent Orchestration guide added to the README** — full lifecycle for the main agent +
+  `salesforce-developer` + `architect` trio: a structured **work-brief template** (objective,
+  spec reference, embedded schema context, test scenarios, constraints, dependencies, expected
+  outputs, validation criteria), parallel-vs-sequential dispatch rules (including a
+  contract-first variant for parallelizing dependent artifacts), the build-summary-as-
+  integration-point rule, and the BLOCKED → fix-brief → re-review loop. Patterns adapted from
+  [Agentic Project Management](https://github.com/sdi2200262/agentic-project-management); its
+  message bus, handoffs, and Planner agent were deliberately not adopted.
+- **"Prompting a pattern" subsection** — what the user actually types to get each dispatch
+  shape: a per-pattern example-prompt table, the three steering levers (work scoping,
+  parallelism/contract pinning, architect gates), and a kickoff prompt opening every worked
+  example. Baselines gained the matching rule: honor explicit steering in the prompt,
+  otherwise derive the shape from the dependency structure and skip the architect.
+- **Six collapsed worked examples, one per pattern** — all standard-object builds the community
+  demonstrably does a lot (tutorial sources linked in each): Opportunity rollup (dependent
+  chain + fix loop), CMDT-driven reusable datatable for Account/Contact/Opportunity
+  (contract-first parallel dispatch), Case SLA escalation (the self-contained brief), Lead
+  auto-conversion (build summary as integration point), Case/Task data-hygiene batches (the
+  task loop repeated), and an Account address-verification callout (design gate + build gate).
+- **Baselines: Priority 4 renamed to "Agent Orchestration & Spec Doc Map"** — now carries the
+  enforceable subset of the orchestration rules (structured brief with embedded context,
+  dispatch rules, build-summary tracking, review loop) above the existing doc map.
+- **Agents updated** — `salesforce-developer` lists the work-brief fields it expects and asks
+  (rather than inventing requirements) when test scenarios or validation criteria are missing;
+  `architect` gained an "After the review" section making the report append-only and its
+  Recommended Actions the seed of the fix brief.
+
 ## 2026-06-11 (installer v1.1)
 
 - **Keyboard-driven prompts** — assistant choice is an arrow-key picker; skill and agent

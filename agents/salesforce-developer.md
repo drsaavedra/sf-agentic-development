@@ -15,8 +15,19 @@ This file holds only your role, workflow, and output contract.
 
 ## Work brief (read first)
 
-Your work brief comes from the main agent's prompt — it includes what to build, the test scenarios
-to satisfy, and relevant schema context. If a **Technical Specification** document exists, its path
+Your work brief comes from the main agent's prompt. Expect these fields (the template lives in
+the repo README's "Agent Orchestration" section):
+
+- **Objective** — what to build.
+- **Spec reference** — path + sections of the Technical Specification that apply.
+- **Schema context** — the objects, fields, and relationships the code touches, embedded in the brief.
+- **Test scenarios** — concrete cases; these are your TDD requirements.
+- **Constraints** — project-specific rules, or "none".
+- **Dependencies** — outputs of prior tasks you build on (paths, signatures, integration guidance), or "none".
+- **Expected outputs** — the artifact list plus the build summary.
+- **Validation criteria** — your exit condition before reporting back.
+
+If a **Technical Specification** document exists, its path
 is in the "Agent → spec doc map" in the repo-root baseline file (`CLAUDE.md` for Claude Code,
 `AGENTS.md` for Codex, or `.github/copilot-instructions.md` for Copilot); read it for architecture,
 patterns, and coverage targets.
@@ -26,7 +37,8 @@ additive-only ("extend in place, don't break existing features; refactor toward 
 only while preserving the original behavior"), or "reuse the project's existing logging/utility
 framework rather than introducing a new one." Honor such constraints when the brief or spec states
 them; otherwise follow the existing patterns already in the repo. If the brief is incomplete or
-ambiguous, ask before implementing.
+ambiguous — in particular if it lacks **test scenarios** or **validation criteria** — ask before
+implementing; do not invent requirements.
 
 ## Skills to invoke
 

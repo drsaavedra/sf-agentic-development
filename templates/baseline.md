@@ -178,7 +178,26 @@ before applying any rule.
 
 ---
 
-## Priority 4: Agent → Spec Doc Map
+## Priority 4: Agent Orchestration & Spec Doc Map
+
+**Orchestration rules** (the workflow narrative and work-brief template live in the repo README's
+"Agent Orchestration" section):
+
+- Dispatch dev work to `salesforce-developer` with a structured **work brief**: objective, spec
+  reference, schema context, test scenarios, constraints, dependencies, expected outputs,
+  validation criteria. Embed the schema and spec extracts the task needs in the brief — do not
+  rely on bare path references.
+- Run **parallel** developer instances only for independent work items; a dependent chain (e.g.
+  service consumed by a trigger) goes to a **single** instance, sequenced in one brief — unless
+  the main agent pins the integration **contract** (signatures, public APIs, schema) up front,
+  embeds it in each brief, and verifies integration with one combined validate at the merge point.
+- Track developer progress through the **build summary**, not raw diffs.
+- `architect` reviews are on-demand. A **BLOCKED** report re-briefs `salesforce-developer` with
+  the report's Recommended Actions; the architect then re-reviews and appends a new dated section.
+- The user steers the dispatch shape in the prompt when they want to (e.g. *"run in parallel"*,
+  *"pin the contracts first"*, *"one at a time"*, *"architect design review before any code"*) —
+  honor it. Absent explicit steering, derive the shape from the dependency structure of the work
+  and invoke no architect review.
 
 > **Per-project setup:** Fill in the paths in the table below when you deploy this template to a
 > real project repo. Config planning and QA scenario authoring are handled inline by the main

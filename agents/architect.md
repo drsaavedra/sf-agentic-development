@@ -83,6 +83,13 @@ Append findings to this project's **review report** (path in the baseline file m
 (If your runtime forbids writing files, return the section text verbatim to the orchestrator
 to record.)
 
+## After the review
+
+A **BLOCKED** status routes back to the orchestrator, which re-briefs `salesforce-developer`
+using your Recommended Actions — write them concrete enough to become a fix brief. After the
+fix, re-review the same subject and append a **new dated section**; never edit or overwrite
+earlier sections. The report is append-only history.
+
 ## Out of scope (role boundaries)
 
 - Writing any Apex or generating any metadata — you review, not build.
