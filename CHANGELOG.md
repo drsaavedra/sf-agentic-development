@@ -2,6 +2,41 @@
 
 Notable changes to the toolkit, newest first. For full detail see `git log`.
 
+## 2026-06-12 (example set curated + dispatch threshold)
+
+- **Dispatch threshold added to the orchestration rules** (README dispatch rules + baselines'
+  Priority 4) — orchestrate only when complexity pays for the dispatch. The decision map: a
+  spawned agent re-reads context cold (a token cost the user owns — in marginal cases surface
+  the trade-off, never silently spawn), while long-running or complex work done inline crowds
+  the main context window. Simple single-artifact work and all config stays with the main
+  agent; dispatch parallelizable items, multi-artifact chains with long TDD/validate loops,
+  or work the user wants to keep planning around. Architect gates are orthogonal — on-demand
+  at any size.
+- **Worked examples cut from seven to four** — every survivor justifies its dispatch under the
+  threshold. Removed: build summary as integration point and the repeated task loop (simple
+  sequential dev work — the doctrine they taught lives on in the lifecycle and dispatch
+  rules), and the self-contained-brief example (a basic single-instance spawn; its one unique
+  insight — gather scattered org config into the brief because the isolated agent can't see
+  the conversation — moved into the work-brief section). Survivors renumbered 1–4; index,
+  prompting-a-pattern table, and steering-levers list updated to match.
+- **Example 1 scenario corrected for platform credibility** — the won-Opportunity rollup was
+  wrong as an Apex example: Account↔Opportunity is a standard exception where declarative
+  Roll-Up Summary fields work despite the lookup, so coding it signals inexperience. Replaced
+  with an open-case rollup (Case↔Account gets no such exception, and flows can't trigger on
+  undelete), plus a "why Apex at all" note: when the platform gives the rollup away, take the
+  field, not the trigger.
+
+## 2026-06-12 (Flow worked example)
+
+- **Example 7 added to the Agent Orchestration guide** — round-robin lead assignment: a
+  record-triggered flow on Lead create calling an invocable Apex action, the routing table's
+  "Flow + Apex invocable" cross-domain pair as a worked dispatch. Teaching points: a Flow brief
+  is a developer dispatch like any other (same brief template, same quality gates, different
+  skill chain), and a Flow that calls Apex is a dependent chain across artifact types — one
+  instance, two sequenced work items, the contract inside the brief. Fills the one artifact-type
+  gap in the example set now that `salesforce-developer` covers Flow work; index and
+  prompting-a-pattern tables gained the matching row.
+
 ## 2026-06-12 — v1.0.0
 
 First tagged release of the toolkit. Release housekeeping:

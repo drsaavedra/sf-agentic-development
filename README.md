@@ -250,10 +250,33 @@ path reference forces the agent to rediscover context it can't see from your con
 | Expected outputs | The artifact list, so "done" is checkable |
 | Validation criteria | The exit condition the developer loops against before reporting back |
 
+When the context a task needs lives in scattered org config rather than the spec — queues,
+record types, business-hours rules — gather it into the brief too: the isolated agent can't see
+your conversation, and a bare "see the spec and the org" reference spends its run rediscovering
+(or worse, inventing) exactly that context.
+
 If a brief lacks test scenarios or validation criteria, the developer agent asks instead of
 inventing requirements — write them before dispatching.
 
-### Dispatch rules — parallel or sequential?
+### Dispatch rules — whether to dispatch, then parallel or sequential?
+
+**The dispatch threshold — orchestrate only when complexity pays for it.** A spawned agent
+starts cold: it re-reads project context the main agent already holds, and that costs real
+tokens — spending them is your call, so when the case is marginal the main agent should surface
+the trade-off rather than silently spawn. The counterweight is your main context window:
+long-running or complex work done inline fills it fast, and a crowded context degrades
+everything that follows. That tension is the decision map:
+
+- **Stays with the main agent** — simple, single-artifact work (one class, one small fix, any
+  config): the brief plus the cold start cost more tokens than they save, and the main agent
+  already holds the context.
+- **Dispatch to `salesforce-developer`** — work heavy enough to crowd the main conversation:
+  independent or contract-pinned items that build in parallel, a multi-artifact chain with a
+  long TDD/validate loop, or a build you want to keep planning around while it runs.
+- **Architect gates are orthogonal** — on-demand at any size; review cost scales with the
+  artifact, not the dispatch shape.
+
+Once dispatching, parallel or sequential:
 
 - **Independent work items** (separate objects or domains, no shared classes) → **parallel**
   developer instances, one brief each.
@@ -308,15 +331,13 @@ architect gate** (it is on-demand, never automatic). Example prompts:
 
 | Pattern | What you'd type |
 |---|---|
-| 1 — Dependent chain + fix loop | *"Implement the won-opportunity rollup from spec §4.2 — send it to the developer agent, then have the architect review the build."* |
+| 1 — Dependent chain + fix loop | *"Implement the open-case rollup from spec §4.2 — send it to the developer agent, then have the architect review the build."* |
 | 2 — Contract-first parallel dispatch | *"Build a reusable datatable LWC driven by custom metadata, plus versions for Account, Contact, and Opportunity. Pin the contracts first and run the dev work in parallel where the pieces allow it."* |
-| 3 — Self-contained work brief | *"Implement case SLA escalation from spec §5.3 with the developer agent. Put everything it needs — queues, record types, the business-hours rule — in the brief."* |
-| 4 — Build summary as integration point | *"Now add auto-conversion of qualified leads. Reuse the LeadConvertService from the build summary — brief the developer from that entry, don't re-read the class."* |
-| 5 — Full task loop, repeated | *"Work through the data-hygiene jobs in spec §5.1 one at a time: brief, build, then show me the build summary before you start the next one."* |
-| 6 — Review gates at both ends | *"We need address verification on Accounts against the vendor API. Have the architect clear the design before any code is written, and review the build afterwards."* |
+| 3 — Review gates at both ends | *"We need address verification on Accounts against the vendor API. Have the architect clear the design before any code is written, and review the build afterwards."* |
+| 4 — Cross-domain chain (Flow + invocable Apex) | *"Add round-robin assignment for new leads: a record-triggered flow on Lead create that hands the batch to an invocable Apex action, rotating evenly across the Sales queue's members."* |
 
 The italicized phrases are the levers: *"in parallel where the pieces allow it"*, *"pin the
-contracts first"*, *"from the build summary"*, *"one at a time"*, *"before any code is
+contracts first"*, *"before any code is
 written"*, *"checkpoint as you go"*. Leave them out and the main agent still picks a sane shape — sequential, briefed,
 no review — and you can redirect at any checkpoint. Each worked example below opens with its
 kickoff prompt.
@@ -329,64 +350,69 @@ matches the situation you're in.
 
 | # | Pattern | Scenario |
 |---|---|---|
-| 1 | Dependent chain + fix loop | Opportunity rollup to Account |
+| 1 | Dependent chain + fix loop | Open-case rollup to Account (the rollup a formula can't do) |
 | 2 | Contract-first parallel dispatch | Apex controller ‖ LWC built in parallel: a reusable CMDT-driven datatable |
-| 3 | The self-contained work brief | Case SLA escalation to a Tier 2 queue |
-| 4 | Build summary as the integration point | Auto-converting qualified Leads |
-| 5 | The full task loop, repeated | Data-hygiene batches: stale Case auto-close, then old Task purge |
-| 6 | Review gates at both ends | Account address verification via Named Credential callout |
+| 3 | Review gates at both ends | Account address verification via Named Credential callout |
+| 4 | Cross-domain chain: Flow + invocable Apex | Round-robin lead assignment — record-triggered flow calling an invocable action |
 
 <details>
-<summary><strong>Example 1 — dependent chain + fix loop: Opportunity rollup (single instance)</strong></summary>
+<summary><strong>Example 1 — dependent chain + fix loop: open-case rollup to Account (single instance)</strong></summary>
 
-**The kickoff prompt** — *"Implement the won-opportunity rollup from spec §4.2 — send it to
+**The kickoff prompt** — *"Implement the open-case rollup from spec §4.2 — send it to
 the developer agent, then have the architect review the build."* The service and the trigger
 that calls it are a dependent chain, so the main agent sends both to one instance in one brief.
+
+**Why this rollup needs Apex at all** — the first thing the main agent checks before any code
+is briefed. Case↔Account is a plain lookup with no declarative rollup path: Roll-Up Summary
+fields need master-detail, and the standard-relationship exception covers Opportunity→Account
+and CampaignMember→Campaign — **not** Case. A record-triggered flow can't fire on undelete,
+which the count must survive. When the platform gives the rollup away — summing won Opportunity
+Amount onto Account is a five-minute Roll-Up Summary field, no code — take the field, not the
+trigger; briefing Apex for that burns a developer instance on config work.
 
 **The brief** (composed by the main agent after planning the config inline):
 
 ```markdown
-## Work Brief — Won Opportunity rollup to Account
+## Work Brief — Open-case rollup to Account
 
-**Objective** — Maintain Account.Total_Won_Amount__c as the sum of Amount across the
-account's Closed Won opportunities, updated on opportunity insert, update, delete, undelete.
+**Objective** — Maintain Account.Open_Case_Count__c as the count of the account's open Cases,
+updated on case insert, update (status change or reparent), delete, undelete.
 **Spec reference** — docs/tech-spec.md §4.2 "Account rollups"
-**Schema context** — Opportunity.AccountId (lookup, not master-detail — hence Apex, not a
-rollup summary field). Account.Total_Won_Amount__c: Currency(16,2), already deployed.
-Opportunity.StageName = 'Closed Won' is the won condition (IsWon mirrors it).
+**Schema context** — Case.AccountId (lookup — no Roll-Up Summary possible on it, and flows
+can't trigger on undelete: hence Apex). Account.Open_Case_Count__c: Number(8,0), already
+deployed. Open = IsClosed = false.
 **Test scenarios**
-- Insert 200 won opps across 50 accounts → each account totals its own opps (bulk)
-- Update an opp from open to won → total increases; won to open → decreases
-- Move a won opp to a different account → old account decreases, new account increases
-- Delete / undelete a won opp → total follows
-- Amount = null on a won opp → treated as 0, no exception
+- Insert 200 open cases across 50 accounts → each account counts its own cases (bulk)
+- Close a case → count decreases; reopen it → count increases
+- Reparent an open case to another account → old account decreases, new account increases
+- Delete / undelete an open case → count follows
+- Case with no AccountId → ignored, no exception
 **Constraints** — Reuse the existing TriggerHandler base class (force-app/main/default/classes/TriggerHandler.cls); additive-only.
 **Dependencies** — none
-**Expected outputs** — OpportunityTrigger (extended), OpportunityRollupService.cls,
-OpportunityRollupServiceTest.cls + build summary entry
+**Expected outputs** — CaseTrigger (extended), CaseRollupService.cls,
+CaseRollupServiceTest.cls + build summary entry
 **Validation criteria** — all scenarios green via validate deploy, ≥85% coverage, analyzer clean
 ```
 
-**The build** — the developer writes `OpportunityRollupServiceTest` first (fails), implements
-`OpportunityRollupService`, loops `sf project deploy validate --test-level RunSpecifiedTests`
+**The build** — the developer writes `CaseRollupServiceTest` first (fails), implements
+`CaseRollupService`, loops `sf project deploy validate --test-level RunSpecifiedTests`
 until green, and appends to `docs/dev-build-summary.md`:
 
-> **OpportunityRollupService** — aggregates won Opportunity Amount per Account (spec §4.2).
-> Scenarios: bulk insert, stage transitions, reparent, delete/undelete, null Amount.
+> **CaseRollupService** — maintains the open-case count per Account (spec §4.2).
+> Scenarios: bulk insert, close/reopen, reparent, delete/undelete, orphan case.
 > Tests: 6/6 pass · coverage 94%.
 
 **The review** — you invoke `architect` for a build review. It reads the spec and the build
 summary, runs the code analyzer, and appends to `docs/sa-review-report.md`:
 
-> ## Review — Won Opportunity rollup (2026-06-11)
+> ## Review — Open-case rollup (2026-06-12)
 > ### Review Status: BLOCKED
 > #### Gaps — Reparenting recalculates the new account but not the prior account when
-> AccountId changes on an already-won opp updated in the same transaction as a stage change
-> (spec §4.2: "both accounts must be recalculated"). Test scenario 3 passes only for the
-> single-field update path.
+> AccountId and Status change in the same update (spec §4.2: "both accounts must be
+> recalculated"). Test scenario 3 passes only for the single-field update path.
 > #### Out of Scope — None
 > #### Recommended Actions — 1. Collect old and new AccountId into the recalc set when either
-> StageName or AccountId changes. 2. Add a test mutating both fields in one update.
+> Status or AccountId changes. 2. Add a test mutating both fields in one update.
 
 **The fix loop** — the main agent turns Recommended Actions into a short fix brief for the same
 developer instance (it already knows the code); the developer fixes, re-validates, updates the
@@ -521,214 +547,7 @@ re-reviews and appends a new dated **APPROVED** section.
 </details>
 
 <details>
-<summary><strong>Example 3 — the self-contained brief (embedded context): Case SLA escalation to a Tier 2 queue</strong></summary>
-
-**The kickoff prompt** — *"Implement case SLA escalation from spec §5.3 with the developer
-agent. Put everything it needs — queues, record types, the business-hours rule — in the
-brief."* The second sentence is technically redundant (briefs are always self-contained per
-the baseline rules) but worth saying when the context is scattered across org config the
-isolated agent can't see.
-
-*Why this scenario: case escalation/SLA automation is one of the most-covered Service Cloud builds — [Salesforce Ben's escalation rules tutorial](https://www.salesforceben.com/tutorial-how-to-create-salesforce-escalation-rules/), [Apex Hours' case escalation guide](https://www.apexhours.com/case-escalation-rule/), and the official [Trailhead support-case project](https://trailhead.salesforce.com/content/learn/projects/create-a-process-for-managing-support-cases/create-an-escalation-rule) all walk through it — and Apex takes over the moment declarative escalation rules can't express the SLA math.*
-
-**The feature** — open Support cases that sit past a priority-based SLA get escalated: flagged,
-timestamped, and reassigned to a Tier 2 queue, with the clock measured in business hours.
-
-**Step 0 — the main agent does the config inline.** The two queues (`Tier_1_Support`,
-`Tier_2_Support`) and the `Case.Escalated_On__c` Datetime field are main-agent work — never a
-developer brief. It also pins the SLA targets from the spec and authors the test scenarios in
-conversation with you. Everything the isolated developer will need now exists *and is known to
-the main agent* — so it all goes **into the brief**:
-
-```markdown
-## Work Brief — Case SLA escalation service
-
-**Objective** — Hourly scheduled job that escalates open Support cases breaching their
-priority SLA: set IsEscalated and Escalated_On__c, reassign to the Tier 2 queue.
-**Spec reference** — docs/tech-spec.md §5.3 "Case escalation"
-**Schema context** —
-- Case (standard). Open = Status != 'Closed'. Priority: High / Medium / Low. IsEscalated
-  (standard checkbox) marks escalation; Escalated_On__c (Datetime, already deployed) records it.
-  CreatedDate starts the SLA clock.
-- Record types: Support is in scope; Billing is excluded.
-- Queues (already deployed): Tier_1_Support, Tier_2_Support. Resolve the target owner via
-  [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'Tier_2_Support'].
-- SLA targets (spec §5.3): High = 4 business hours, Medium = 8, Low = 24 — computed against
-  the org default BusinessHours record via BusinessHours.add(hoursId, CreatedDate, target).
-**Test scenarios**
-- 200 open Support cases past target across all priorities → all escalated to Tier_2_Support
-  in one run (bulk)
-- High case 3 business hours old → untouched; 5 business hours old → escalated
-- High case created Friday 16:00 → still within SLA Monday 09:00 (weekend off the clock)
-- Already-escalated case past target → not re-escalated, owner unchanged
-- Billing record type or Closed case past target → never escalated
-**Constraints** — one update DML per run; suppress case assignment rules on the escalation
-update (DMLOptions); additive-only
-**Dependencies** — none
-**Expected outputs** — CaseEscalationService.cls, CaseEscalationSchedulable.cls, test
-classes + build summary entry
-**Validation criteria** — all scenarios green via validate deploy, ≥85% coverage, analyzer clean
-```
-
-**Why this brief works in isolation** — the developer instance opens cold, with none of your
-conversation. It never queries the org to discover queue names, never guesses which record types
-count, never re-derives the SLA math: the queue resolution query, the exclusions, and the
-business-hours formula are all embedded. A bare "see the spec and the org" reference would have
-spent the agent's run rediscovering exactly this context — or worse, inventing it.
-
-**The build** — tests first, implementation, validate loop until green, then the summary entry:
-
-> **CaseEscalationService** — escalates open Support cases past their priority SLA in business
-> hours (spec §5.3); hourly via CaseEscalationSchedulable. Scenarios: bulk, SLA boundary,
-> business-hours clock, idempotent re-run, record-type/status exclusions.
-> Tests: 7/7 pass · coverage 96%.
-
-A build review (`architect`) is optional here as always — invoke it when you want the gate.
-
-</details>
-
-<details>
-<summary><strong>Example 4 — build summary as the integration point: auto-converting qualified Leads</strong></summary>
-
-**The kickoff prompt** (weeks after stage 1 shipped) — *"Now add auto-conversion of qualified
-leads. Reuse the LeadConvertService from the build summary — brief the developer from that
-entry, don't re-read the class."* Pointing at the build summary entry is the lever: it tells
-the main agent the integration contract is already on record.
-
-*Why this scenario: auto lead conversion is a perennial Apex build — covered by Salesforce's own [Converting Leads developer guide](https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/langCon_apex_dml_examples_convertlead.htm) and long-running community tutorials like [Brian Cline's auto-convert guide](https://www.brcline.com/blog/how-to-automatically-convert-leads-in-apex) and [Deadlypenguin's trigger walkthrough](https://blog.deadlypenguin.com/2014/07/23/intro-to-apex-auto-converting-leads-in-a-trigger/).*
-
-**The feature, in two stages weeks apart** — first a bulk-safe conversion service wrapping
-`Database.convertLead`; later, a trigger that auto-converts leads the moment they're qualified.
-Had both been scoped together this would be a dependent chain in one brief (dispatch rules
-above) — but stage 2 arrived as a new request after the stage-1 instance was long gone. The
-bridge between them is the **build summary, not the code**.
-
-**Stage 1** — a developer instance gets the service brief, condensed:
-
-> **Brief 1 → LeadConvertService** — wrap `Database.convertLead` behind one bulk method:
-> match an existing Account by normalized Company before converting (attach, don't duplicate),
-> isolate per-lead failures, return per-lead results. Scenarios: bulk 200, match vs no-match,
-> partial failure isolation, already-converted lead skipped. **Dependencies** — none.
-
-It builds via TDD and appends to `docs/dev-build-summary.md`:
-
-> **LeadConvertService** — bulk lead conversion with account matching (spec §3.4).
-> `public static List<ConversionResult> convertQualified(Set<Id> leadIds)` —
-> force-app/main/default/classes/LeadConvertService.cls. Matches existing Accounts by
-> normalized Company; resolves ConvertedStatus from the org's lead status picklist;
-> ConversionResult { leadId, success, accountId, contactId, opportunityId, error }.
-> Tests: 8/8 pass · coverage 93%.
-
-**Stage 2 — the main agent composes the next brief from that entry.** It reads the build
-summary, **not** `LeadConvertService.cls` — the manager reads logs, not code. The entry's class
-name, method signature, result shape, and file path land in the new brief's Dependencies field
-nearly verbatim:
-
-```markdown
-## Work Brief — Auto-convert qualified leads (trigger)
-
-**Objective** — When Lead.Status becomes 'Qualified' (on insert or update), convert the lead
-in the same transaction via the existing conversion service.
-**Spec reference** — docs/tech-spec.md §3.5 "Auto-conversion"
-**Schema context** — Lead.Status picklist: 'Qualified' is the eligible value. Lead.IsConverted
-guards re-entry. Conversion produces Account, Contact, Opportunity (handled by the service).
-**Test scenarios**
-- Update 200 leads to 'Qualified' in one DML → all converted, one service call (bulk)
-- Insert a lead already 'Qualified' → converted
-- Update not touching Status, or setting another value → no conversion
-- One lead fails conversion → the rest of the batch still converts; failure logged, no throw
-**Constraints** — reuse the existing TriggerHandler base class; the trigger filters and
-delegates — conversion logic stays in the service; additive-only
-**Dependencies** — from build summary entry "LeadConvertService" (2026-05-28):
-LeadConvertService.convertQualified(Set<Id> leadIds) returning List<ConversionResult>
-{ leadId, success, accountId, contactId, opportunityId, error } —
-force-app/main/default/classes/LeadConvertService.cls. It already handles account matching,
-ConvertedStatus resolution, and per-lead failure isolation: pass Ids, read results,
-re-implement none of it.
-**Expected outputs** — LeadTrigger (extended), LeadAutoConvertHandler.cls + test class +
-build summary entry
-**Validation criteria** — all scenarios green via validate deploy (include
-LeadConvertServiceTest in the test run), ≥85% coverage, analyzer clean
-```
-
-**Why this works** — every fact the stage-2 developer needs about stage 1 came from one summary
-entry: what to call, what comes back, where it lives, and what *not* to rebuild. The main agent
-never opened the class; the new developer instance honors the signature instead of re-reading
-its internals. That is the build summary doing its job as the integration point — and it's why
-the developer agent writes a summary entry worth quoting after every brief.
-
-</details>
-
-<details>
-<summary><strong>Example 5 — the full task loop, repeated: scheduled data-hygiene jobs (stale Case auto-close, then old Task purge)</strong></summary>
-
-**The kickoff prompt** — *"Work through the data-hygiene jobs in spec §5.1 one at a time:
-brief, build, then show me the build summary before you start the next one."* — *"one at a
-time"* plus *"show me the summary"* turns the loop's natural checkpoints into explicit user
-gates between iterations.
-
-*Why this scenario: scheduled batch cleanup is one of the most-built Apex patterns —
-[Batch Apex in Salesforce (Apex Hours)](https://www.apexhours.com/batch-apex-in-salesforce/) ·
-[Hard Delete Records From Salesforce With Batch Apex (Salesforce Help)](https://help.salesforce.com/s/articleView?id=000385786&language=en_US&type=1) ·
-[Auto-close cases which are inactive (Trailblazer Community)](https://trailhead.salesforce.com/trailblazer-community/feed/0D54S00000A8vAtSAJ).*
-
-**The feature** — two nightly hygiene jobs: auto-close Cases untouched for 30+ days, then purge
-completed Tasks older than two years. Same loop, run twice: plan → brief → build → summary →
-read summary → next brief.
-
-**Iteration 1 — plan.** The main agent does the config inline: adds the `Closed — Inactive`
-value to Case.Status and agrees the staleness rule with you. Picklist config is main-agent
-work — it never goes in a developer brief.
-
-**Iteration 1 — brief.**
-
-```markdown
-## Work Brief — Stale Case auto-close batch
-
-**Objective** — Nightly batch that closes Cases untouched for 30+ days (Status →
-'Closed — Inactive') and emails a run summary from finish(). Schedulable for a 2:00 AM run.
-**Spec reference** — docs/tech-spec.md §5.1 "Data hygiene jobs"
-**Schema context** — All standard: Case.Status (value 'Closed — Inactive' already deployed),
-IsClosed, LastModifiedDate. Stale = LastModifiedDate < LAST_N_DAYS:30 AND IsClosed = false.
-**Test scenarios**
-- 200 stale open cases → all closed in one run (bulk)
-- Case modified 29 days ago → untouched; already-closed case → untouched
-- One case fails validation on update → rest of the chunk still closes
-  (Database.update with allOrNone=false), failure counted in the summary email
-- Schedulable entry point enqueues the batch (assert via System.schedule + CronTrigger)
-**Constraints** — QueryLocator in start(); Database.Stateful counters for the summary;
-no hardcoded recipient — read the support-manager email from the existing org settings class
-**Dependencies** — none
-**Expected outputs** — StaleCaseCleanupBatch.cls (Batchable + Schedulable) + test class
-+ build summary entry
-**Validation criteria** — all scenarios green via validate deploy, ≥85% coverage, analyzer clean
-```
-
-**Iteration 1 — build + summary.** The developer writes the failing tests, implements, loops
-the validate deploy until green, and appends to `docs/dev-build-summary.md`:
-
-> **StaleCaseCleanupBatch** — Batchable + Schedulable closing stale open Cases (spec §5.1).
-> Stateful processed/failed counters feed the finish() summary email; partial-success DML.
-> Tests: 5/5 pass · coverage 93%. Reusable pattern: counters + finish() notification.
-
-**Iteration 2 — the loop repeats.** The main agent reads that summary — not the code — and
-composes the next brief, with the **Dependencies** field carrying what the summary established:
-
-> **Work Brief — Completed Task purge batch** — delete Tasks with Status = 'Completed' and
-> ActivityDate older than 730 days; scenarios: bulk purge of 200, recent completed task
-> untouched, open old task untouched, partial-failure counting. **Dependencies** —
-> `StaleCaseCleanupBatch.cls` established the job pattern: Batchable + Schedulable in one
-> class, Database.Stateful counters, partial-success DML, finish() summary email. Mirror it.
-
-Same instance (it already knows the pattern it's reusing), same TDD loop, second build summary
-entry. The main agent then hands you the two `System.schedule` calls to confirm and run —
-touching the org stays user-gated. An architect build review across both jobs is optional;
-the loop itself doesn't require one.
-
-</details>
-
-<details>
-<summary><strong>Example 6 — review gates at both ends: Account address verification via Named Credential callout</strong></summary>
+<summary><strong>Example 3 — review gates at both ends: Account address verification via Named Credential callout</strong></summary>
 
 **The kickoff prompt** — *"We need address verification on Accounts against the vendor API.
 Have the architect clear the design before any code is written, and review the build
@@ -805,6 +624,93 @@ coverage 91%"*). The architect re-reads spec + summary, runs the analyzer, and a
 Minor issues don't reopen the loop — they ride along to the next brief. The teaching point:
 the same architect, two different gates — the design gate caught what no test would have
 (a wrong architecture passes its own tests), the build gate judged what was actually shipped.
+
+</details>
+
+<details>
+<summary><strong>Example 4 — cross-domain chain: round-robin lead assignment, a record-triggered Flow + invocable Apex</strong></summary>
+
+**The kickoff prompt** — *"Add round-robin assignment for new leads: a record-triggered flow
+on Lead create that hands the batch to an invocable Apex action, rotating evenly across the
+Sales queue's members."* No steering needed: the flow calls the action, so the two artifacts
+are a dependent chain across artifact types — the main agent derives one developer instance,
+both work items sequenced in one brief (dispatch rules above).
+
+*Why this scenario: round-robin assignment is the perennial "Flow needs Apex" build — a flow
+can't hold a rotation counter across transactions —
+[Round Robin Assignment in Salesforce (Salesforce Ben)](https://www.salesforceben.com/round-robin-assignment-in-salesforce-how-to-keep-your-team-in-the-loop/) ·
+[Open Sourcing the Round Robin Assigner (Joys of Apex)](https://www.jamessimone.net/blog/joys-of-apex/open-sourcing-round-robin/) ·
+[InvocableMethod Annotation (Salesforce Developers)](https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_classes_annotation_InvocableMethod.htm).*
+
+**The feature** — new Leads landing in the Sales queue get distributed evenly across the
+queue's active members: a record-triggered flow fires on create and calls one invocable action,
+which assigns owners round-robin and persists the rotation pointer between transactions.
+
+**Step 0 — the main agent does the config inline.** The `Round_Robin__c` custom setting
+(`Pointer__c`, Number, org default record) that persists the rotation, and confirmation that
+the `Sales_Queue` queue exists with its members — main-agent work, never a developer brief. It
+then authors the test scenarios with you and embeds everything in the brief:
+
+```markdown
+## Work Brief — Round-robin lead assignment (invocable + record-triggered flow)
+
+**Objective** — Distribute newly created Leads owned by the Sales queue evenly across the
+queue's active members: an invocable Apex action assigns owners round-robin; a record-triggered
+flow on Lead create filters and calls it.
+**Spec reference** — docs/tech-spec.md §3.6 "Lead routing"
+**Schema context** — Lead.OwnerId (polymorphic: queue or user). Queue Sales_Queue — resolve via
+[SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'Sales_Queue']; members via
+GroupMember.UserOrGroupId (users only, skip nested groups). Round_Robin__c custom setting
+(Pointer__c Number, org default deployed) persists the rotation across transactions.
+
+**Work item 1 — LeadRoundRobinAssigner (Apex invocable, TDD first)**
+@InvocableMethod assign(List<Id> leadIds), one bulk call: query active queue members in a
+deterministic order, assign owners starting at the persisted pointer with wrap-around, advance
+and save the pointer, one update DML.
+Test scenarios:
+- 200 leads across 4 members → 50 each in one invocation (bulk, even split)
+- Pointer persists: a second invocation continues the rotation, never restarts it
+- Member list shrinks between runs → wrap-around stays in bounds
+- Inactive user in the queue → skipped; queue with no active members → leads untouched, no throw
+- Lead in the batch no longer queue-owned → skipped, rest still assigned
+
+**Work item 2 — Lead_Round_Robin flow (record-triggered, starts after item 1 is green)**
+- On Lead create only (no update trigger — assignment happens once), after-save.
+- Entry condition (formula): Owner:Queue.DeveloperName = 'Sales_Queue' — filter at the entry,
+  not with a Decision inside; no hardcoded queue Id.
+- One Action element calling LeadRoundRobinAssigner with $Record.Id (platform bulkification
+  batches the interviews into one invocable call); fault connector → log via the existing
+  logging framework and leave the lead queue-owned — never lose a lead to a routing failure.
+
+**Constraints** — rotation state lives in the custom setting only (no new objects); queue
+resolved by DeveloperName, never a hardcoded Id; reuse the existing logging framework;
+additive-only
+**Dependencies** — none external. Work item 2 consumes work item 1's invocable — same instance,
+sequenced, so the contract never leaves the brief.
+**Expected outputs** — LeadRoundRobinAssigner.cls + test class, Lead_Round_Robin
+flow-meta.xml + flow test + build summary entry
+**Validation criteria** — all Apex scenarios green via validate deploy, ≥85% coverage,
+analyzer clean; salesforce-flow-quality pass on the flow; flow test asserting a queue-owned
+created lead ends user-owned
+```
+
+**The build — one instance, two artifact types, two skill chains.** The developer runs the
+Apex chain first (`generating-apex-test` → `generating-apex` → `salesforce-apex-quality`,
+validate loop until the invocable's scenarios are green), then the Flow chain
+(`generating-flow` → `salesforce-flow-quality` — the routing table's "Flow + Apex invocable"
+pair loads both quality skills). Because the flow only fires on create and reassigns the lead
+to a user, the entry condition is also the recursion guard — a re-fired update never re-enters.
+The build summary entry:
+
+> **LeadRoundRobinAssigner + Lead_Round_Robin flow** — round-robin distribution of queue-owned
+> new Leads (spec §3.6). Rotation pointer in Round_Robin__c; flow filters at the entry
+> condition and delegates — no logic in the flow beyond the action call and its fault path.
+> Tests: 7/7 Apex + flow test pass · coverage 95%.
+
+An architect build review is optional as always. The teaching point: **a Flow brief is a
+developer dispatch like any other** — same brief template, same quality gates, just a different
+skill chain — and a Flow that calls Apex is a dependent chain even though the two artifacts are
+different types: one instance, sequenced, contract inside the brief.
 
 </details>
 

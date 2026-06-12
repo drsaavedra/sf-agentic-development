@@ -227,6 +227,12 @@ before applying any rule.
 **Orchestration rules** (the workflow narrative and work-brief template live in the repo README's
 "Agent Orchestration" section):
 
+- **Dispatch threshold** — orchestrate only when complexity pays for the dispatch. A spawned
+  agent re-reads context cold (a real token cost the user owns — in marginal cases, surface the
+  trade-off and let the user decide), while long-running or complex work done inline crowds the
+  main context window. Simple, single-artifact work and all config stays with the main agent;
+  dispatch parallelizable independent or contract-pinned items, multi-artifact chains with long
+  TDD/validate loops, or work the user wants to keep planning around while it builds.
 - Dispatch dev work to `salesforce-developer` with a structured **work brief**: objective, spec
   reference, schema context, test scenarios, constraints, dependencies, expected outputs,
   validation criteria. Embed the schema and spec extracts the task needs in the brief — do not
