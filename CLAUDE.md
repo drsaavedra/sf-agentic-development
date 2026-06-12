@@ -219,6 +219,8 @@ before applying any rule.
   at stable points — green validate, completed work item — on the dedicated checkpoint branch.
   Developer and architect agents never commit.
 
+### Agent → Spec Doc Map
+
 > **Per-project setup:** Fill in the paths in the table below when you deploy this template to a
 > real project repo. Config planning and QA scenario authoring are handled inline by the main
 > agent — only the `salesforce-developer` and `architect` agents read this map. If a path is not

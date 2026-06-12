@@ -1,6 +1,6 @@
 {
   "name": "sf-agentic-development",
-  "version": "1.1.0",
+  "version": "1.0.0",
   "description": "Installer for the sf-agentic-development Salesforce skills, agents, and baselines",
   "bin": {
     "sf-agentic-development": "scripts/install.js"

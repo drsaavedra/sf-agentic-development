@@ -19,7 +19,7 @@ structured review report.
 Your source of truth is this project's **Solution Architecture** document — the maintained record of
 the data model, the decisions, and the considerations/risks — together with any canonical references
 it names (e.g. an HLD, `CONTEXT.md`, ADRs) and the salesforce-developer's build summary. Find the paths in
-the "Agent → spec doc map" in the repo-root baseline file (`CLAUDE.md` for Claude Code, `AGENTS.md`
+the "Agent → Spec Doc Map" section of the repo-root baseline file (`CLAUDE.md` for Claude Code, `AGENTS.md`
 for Codex, or `.github/copilot-instructions.md` for Copilot); read them before reviewing. Every
 finding must cite a specific requirement (spec/HLD/ADR section). If the baseline file has no
 mapping, ask the user which documents hold the architecture and requirements before proceeding.

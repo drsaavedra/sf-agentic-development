@@ -2,7 +2,40 @@
 
 Notable changes to the toolkit, newest first. For full detail see `git log`.
 
-## 2026-06-11 (org introspection)
+## 2026-06-12 — v1.0.0
+
+First tagged release of the toolkit. Release housekeeping:
+
+- **Versioning aligned** — `package.json` now tracks **toolkit** releases and is set to
+  `1.0.0`. Its previous `1.1.0` versioned the installer only (the "installer v1.1" entry
+  below); the package was never published to npm, so nothing depended on the old number.
+  From here, the package version, the git tag, and the changelog release heading move together.
+- **"Agent → Spec Doc Map" is now a real heading** — the baselines' Priority 4 doc-map table
+  sits under its own `### Agent → Spec Doc Map` subsection, so every cross-reference to it
+  (both agents, the README setup steps, the installer's closing note) resolves to an exact
+  section name, per the repo's name-based cross-reference rule.
+- **`.gitignore` covers `.claude/settings.local.json`** — per-machine assistant settings no
+  longer show up as untracked noise for contributors without a global git ignore.
+- **Superpowers link fixed** — the README pointed at `superpowers.ai`, which is a parked
+  domain for sale; it now points at the actual project,
+  [github.com/obra/superpowers](https://github.com/obra/superpowers).
+
+## 2026-06-12 (developer agent scope)
+
+- **`salesforce-developer` broadened to all automation** — the agent now covers Apex, LWC, and
+  Flow briefs (it was Apex-scoped on paper while the orchestration guide already dispatched it
+  an LWC brief). Per-domain skill routing added (`generating-lwc-components` /
+  `salesforce-lwc-quality`, `generating-flow` / `salesforce-flow-quality`, cross-domain pairs
+  for Apex controllers and invocables), and the workflow split by domain: Apex via TDD, LWC via
+  quality spot-check with Jest recommended-on-request, Flow via quality pass + validate loop.
+  Output artifacts and the build summary now cover `lwc/` and `flows/` alongside classes and
+  triggers.
+- **Example 2 restructured around the pinned contract** — the Apex ‖ LWC parallel dispatch is
+  now the headline: both phase-1 briefs are written out in full (the LWC brief was previously a
+  blockquote summary), contract pinning is called out as the step that makes the parallel
+  dispatch legal, the phase-2 wrappers are compressed to a paragraph, and a closing note
+  generalizes the shape to any LWC + Apex controller pair (quick actions, record-page panels,
+  screen-flow components).
 
 - **"Org introspection & schema truth" rule added to Priority 1** — always-on: never guess
   object/field/relationship API names; verify against local metadata first, then the org (the

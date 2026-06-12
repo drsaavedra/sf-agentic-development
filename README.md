@@ -4,7 +4,7 @@ A developer productivity toolkit for **Claude Code**, **GitHub Copilot**, and **
 
 The skills encode hard-won Salesforce quality rules — bulk safety, security, architecture patterns, anti-patterns — that fire automatically based on what you're building.
 
-The agents provide on-demand specialisation. The main agent handles config planning and QA reasoning inline, since it already has your conversation context. The `salesforce-developer` agent runs Apex work in an isolated context, parallelizable across several instances at once. The `architect` agent gives you an independent technical review when you want one. How the three work together — the work brief, dispatch rules, and review loop — is covered in [Agent Orchestration](#agent-orchestration).
+The agents provide on-demand specialisation. The main agent handles config planning and QA reasoning inline, since it already has your conversation context. The `salesforce-developer` agent runs automation work — Apex, LWC, Flows — in an isolated context, parallelizable across several instances at once. The `architect` agent gives you an independent technical review when you want one. How the three work together — the work brief, dispatch rules, and review loop — is covered in [Agent Orchestration](#agent-orchestration).
 
 Agents are deliberately thin — the domain knowledge lives in the skills, which every agent shares. Project-specific constraints (e.g. additive-only, or reusing an existing logging framework) are passed in the work brief, not hardcoded into the agents.
 
@@ -28,7 +28,7 @@ This repo evolves continuously: new Salesforce releases, better agentic patterns
 
 | Agent | Role |
 |---|---|
-| `salesforce-developer` | Receives a brief from the main agent; builds Apex following TDD in an isolated, parallelizable context; quality rules and project constraints come from the skills and brief; produces a build summary |
+| `salesforce-developer` | Receives a brief from the main agent; builds all automation — Apex (via TDD), LWC, Flows — in an isolated, parallelizable context; quality rules and project constraints come from the skills and brief; produces a build summary |
 | `architect` | On-demand independent review — pre-implementation, post-implementation, or both; flags project-specific constraint violations (e.g. additive-only) only when the spec/brief/ADRs impose them; produces a gap-analysis report |
 
 See [Agent Orchestration](#agent-orchestration) for the full workflow: the work-brief template, when to parallelize developer instances, and the review/fix loop.
@@ -83,8 +83,8 @@ existing install); steps 3–4 always apply:
      npx skills add forrestchang/andrej-karpathy-skills
      ```
 3. Fill in the baseline's **Agent → Spec Doc Map** section with your project's spec document paths.
-4. *(Optional)* [Superpowers](https://superpowers.ai) for brainstorming, plan-writing, TDD, and
-   debugging workflow skills.
+4. *(Optional)* [Superpowers](https://github.com/obra/superpowers) for brainstorming, plan-writing,
+   TDD, and debugging workflow skills.
 
 ### Commerce projects
 
@@ -206,8 +206,9 @@ sequenceDiagram
    context.
 2. **Compose a work brief** — one brief per unit of dev work, using the template below.
 3. **Dispatch `salesforce-developer`** — one instance, or several in parallel (dispatch rules below).
-4. **Developer builds via TDD** — tests first, minimum implementation, validate-deploy loop until
-   green — then writes the **build summary** (default `docs/dev-build-summary.md`).
+4. **Developer builds** — Apex via TDD (tests first, minimum implementation, validate-deploy
+   loop until green); LWC and Flow briefs through the matching quality pass and validate — then
+   writes the **build summary** (default `docs/dev-build-summary.md`).
 5. **Main agent reads the build summary, not the raw code** — the summary is the integration
    point: it tells the main agent what exists, which scenarios passed, and what the next brief can
    depend on.
@@ -329,7 +330,7 @@ matches the situation you're in.
 | # | Pattern | Scenario |
 |---|---|---|
 | 1 | Dependent chain + fix loop | Opportunity rollup to Account |
-| 2 | Contract-first parallel dispatch | Reusable CMDT-driven datatable for Account / Contact / Opportunity |
+| 2 | Contract-first parallel dispatch | Apex controller ‖ LWC built in parallel: a reusable CMDT-driven datatable |
 | 3 | The self-contained work brief | Case SLA escalation to a Tier 2 queue |
 | 4 | Build summary as the integration point | Auto-converting qualified Leads |
 | 5 | The full task loop, repeated | Data-hygiene batches: stale Case auto-close, then old Task purge |
@@ -394,7 +395,7 @@ build summary; the architect re-reviews and appends a new dated **APPROVED** sec
 </details>
 
 <details>
-<summary><strong>Example 2 — contract-first parallel dispatch: a reusable datatable for Account, Contact, Opportunity</strong></summary>
+<summary><strong>Example 2 — contract-first parallel dispatch: Apex controller ‖ LWC, a reusable CMDT-driven datatable</strong></summary>
 
 **The kickoff prompt** — *"Build a reusable datatable LWC driven by custom metadata, plus
 versions for Account, Contact, and Opportunity. Pin the contracts first and run the dev work
@@ -407,9 +408,15 @@ driven by `Datatable_Config__mdt` custom metadata, an Apex controller that reads
 queries the rows, then three thin wrappers exposing the table for Account, Contact, and
 Opportunity pages.
 
-**Step 0 — the main agent plans inline and pins the contracts.** The foundation artifacts
-depend on each other — the LWC wires to the controller, the controller reads the metadata — so
-parallel dispatch only works if the integration contracts are fixed before anyone builds:
+This is the everyday Salesforce-developer split: **an LWC and the Apex controller behind it,
+built by two parallel instances** — one on each side of the wire. They never see each other's
+code while building; the pinned contract is the only thing both briefs share, and the merge-point
+validate proves the two halves meet.
+
+**Step 0 — the main agent plans inline and pins the contracts.** This is the step that makes
+the parallel dispatch legal. The foundation artifacts depend on each other — the LWC wires to
+the controller, the controller reads the metadata — so parallel dispatch only works if the
+integration contracts are fixed before anyone builds:
 
 - `Datatable_Config__mdt` — fields `Object_API_Name__c`, `Columns__c` (JSON array of
   `{fieldApiName, label, type}`), `Filter__c`, `Order_By__c`, `Row_Limit__c`; records
@@ -421,7 +428,9 @@ parallel dispatch only works if the integration contracts are fixed before anyon
   `TableResponse { List<Column> columns; List<SObject> rows; }`, `@AuraEnabled(cacheable=true)`.
 - LWC contract — `<c-record-datatable config-name="Account_Table">`.
 
-**Phase 1 — two briefs dispatched in parallel**, the contract embedded in both:
+**Phase 1 — two briefs dispatched in parallel**, the contract embedded in both.
+
+**Brief A → instance 1, the Apex side:**
 
 ```markdown
 ## Work Brief — RecordDatatableController (generic table query)
@@ -448,25 +457,49 @@ contract exactly — getTable(String configName) returning TableResponse { colum
 **Validation criteria** — all scenarios green via validate deploy, ≥85% coverage, analyzer clean
 ```
 
-> **Brief B → instance 2** — the generic `recordDatatable` LWC: wire `getTable` with
-> `config-name` as the reactive public property, render `lightning-datatable` from the returned
-> columns and rows, loading spinner, error panel on wire rejection. **Dependencies** — the
-> controller is being built in parallel; code against the contract in this brief, not against
-> the org. **Validation criteria** — `salesforce-lwc-quality` pass; the combined validate is
-> deferred to the merge point (Jest spec recommended, generated on request).
+**Brief B → instance 2, the LWC side** — written out in full just like the Apex brief; the LWC
+half of a parallel dispatch is a first-class work item, not a footnote:
+
+```markdown
+## Work Brief — recordDatatable LWC (generic table component)
+
+**Objective** — Generic LWC that renders a lightning-datatable for any object, driven entirely
+by the Datatable_Config__mdt record named in its public config-name property.
+**Spec reference** — docs/tech-spec.md §6.1 "Configurable datatable"
+**Schema context** — none queried directly: every field this component shows arrives through
+the Apex contract below. Column JSON shape: {fieldApiName, label, type}.
+**Test scenarios**
+- config-name="Account_Table" → wire returns columns + rows → datatable renders the 4
+  configured columns
+- Wire in flight → lightning-spinner; wire error → error panel showing the friendly
+  AuraHandledException message, never the raw error body
+- config-name changes at runtime → wire re-fires and the table re-renders (reactive parameter)
+- Wire returns 0 columns / 0 rows → "no records" empty state instead of an empty table
+**Constraints** — base lightning-datatable + SLDS only, no third-party grid; no Apex import
+other than the contract method
+**Dependencies** — none built yet: the controller is developed in parallel by another instance.
+Code against the contract exactly — wire getTable from RecordDatatableController with
+{ configName: '$configName' }, expect TableResponse { columns, rows } — not against the org.
+**Expected outputs** — lwc/recordDatatable bundle (.js, .html, .js-meta.xml) + build summary entry
+**Validation criteria** — salesforce-lwc-quality pass; Jest spec recommended (generated on
+request); the combined validate deploy is deferred to the merge point
+```
 
 Neither instance waits on the other — both briefs embed the contract instead of a build
-summary. When both summaries land, the main agent runs **one combined validate**: integration
-is verified at the merge point. (Prefer not to pin contracts up front? Then phase 1 is a
-dependent chain — send it to a single instance instead.)
+summary, and each instance codes against the contract, not against the other's work-in-progress.
+When both summaries land, the main agent runs **one combined validate**: integration is verified
+at the merge point. (Prefer not to pin contracts up front? Then phase 1 is a dependent chain —
+send it to a single instance instead.) The same shape fits any LWC + Apex controller pair —
+quick actions, record-page panels, screen-flow components: pin the `@AuraEnabled` signature and
+the wire shape, and the two sides build in parallel.
 
-**Phase 2 — three briefs dispatched in parallel** (independent consumers). The wrappers
-`accountDatatable`, `contactDatatable`, `opportunityDatatable` share no code — each drops
-`<c-record-datatable>` with its config name and adds its page targets in `js-meta.xml` — so
-they parallelize cleanly, one brief each. Each brief's **Dependencies** field carries the
-phase-1 outputs taken from the build summaries: the LWC public API, its bundle path, and the
-config record names. (Three thin wrappers would also fit in one brief — parallelize when the
-independent items are big enough to be worth the dispatch.)
+**Phase 2 — the thin wrappers.** `accountDatatable`, `contactDatatable`, and
+`opportunityDatatable` each drop `<c-record-datatable>` with their config name and add page
+targets in `js-meta.xml`. Independent consumers, no shared code — one brief each in parallel, or
+all three in one brief since they're small (parallelize when the independent items are big
+enough to be worth the dispatch). Each brief's **Dependencies** field carries the phase-1
+outputs from the build summaries: the LWC public API, its bundle path, and the config record
+names.
 
 **The review** — a build review across the suite. The architect reads the spec and the build
 summaries, runs the analyzer, and appends to `docs/sa-review-report.md`:
