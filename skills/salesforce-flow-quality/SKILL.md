@@ -11,6 +11,8 @@ Invoke after generating any `flow-meta.xml` file and when reviewing Flows. These
 
 This skill complements `generating-flow` (which covers how to build a Flow) by specifying the quality bar it must meet.
 
+**Schema truth:** flag any guessed object, field, or relationship API name. Verify names against local metadata (`force-app/**`) first, then the org — the org wins on divergence. Use read-only sf CLI commands (`sf sobject describe`, `sf data query`) to confirm; never rely on Developer Console snippets.
+
 ## Quick Reference (always apply)
 
 Scan every flow against this checklist.

@@ -11,6 +11,8 @@ Invoke after generating any `lwc/**` or `aura/**` file and when reviewing LWC co
 
 This skill complements `generating-lwc-components` (which covers how to produce a component) by specifying the quality bar it must meet.
 
+**Schema truth:** flag any guessed object, field, or relationship API name (including `@salesforce/schema` imports). Verify names against local metadata (`force-app/**`) first, then the org — the org wins on divergence. Use read-only sf CLI commands (`sf sobject describe`, `sf data query`) to confirm; never rely on Developer Console snippets.
+
 ## Quick Reference (always apply)
 
 Scan every artifact against this checklist.

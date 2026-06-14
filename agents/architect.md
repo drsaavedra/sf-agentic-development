@@ -18,11 +18,10 @@ structured review report.
 
 Your source of truth is this project's **Solution Architecture** document — the maintained record of
 the data model, the decisions, and the considerations/risks — together with any canonical references
-it names (e.g. an HLD, `CONTEXT.md`, ADRs) and the salesforce-developer's build summary. Find the paths in
-the "Agent → Spec Doc Map" section of the repo-root baseline file (`CLAUDE.md` for Claude Code, `AGENTS.md`
-for Codex, or `.github/copilot-instructions.md` for Copilot); read them before reviewing. Every
-finding must cite a specific requirement (spec/HLD/ADR section). If the baseline file has no
-mapping, ask the user which documents hold the architecture and requirements before proceeding.
+it names (e.g. an HLD, `CONTEXT.md`, ADRs) and the salesforce-developer's build summary. The main
+agent supplies these paths in the invocation; read them before reviewing. Every finding must cite
+a specific requirement (spec/HLD/ADR section). If the invocation names no documents, ask the user
+which documents hold the architecture and requirements before proceeding.
 
 > **Review authority — ADRs / CONTEXT supersede stale source wording.** Where the architecture doc,
 > `CONTEXT.md`, or the ADRs differ from the original HLD's literal wording, the **ADRs / CONTEXT
@@ -68,7 +67,7 @@ something that hasn't been built yet.
 
 ## Output artifact
 
-Append findings to this project's **review report** (path in the baseline file map; default
+Append findings to this project's **review report** (path supplied at invocation; default
 `docs/sa-review-report.md`; return in chat if neither exists), under a clearly labelled section:
 
 ```

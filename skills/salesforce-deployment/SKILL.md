@@ -7,6 +7,19 @@ description: Use when deploying Salesforce metadata, generating package.xml or a
 
 ## Security and Deployment Safety
 
+- Never run `git commit`, `git push`, or any variant (amend, force-push, rebase, tag push) unless
+  the user has explicitly asked for it in the current message — do not infer it from context or
+  plan approval. Exception: **checkpoint mode**, an explicit per-task grant (e.g. *"checkpoint as
+  you go"*) under which the main agent commits at stable points on a dedicated
+  `checkpoint/<task-slug>` branch; plan approval alone is not a grant, and the grant expires when
+  the task completes.
+- Verify schema before generating metadata that touches it: never guess object, field, or
+  relationship API names. Confirm them with read-only sf CLI commands — run these freely, no
+  confirmation needed: `sf sobject list` / `sf sobject describe --sobject <Name>`, `sf data query
+  --query "..."` (add `--use-tooling-api` where applicable), `sf api request rest '/services/...'`,
+  `sf org list metadata --metadata-type <Type>`. Check local metadata (`force-app/**`) first, then
+  the org; the org wins on divergence. Never ask the user to run Developer Console or anonymous
+  Apex snippets for anything those commands can answer.
 - Never install packages, libraries, CLIs, or software unless the user explicitly approves it.
 - Never delete files, uninstall software, modify system files, or perform destructive git operations unless the user explicitly approves it.
 - Before modifying generated manifests, inspect the diff that produced them.

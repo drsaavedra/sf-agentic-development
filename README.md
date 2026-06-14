@@ -33,9 +33,7 @@ This repo evolves continuously: new Salesforce releases, better agentic patterns
 
 See [Agent Orchestration](#agent-orchestration) for the full workflow: the work-brief template, when to parallelize developer instances, and the review/fix loop.
 
-### Baselines
-
-`CLAUDE.md`, `AGENTS.md`, and `.github/copilot-instructions.md` are rendered from `templates/baseline.md` by `scripts/render-baselines.js` — one source of truth for skill routing, safety rules, and the agent→doc map across all three assistants.
+This toolkit ships **no baseline file** (`CLAUDE.md` / `AGENTS.md` / `copilot-instructions.md`). Each skill and agent is self-contained: skills declare their own triggers and carry their own safety rules, and the agents ask for spec/architecture paths at dispatch time. Nothing is forced into a consumer's repo root.
 
 ---
 
@@ -49,12 +47,10 @@ From the **root of your Salesforce project** (requires Node 18+):
 npx github:drsaavedra/sf-agentic-development
 ```
 
-The installer asks four questions — which assistant you use (Claude Code / GitHub Copilot /
-Codex, arrow keys to pick), which skills and which agents to install (spacebar to toggle
-checkboxes, `a` to select all, Enter to confirm), and whether this is a B2B Commerce
-project — then copies your picks into the right per-assistant directories, drops the matching
-baseline file (`CLAUDE.md`, `.github/copilot-instructions.md`, or `AGENTS.md`) into your
-project root, and sets the Commerce flag in it if you said yes.
+The installer asks which assistant you use (Claude Code / GitHub Copilot / Codex, arrow keys to
+pick), then which skills and which agents to install (spacebar to toggle checkboxes, `a` to
+select all, Enter to confirm) — then copies your picks into the right per-assistant directories.
+It writes no baseline file: the skills and agents are self-contained.
 
 It then checks whether the toolkit's one dependency — `forcedotcom/sf-skills`, the
 Salesforce-maintained base skills that do the generation this repo's quality gates sit on top
@@ -64,22 +60,24 @@ dependency — see [Recommended companion skills](#recommended-companion-skills)
 
 ### After the installer
 
-Step 1 is only needed if you declined the installer's offer (or it couldn't detect an existing
-install); step 2 always applies:
+This step is only needed if you declined the installer's offer (or it couldn't detect an
+existing install):
 
 1. Install the Salesforce-maintained base skills — 50+ official skills (`generating-apex`,
    `generating-lwc-components`, `deploying-metadata`, `querying-soql`, and more):
    ```bash
    npx skills add forcedotcom/sf-skills
    ```
-2. Fill in the baseline's **Agent → Spec Doc Map** section with your project's spec document paths.
+
+There's nothing else to configure: the `salesforce-developer` and `architect` agents ask for
+your technical-spec and architecture document paths when you dispatch them.
 
 ### Recommended companion skills
 
 This toolkit is deliberately Salesforce-only: `forcedotcom/sf-skills` does the base generation
 (maintained by Salesforce), and the authored `salesforce-*` skills add the quality gates. It
 takes no opinion on general coding-behavior skills — those are a personal preference, so the
-baseline doesn't require any. If you want one, two good options:
+toolkit requires none. If you want one, two good options:
 
 - **[andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills)** —
   behavioral guidelines that curb common LLM coding mistakes (overcomplication, sweeping
@@ -96,37 +94,24 @@ baseline doesn't require any. If you want one, two good options:
 - **[Superpowers](https://github.com/obra/superpowers)** — workflow skills for brainstorming,
   plan-writing, TDD, and systematic debugging.
 
-Neither is wired into the baseline — if you install one, it activates on its own triggers
+Neither is wired into anything — if you install one, it activates on its own triggers
 alongside the Salesforce skills.
 
 ### Commerce projects
 
-`salesforce-commerce-b2b` is **gated on the Commerce flag in the baseline's Project Conventions
-section**, never on file content. When set, it overlays the `generating-*` skill during
-authoring (so generated Apex/LWC/Flow is Commerce-aware from the start) and chains after the
-matching `salesforce-*-quality` skill as a Commerce-domain review pass.
-
-Three ways to set it: answer **yes** to the installer's Commerce question, edit the **Current
-setting** line in the baseline's **Commerce project flag** bullet, or simply tell the agent
-*"This is a Commerce project"* and let it update the section. One-time setup — once set, the
-routing applies on every Apex/LWC/Flow task, the same across all three assistants.
-
-Leave the flag unset for non-Commerce orgs — the skill then never fires. For a mixed
-CRM+Commerce org, either set the flag (and accept the overlay + review chain on all
-Apex/LWC/Flow work) or leave it unset and invoke `salesforce-commerce-b2b` manually on the
-Commerce pieces.
+`salesforce-commerce-b2b` is **invoked manually** — it does not auto-trigger on file content.
+Load it on demand for B2B Commerce work: it overlays the `generating-*` skill during authoring
+(so generated Apex/LWC/Flow is Commerce-aware) and chains after the matching
+`salesforce-*-quality` skill as a Commerce-domain review pass. Just tell the agent you're doing
+Commerce work (e.g. *"review this with the Commerce skill"*) and it loads alongside the base
+LWC/Apex/Flow skill — never instead of it.
 
 ### Repository layout
 
 ```
 skills/<name>/              ← 5 authored Salesforce skills (canonical source: SKILL.md + references/)
 agents/<name>.md            ← 2 Salesforce agents (canonical source)
-templates/baseline.md       ← single-source template for the three root files below
-scripts/render-baselines.js ← regenerates the three renders from the template
 scripts/install.js          ← the interactive installer (npx entry point)
-CLAUDE.md                   ← Claude Code baseline (rendered — do not edit directly)
-AGENTS.md                   ← Codex baseline (rendered — do not edit directly)
-.github/copilot-instructions.md ← Copilot baseline (rendered — do not edit directly)
 ```
 
 | Assistant | Reads SKILL.md from |
@@ -152,16 +137,8 @@ All three use the same `name` + `description` frontmatter format.
    cp -r agents/* .github/agents/    # GitHub Copilot
    cp -r agents/* .agents/agents/    # Codex
    ```
-3. Copy the matching baseline into your project root:
-
-   | Assistant | File to copy |
-   |---|---|
-   | Claude Code | `CLAUDE.md` |
-   | GitHub Copilot | `.github/copilot-instructions.md` |
-   | Codex | `AGENTS.md` |
-
-4. Continue with [After the installer](#after-the-installer) above; for Commerce orgs, set the
-   flag as described in [Commerce projects](#commerce-projects).
+3. Continue with [After the installer](#after-the-installer) above. There's no baseline file to
+   copy — the skills and agents are self-contained.
 
 </details>
 
@@ -169,7 +146,7 @@ All three use the same `name` + `description` frontmatter format.
 
 ## Skill Routing
 
-The baseline routes to the right skill automatically based on context. Cross-domain work (LWC + Apex controller, Flow + invocable Apex) loads both relevant skills:
+Each skill declares its own trigger in its `description` frontmatter, so the assistant invokes it automatically based on context — there's no baseline routing table. The table below summarizes which skills cover which context. Cross-domain work (LWC + Apex controller, Flow + invocable Apex) loads both relevant skills, and each quality skill names its own cross-domain partner:
 
 | Context | Skills |
 |---|---|
@@ -180,7 +157,7 @@ The baseline routes to the right skill automatically based on context. Cross-dom
 | Flows | `generating-flow` · `salesforce-flow-quality` |
 | Flow + Apex invocable | `salesforce-flow-quality` · `salesforce-apex-quality` |
 | Deployment / package.xml / CI-CD | `salesforce-deployment` · `deploying-metadata` |
-| B2B Commerce *(when the Commerce flag is set)* | `salesforce-commerce-b2b` — overlay during authoring + review pass after the quality skill |
+| B2B Commerce *(invoke manually)* | `salesforce-commerce-b2b` — overlay during authoring + review pass after the quality skill |
 
 ---
 
@@ -230,8 +207,8 @@ sequenceDiagram
 7. **Fix loop** — a **BLOCKED** review goes back to `salesforce-developer` as a new brief built
    from the report's Recommended Actions; the architect re-reviews after the fix and appends a new
    dated section to the report (the report is append-only history).
-8. **You gate the irreversible steps** — validates and deploys are confirmed per the baseline's
-   safety rules, and you can review any brief or report before the next agent acts on it.
+8. **You gate the irreversible steps** — validates and deploys are confirmed per the deployment
+   skill's safety rules, and you can review any brief or report before the next agent acts on it.
 
 ### The work brief
 
@@ -255,8 +232,8 @@ path reference forces the agent to rediscover context it can't see from your con
 | Field | What goes in it |
 |---|---|
 | Objective | The unit of work in plain language — what exists when this brief is done |
-| Spec reference | Path to the Technical Specification (also in the baseline's Agent → Spec Doc Map) plus the sections that apply to this task |
-| Schema context | The data model the code touches, written out in the brief. The developer runs isolated — don't make it rediscover the schema. Gather it verified, not guessed: `sf sobject describe` and read-only queries against the org (the baseline's "Org introspection & schema truth" rule) |
+| Spec reference | Path to the Technical Specification plus the sections that apply to this task |
+| Schema context | The data model the code touches, written out in the brief. The developer runs isolated — don't make it rediscover the schema. Gather it verified, not guessed: `sf sobject describe` and read-only queries against the org (the developer agent's "Org introspection & schema truth" rule) |
 | Test scenarios | The TDD requirements. The developer writes these as failing tests first, so they must be concrete enough to assert on |
 | Constraints | Project-specific rules from the spec or your conversation. Constraints live in the brief, never hardcoded in the agent |
 | Dependencies | What earlier briefs produced that this one consumes — paths, signatures, and how to integrate |
@@ -305,8 +282,9 @@ Once dispatching, parallel or sequential:
 
 ### Checkpoint commits (opt-in)
 
-The baseline's git safety rule means a long multi-brief run normally accumulates everything in
-the working tree — if work item four goes sideways, there is no stable point to roll back to.
+The git safety rule (never commit without an explicit request — see the `salesforce-deployment`
+skill) means a long multi-brief run normally accumulates everything in the working tree — if
+work item four goes sideways, there is no stable point to roll back to.
 **Checkpoint mode** trades a single explicit grant for rollback safety, the same shape as the
 TDD validate-loop exception (confirm once, then iterate automatically):
 
@@ -329,12 +307,12 @@ TDD validate-loop exception (confirm once, then iterate automatically):
    back to a checkpoint, merging or squashing the branch into your branch, pushing, and deleting
    the branch all remain explicit requests from you.
 
-The full rule lives in the baseline's Git safety section (Priority 1).
+The full rule lives in the `salesforce-deployment` skill's Security and Deployment Safety section.
 
 ### Prompting a pattern
 
 You never have to name a pattern. Describe the build, and the main agent derives the dispatch
-shape from the baseline's orchestration rules: dependent chain → one instance, independent
+shape from the dependency structure of the work: dependent chain → one instance, independent
 items → parallel, review only when you ask for it. The work brief happens regardless — it's
 how every dispatch is packaged.
 
@@ -732,7 +710,6 @@ different types: one instance, sequenced, contract inside the brief.
 ## Maintaining
 
 - **Skills & agents** — `skills/` and `agents/` are the only source of truth. Edit `skills/<name>/` (the `SKILL.md` and its `references/`) or `agents/<name>.md`, then re-run the installer (or re-copy) into the per-assistant directories. Never edit the installed copies — changes are lost on the next install.
-- **Baselines** — edit `templates/baseline.md` (its header comment documents the template token syntax), then run `node scripts/render-baselines.js` to regenerate the three renders. Never edit `CLAUDE.md`, `AGENTS.md`, or `.github/copilot-instructions.md` by hand.
 
 ## License
 

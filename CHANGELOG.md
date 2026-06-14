@@ -2,6 +2,37 @@
 
 Notable changes to the toolkit, newest first. For full detail see `git log`.
 
+## 2026-06-14 (baseline removed — pure skills + agents toolkit)
+
+Breaking change: the toolkit no longer ships or generates a baseline file. A `CLAUDE.md` /
+`AGENTS.md` / `copilot-instructions.md` can't be forced onto a consumer's repo, so the skills
+and agents now stand entirely on their own.
+
+- **Baseline files and generation deleted** — `CLAUDE.md`, `AGENTS.md`,
+  `.github/copilot-instructions.md`, `templates/baseline.md`, and `scripts/render-baselines.js`
+  are gone, along with the `render` npm script. Verified the move is safe: skills auto-trigger
+  from their own `SKILL.md` `description` frontmatter, not from the old Priority 2 routing
+  table, so review-on-Apex/LWC/Flow and deploy-metadata behavior is unchanged.
+- **Installer simplified** — `scripts/install.js` now asks two questions (assistant, then skills
+  + agents) and copies the picks; the Commerce-flag question, baseline copy, and
+  `<!-- commerce-flag -->` patching were removed.
+- **Priority 1 safety rules folded into skills + agents** — the git-never-commit-unprompted
+  rule (with the checkpoint-mode exception) and the org-introspection read-only sf-CLI rule moved
+  into `salesforce-deployment`'s Security and Deployment Safety section; the introspection rule
+  is also inlined in `salesforce-developer`. The three quality skills (`salesforce-apex-quality`,
+  `salesforce-lwc-quality`, `salesforce-flow-quality`) gained a "Schema truth" note so reviews
+  flag guessed API names.
+- **`salesforce-commerce-b2b` switched to manual-invoke** — it was gated on the baseline's
+  Commerce flag, which no longer exists. Its description and scope now say it's loaded on demand
+  for Commerce work (overlay during authoring, review pass after the quality skill), never
+  auto-triggered from file content.
+- **Agents made self-contained** — `salesforce-developer` and `architect` no longer reference a
+  repo-root baseline for the spec-doc map, routing, or introspection; they take spec/architecture
+  paths from the work brief or invocation and ask the user when none is supplied.
+- **README updated** — removed the Baselines section, the baseline-copy step from manual setup,
+  and the Commerce-flag instructions; reframed Skill Routing as "each skill declares its own
+  trigger"; repointed the Agent Orchestration safety/git references at the skills themselves.
+
 ## 2026-06-14 (Salesforce-only scope — behavioral skills demoted to optional)
 
 - **Karpathy guidelines removed as a hard dependency** — the baselines' Priority 1 no longer

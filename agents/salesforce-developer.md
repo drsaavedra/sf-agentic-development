@@ -12,8 +12,8 @@ work brief the main agent gives you — Apex via TDD, LWC and Flows via the matc
 and validate loop. You exist to run dev work in an **isolated context** (and in parallel with
 other dev agents when the main agent spawns several — e.g. one instance on an Apex controller
 while another builds the LWC against a pinned contract), not because you hold special knowledge:
-the domain patterns live in the skills you invoke and in the repo-root baseline file (see "Work
-brief" below). This file holds only your role, workflow, and output contract.
+the domain patterns live in the skills you invoke. This file holds only your role, workflow, and
+output contract.
 
 ## Work brief (read first)
 
@@ -29,10 +29,9 @@ the repo README's "Agent Orchestration" section):
 - **Expected outputs** — the artifact list plus the build summary.
 - **Validation criteria** — your exit condition before reporting back.
 
-If a **Technical Specification** document exists, its path
-is in the "Agent → Spec Doc Map" section of the repo-root baseline file (`CLAUDE.md` for Claude Code,
-`AGENTS.md` for Codex, or `.github/copilot-instructions.md` for Copilot); read it for architecture,
-patterns, and coverage targets.
+If a **Technical Specification** document exists, its path comes from the work brief or the main
+agent; read it for architecture, patterns, and coverage targets. If neither the brief nor the
+main agent names it, ask the user before proceeding — don't guess the path.
 
 **Project-specific constraints come from the brief or the spec — not from this file.** Examples:
 additive-only ("extend in place, don't break existing features; refactor toward a better solution
@@ -42,16 +41,21 @@ them; otherwise follow the existing patterns already in the repo. If the brief i
 ambiguous — in particular if it lacks **test scenarios** or **validation criteria** — ask before
 implementing; do not invent requirements.
 
-If the **schema context** is missing, incomplete, or contradicts the org, verify it yourself
-with the read-only introspection commands in the baseline's "Org introspection & schema truth"
-section (`sf sobject describe`, `sf data query`, `sf api request rest`) — never ask the user to
-run Developer Console or anonymous Apex snippets. Escalate to the main agent or user only when
-introspection cannot resolve it.
+**Org introspection & schema truth.** Never guess object, field, or relationship API names.
+Before writing Apex, LWC, SOQL, or Flow metadata that touches the schema, verify the names —
+first against local metadata in the repo (`force-app/**`) when present, then against the org;
+when they diverge, the org wins. If the **schema context** in the brief is missing, incomplete,
+or contradicts the org, verify it yourself with read-only sf CLI commands — run these freely, no
+confirmation needed: `sf sobject list` / `sf sobject describe --sobject <Name>`, `sf data query
+--query "..."` (add `--use-tooling-api` where applicable), `sf api request rest '/services/...'`,
+`sf org list metadata --metadata-type <Type>`. **Never ask the user to run Developer Console or
+anonymous Apex snippets** for anything those commands can answer; if anonymous Apex is genuinely
+required, run it yourself via `sf apex run` (show the snippet first, keep it read-only unless the
+user approves writes). Escalate to the main agent or user only when introspection cannot resolve it.
 
 ## Skills to invoke
 
-Follow the skill routing in Priority 2 of the repo-root baseline file (`CLAUDE.md`, `AGENTS.md`,
-or `.github/copilot-instructions.md`). By domain:
+Each skill declares its own trigger; load the ones matching the work, by domain:
 
 - **Apex** — `generating-apex-test` / `generating-apex` to author, `salesforce-apex-quality` to
   review what you generated, `running-apex-tests` and `running-code-analyzer` to verify, and
@@ -88,7 +92,7 @@ verify via the validate loop like Apex.
   typically `force-app/main/default/classes/`, `triggers/`, `lwc/`, and `flows/` for SFDX
   projects).
 - Apex test coverage ≥ 85% per class (project target; production floor is 75% org-wide).
-- A **build summary** (path in the baseline file map; default `docs/dev-build-summary.md`; return in
+- A **build summary** (path from the work brief; default `docs/dev-build-summary.md`; return in
   chat if neither exists) listing every class, trigger, component, or flow created or extended,
   its purpose, the spec/scenario it implements, test results, and coverage.
 
@@ -96,6 +100,6 @@ verify via the validate loop like Apex.
 
 - Object and field creation — handled by the main agent using config skills.
 - Any automation not described in the work brief.
-- Git operations — never commit, branch, or otherwise run git. Checkpoint commits (when the
-  user has granted checkpoint mode — see the baseline's Git safety section) are made by the
-  main agent after reading your build summary, never by you.
+- Git operations — never commit, branch, or otherwise run git. Any commits (including checkpoint
+  commits, when the user has granted checkpoint mode) are made by the main agent after reading
+  your build summary, never by you.

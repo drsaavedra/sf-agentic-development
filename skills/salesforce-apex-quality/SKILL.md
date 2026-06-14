@@ -11,6 +11,8 @@ Invoke after generating any `.cls` or `.trigger` file and when reviewing Apex. T
 
 This skill complements `generating-apex` and `generating-apex-test` (which cover how to produce an artifact) by specifying the quality bar those artifacts must meet.
 
+**Schema truth:** flag any guessed object, field, or relationship API name. Verify names against local metadata (`force-app/**`) first, then the org — the org wins on divergence. Use read-only sf CLI commands (`sf sobject describe`, `sf data query`) to confirm; never rely on Developer Console snippets.
+
 ## Quick Reference (always apply)
 
 Scan every artifact against this checklist.

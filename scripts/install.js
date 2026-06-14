@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Interactive installer for the sf-agentic-development skills, agents, and baselines.
+// Interactive installer for the sf-agentic-development skills and agents.
 // Zero dependencies. Run from the root of your Salesforce project:
 //   npx github:drsaavedra/sf-agentic-development
 // or, from a local clone:  node <clone>/scripts/install.js
@@ -24,24 +24,18 @@ const assistants = [
     name: 'Claude Code',
     skillsDir: '.claude/skills',
     agentsDir: '.claude/agents',
-    baseline: 'CLAUDE.md',
   },
   {
     name: 'GitHub Copilot',
     skillsDir: '.github/skills',
     agentsDir: '.github/agents',
-    baseline: path.join('.github', 'copilot-instructions.md'),
   },
   {
     name: 'Codex',
     skillsDir: '.agents/skills',
     agentsDir: '.agents/agents',
-    baseline: 'AGENTS.md',
   },
 ];
-
-const commerceSetLine =
-  '  - **Current setting:** **This is a Commerce org.** `salesforce-commerce-b2b` overlays all Apex/LWC/Flow work. <!-- commerce-flag -->';
 
 // ---------------------------------------------------------------------------
 // TTY UI — raw-mode keypresses, no typed input
@@ -267,11 +261,6 @@ async function main() {
     );
     if (agents.length === 0) console.log('No agents selected — skipping agents.');
 
-    console.log('');
-    const commerce = await ui.confirm(
-      'Is this a Salesforce B2B Commerce project? (sets the Commerce flag in the baseline)'
-    );
-
     // Copy skills and agents
     for (const name of skills) {
       const dest = path.join(target, assistant.skillsDir, name);
@@ -283,33 +272,6 @@ async function main() {
       fs.mkdirSync(path.dirname(dest), { recursive: true });
       fs.copyFileSync(path.join(pkgRoot, 'agents', name + '.md'), dest);
       console.log('installed agent  ' + path.join(assistant.agentsDir, name + '.md'));
-    }
-
-    // Copy the baseline (CLAUDE.md / AGENTS.md / .github/copilot-instructions.md)
-    const baselineDest = path.join(target, assistant.baseline);
-    let writeBaseline = true;
-    if (fs.existsSync(baselineDest)) {
-      writeBaseline = await ui.confirm('\n' + assistant.baseline + ' already exists. Overwrite?');
-    }
-    if (writeBaseline) {
-      let content = fs.readFileSync(path.join(pkgRoot, assistant.baseline), 'utf8');
-      if (commerce) {
-        const lines = content.split('\n');
-        const idx = lines.findIndex((l) => l.includes('<!-- commerce-flag -->'));
-        if (idx === -1) {
-          console.warn('warning: commerce-flag sentinel not found in ' + assistant.baseline);
-        } else {
-          lines[idx] = commerceSetLine;
-          content = lines.join('\n');
-        }
-      }
-      fs.mkdirSync(path.dirname(baselineDest), { recursive: true });
-      fs.writeFileSync(baselineDest, content, 'utf8');
-      console.log(
-        'installed baseline ' + assistant.baseline + (commerce ? ' (Commerce flag set)' : '')
-      );
-    } else {
-      console.log('kept existing ' + assistant.baseline + ' (Commerce flag not changed)');
     }
 
     // Dependency — sf-skills is the toolkit's one required base; detect and offer it now
@@ -328,9 +290,8 @@ async function main() {
       console.log('       npx skills add forcedotcom/sf-skills');
     }
     console.log(
-      '\nAgent notes: Fill in the "Agent → Spec Doc Map" section of ' +
-        assistant.baseline +
-        " with your project's spec document paths." +
+      '\nAgent notes: the salesforce-developer and architect agents ask for your spec/' +
+        'architecture\ndocument paths at dispatch time — no project file to fill in up front.' +
         '\nOptional behavioral-guideline skills (karpathy-guidelines, superpowers) are listed' +
         '\nunder "Recommended companion skills" in the README — install whichever you prefer.'
     );
