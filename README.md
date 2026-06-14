@@ -719,6 +719,34 @@ different types: one instance, sequenced, contract inside the brief.
 
 ---
 
+## Roadmap
+
+This toolkit is a developer productivity tool today — you stay at the wheel. The direction it's
+heading is an **autonomous delivery workflow**: agents that build, test, and deploy Salesforce
+solutions from a rigorous design contract, escalating only at genuine gaps. The human's role moves
+from *operator* (approving each command) to *author* (curating the design the workflow executes).
+The full rationale and target operating model live in [VISION.md](VISION.md).
+
+The capability gaps between today's tool and that target, in build order — the first is the
+keystone that makes autonomy safe to grant:
+
+1. **Design contract + completeness gate** *(keystone)* — a machine-checkable CONTEXT/spec schema
+   and a gate that refuses to build an incomplete design. Makes autonomy safe to grant.
+2. **Autonomy + escalation model** — convert today's human-confirmation safety gates to
+   machine-gated conditions, plus a concrete "genuine gap" detector and the autonomy boundaries
+   (what never gets delegated).
+3. **Self-verifying build/deploy loop** — the validate→correct→re-validate loop closes itself:
+   retry budget, machine-checkable "done," automatic BLOCKED→fix routing.
+4. **Durable run state** — a persisted work-ledger (done / blocked / deployed-where) so a long run
+   survives context compaction and is auditable, instead of living only in chat context.
+5. **Environment ladder** — total autonomy through scratch orgs and CI sandboxes; a human
+   signature kept at production.
+
+> Direction-setting, not a commitment schedule. Today's human-at-the-wheel safety rules stay in
+> force until each gate above is built and proven.
+
+---
+
 ## Maintaining
 
 - **Skills & agents** — `skills/` and `agents/` are the only source of truth. Edit `skills/<name>/` (the `SKILL.md` and its `references/`) or `agents/<name>.md`, then re-run the installer (or re-copy) into the per-assistant directories. Never edit the installed copies — changes are lost on the next install.
