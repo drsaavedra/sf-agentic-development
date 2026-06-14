@@ -2,6 +2,26 @@
 
 Notable changes to the toolkit, newest first. For full detail see `git log`.
 
+## 2026-06-14 (Salesforce-only scope — behavioral skills demoted to optional)
+
+- **Karpathy guidelines removed as a hard dependency** — the baselines' Priority 1 no longer
+  mandates the `karpathy-guidelines` skill on every task. The toolkit now declares exactly one
+  dependency, `forcedotcom/sf-skills` (Salesforce-maintained base generation), with the authored
+  `salesforce-*` skills as the quality gates on top. General coding-behavior skills are a personal
+  preference the template takes no opinion on. Priority 1 renamed **Behavioral Guidelines &
+  Operational Safety → Operational Safety**; the `{{INVOKE_KARPATHY}}` template token and its
+  per-assistant render values were dropped, and all three baselines re-rendered.
+- **Installer no longer offers karpathy** — `scripts/install.js` detects and offers only
+  `forcedotcom/sf-skills`; the karpathy detection, install offer, and per-assistant install
+  copy were removed. Its closing note points users to the README's new "Recommended companion
+  skills" section instead.
+- **README adds "Recommended companion skills"** — both
+  [andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) and
+  [Superpowers](https://github.com/obra/superpowers) are listed there as optional, user-choice
+  companions (install commands included), wired into nothing — they activate on their own
+  triggers. The dependency description and "After the installer" steps were trimmed to the single
+  sf-skills dependency.
+
 ## 2026-06-12 (example set curated + dispatch threshold)
 
 - **Dispatch threshold added to the orchestration rules** (README dispatch rules + baselines'

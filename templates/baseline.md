@@ -13,7 +13,6 @@
     {{ASSISTANT_NAME}}    "Claude Code" | "Codex" | "GitHub Copilot"
     {{TITLE_NAME}}        "Claude" | "Codex" | "GitHub Copilot"
     {{SKILLS_DIR}}        ".claude/skills" | ".agents/skills" | ".github/skills"
-    {{INVOKE_KARPATHY}}   "invoke the `karpathy-guidelines` skill" | same | "use `/skill karpathy-guidelines`"
     {{P2_VERB}}           "Invoke" | "Invoke" | "Use"
     {{skill:name}}        `name` | `name` | `/skill name`
     <!-/- only:claude codex copilot -/-> ... <!-/- end:only -/->   (without the slashes)
@@ -35,27 +34,11 @@ explicitly overrides them.
 
 ---
 
-## Priority 1: Behavioral Guidelines & Operational Safety
+## Priority 1: Operational Safety
 
-**Always-on, every task:** before any skill routing (Priority 2) and before generating any
-artifact or response, {{INVOKE_KARPATHY}} to load the latest behavioral
-rules. This applies to every request — reviews, quick fixes, and questions included. Never
-skip it because the task looks trivial.
-
-<!-- only:claude -->
-> Install the plugin if not already active:
-> ```
-> /plugin marketplace add forrestchang/andrej-karpathy-skills
-> /plugin install andrej-karpathy-skills@karpathy-skills
-> ```
-<!-- end:only -->
-<!-- only:codex copilot -->
-> Install if not already available ({{ASSISTANT_NAME}} has no plugin support — install as a skill):
-> ```
-> npx skills add forrestchang/andrej-karpathy-skills
-> ```
-> (or copy `skills/karpathy-guidelines/` from that repo into `{{SKILLS_DIR}}/`)
-<!-- end:only -->
+These safety rules are always on, every task — before any skill routing (Priority 2) and
+before generating any artifact or response. They apply to every request, reviews and quick
+fixes included; never skip them because the task looks trivial.
 
 **Git safety**
 - Never run `git commit`, `git push`, or any variant (amend, force-push, rebase, tag push)

@@ -17,18 +17,11 @@ explicitly overrides them.
 
 ---
 
-## Priority 1: Behavioral Guidelines & Operational Safety
+## Priority 1: Operational Safety
 
-**Always-on, every task:** before any skill routing (Priority 2) and before generating any
-artifact or response, invoke the `karpathy-guidelines` skill to load the latest behavioral
-rules. This applies to every request — reviews, quick fixes, and questions included. Never
-skip it because the task looks trivial.
-
-> Install the plugin if not already active:
-> ```
-> /plugin marketplace add forrestchang/andrej-karpathy-skills
-> /plugin install andrej-karpathy-skills@karpathy-skills
-> ```
+These safety rules are always on, every task — before any skill routing (Priority 2) and
+before generating any artifact or response. They apply to every request, reviews and quick
+fixes included; never skip them because the task looks trivial.
 
 **Git safety**
 - Never run `git commit`, `git push`, or any variant (amend, force-push, rebase, tag push)

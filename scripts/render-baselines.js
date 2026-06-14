@@ -19,7 +19,6 @@ const targets = [
     titleName: 'Claude',
     skillsDir: '.claude/skills',
     agentsDir: '.claude/agents',
-    invokeKarpathy: 'invoke the `karpathy-guidelines` skill',
     p2Verb: 'Invoke',
     skillRef: (name) => '`' + name + '`',
     companions: [
@@ -34,7 +33,6 @@ const targets = [
     titleName: 'Codex',
     skillsDir: '.agents/skills',
     agentsDir: '.agents/agents',
-    invokeKarpathy: 'invoke the `karpathy-guidelines` skill',
     p2Verb: 'Invoke',
     skillRef: (name) => '`' + name + '`',
     companions: [
@@ -49,7 +47,6 @@ const targets = [
     titleName: 'GitHub Copilot',
     skillsDir: '.github/skills',
     agentsDir: '.github/agents',
-    invokeKarpathy: 'use `/skill karpathy-guidelines`',
     p2Verb: 'Use',
     skillRef: (name) => '`/skill ' + name + '`',
     companions: [
@@ -81,7 +78,6 @@ for (const t of targets) {
     .replace(/\{\{ASSISTANT_NAME\}\}/g, t.assistantName)
     .replace(/\{\{TITLE_NAME\}\}/g, t.titleName)
     .replace(/\{\{SKILLS_DIR\}\}/g, t.skillsDir)
-    .replace(/\{\{INVOKE_KARPATHY\}\}/g, t.invokeKarpathy)
     .replace(/\{\{P2_VERB\}\}/g, t.p2Verb);
 
   const leftover = out.match(/\{\{[^}]+\}\}|<!-- (only|end):/);

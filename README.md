@@ -56,35 +56,48 @@ project — then copies your picks into the right per-assistant directories, dro
 baseline file (`CLAUDE.md`, `.github/copilot-instructions.md`, or `AGENTS.md`) into your
 project root, and sets the Commerce flag in it if you said yes.
 
-It then checks whether the two dependencies — `forcedotcom/sf-skills` and the Karpathy
-behavioral guidelines — are already installed (project and user-level skill directories), and
-offers to run `npx skills add` for anything missing. The one thing it can't do for you: the
-Karpathy **plugin** for Claude Code is installed with `/plugin` commands inside Claude Code,
-so it prints those instead.
+It then checks whether the toolkit's one dependency — `forcedotcom/sf-skills`, the
+Salesforce-maintained base skills that do the generation this repo's quality gates sit on top
+of — is already installed (project and user-level skill directories), and offers to run
+`npx skills add` for it if it's missing. Behavioral-guideline skills are your choice, not a
+dependency — see [Recommended companion skills](#recommended-companion-skills).
 
 ### After the installer
 
-Steps 1–2 are only needed if you declined the installer's offers (or it couldn't detect an
-existing install); steps 3–4 always apply:
+Step 1 is only needed if you declined the installer's offer (or it couldn't detect an existing
+install); step 2 always applies:
 
-1. Install the community Salesforce skills — 50+ official skills (`generating-apex`,
+1. Install the Salesforce-maintained base skills — 50+ official skills (`generating-apex`,
    `generating-lwc-components`, `deploying-metadata`, `querying-soql`, and more):
    ```bash
    npx skills add forcedotcom/sf-skills
    ```
-2. Install the Karpathy behavioral guidelines:
-   - **Claude Code** (plugin — updates flow through automatically):
-     ```
-     /plugin marketplace add forrestchang/andrej-karpathy-skills
-     /plugin install andrej-karpathy-skills@karpathy-skills
-     ```
-   - **Codex / Copilot** (no plugin support — install as a skill):
-     ```bash
-     npx skills add forrestchang/andrej-karpathy-skills
-     ```
-3. Fill in the baseline's **Agent → Spec Doc Map** section with your project's spec document paths.
-4. *(Optional)* [Superpowers](https://github.com/obra/superpowers) for brainstorming, plan-writing,
-   TDD, and debugging workflow skills.
+2. Fill in the baseline's **Agent → Spec Doc Map** section with your project's spec document paths.
+
+### Recommended companion skills
+
+This toolkit is deliberately Salesforce-only: `forcedotcom/sf-skills` does the base generation
+(maintained by Salesforce), and the authored `salesforce-*` skills add the quality gates. It
+takes no opinion on general coding-behavior skills — those are a personal preference, so the
+baseline doesn't require any. If you want one, two good options:
+
+- **[andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills)** —
+  behavioral guidelines that curb common LLM coding mistakes (overcomplication, sweeping
+  changes, unstated assumptions).
+  - **Claude Code** (plugin — updates flow through automatically):
+    ```
+    /plugin marketplace add forrestchang/andrej-karpathy-skills
+    /plugin install andrej-karpathy-skills@karpathy-skills
+    ```
+  - **Codex / Copilot** (no plugin support — install as a skill):
+    ```bash
+    npx skills add forrestchang/andrej-karpathy-skills
+    ```
+- **[Superpowers](https://github.com/obra/superpowers)** — workflow skills for brainstorming,
+  plan-writing, TDD, and systematic debugging.
+
+Neither is wired into the baseline — if you install one, it activates on its own triggers
+alongside the Salesforce skills.
 
 ### Commerce projects
 

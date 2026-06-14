@@ -25,34 +25,18 @@ const assistants = [
     skillsDir: '.claude/skills',
     agentsDir: '.claude/agents',
     baseline: 'CLAUDE.md',
-    karpathyAsSkill: false,
-    karpathy: [
-      'Install the Karpathy behavioral guidelines plugin (inside Claude Code):',
-      '    /plugin marketplace add forrestchang/andrej-karpathy-skills',
-      '    /plugin install andrej-karpathy-skills@karpathy-skills',
-    ],
   },
   {
     name: 'GitHub Copilot',
     skillsDir: '.github/skills',
     agentsDir: '.github/agents',
     baseline: path.join('.github', 'copilot-instructions.md'),
-    karpathyAsSkill: true,
-    karpathy: [
-      'Install the Karpathy behavioral guidelines as a skill:',
-      '    npx skills add forrestchang/andrej-karpathy-skills',
-    ],
   },
   {
     name: 'Codex',
     skillsDir: '.agents/skills',
     agentsDir: '.agents/agents',
     baseline: 'AGENTS.md',
-    karpathyAsSkill: true,
-    karpathy: [
-      'Install the Karpathy behavioral guidelines as a skill:',
-      '    npx skills add forrestchang/andrej-karpathy-skills',
-    ],
   },
 ];
 
@@ -236,12 +220,6 @@ function sfSkillsInstalled(assistant) {
   return skillInstalled('generating-apex', assistant);
 }
 
-function karpathyInstalled(assistant) {
-  if (skillInstalled('karpathy-guidelines', assistant)) return true;
-  // Claude Code installs it as a plugin, not a skill
-  return fs.existsSync(path.join(os.homedir(), '.claude', 'plugins', 'cache', 'karpathy-skills'));
-}
-
 function runSkillsAdd(repo) {
   console.log('\nRunning: npx skills add ' + repo + '\n');
   const result = spawnSync('npx skills add ' + repo, { stdio: 'inherit', shell: true });
@@ -334,37 +312,27 @@ async function main() {
       console.log('kept existing ' + assistant.baseline + ' (Commerce flag not changed)');
     }
 
-    // Dependencies — detect what's missing and offer to install it now
+    // Dependency — sf-skills is the toolkit's one required base; detect and offer it now
     let needSfSkills = !sfSkillsInstalled(assistant);
-    let needKarpathy = !karpathyInstalled(assistant);
 
     if (needSfSkills) {
       const yes = await ui.confirm(
-        '\nforcedotcom/sf-skills (community Salesforce skills) not detected. Install now?'
+        '\nforcedotcom/sf-skills (the Salesforce-maintained base skills) not detected. Install now?'
       );
       if (yes && runSkillsAdd('forcedotcom/sf-skills')) needSfSkills = false;
     }
-    if (needKarpathy && assistant.karpathyAsSkill) {
-      const yes = await ui.confirm(
-        '\nforrestchang/andrej-karpathy-skills (behavioral guidelines) not detected. Install now?'
-      );
-      if (yes && runSkillsAdd('forrestchang/andrej-karpathy-skills')) needKarpathy = false;
-    }
 
-    console.log('\nDone.' + (needSfSkills || needKarpathy ? ' Remaining steps:' : ''));
-    let step = 1;
+    console.log('\nDone.' + (needSfSkills ? ' Remaining steps:' : ''));
     if (needSfSkills) {
-      console.log('  ' + step++ + '. Install the community Salesforce skills:');
+      console.log('  1. Install the Salesforce-maintained base skills:');
       console.log('       npx skills add forcedotcom/sf-skills');
-    }
-    if (needKarpathy) {
-      console.log('  ' + step++ + '. ' + assistant.karpathy[0]);
-      for (const line of assistant.karpathy.slice(1)) console.log('   ' + line);
     }
     console.log(
       '\nAgent notes: Fill in the "Agent → Spec Doc Map" section of ' +
         assistant.baseline +
-        " with your project's spec document paths."
+        " with your project's spec document paths." +
+        '\nOptional behavioral-guideline skills (karpathy-guidelines, superpowers) are listed' +
+        '\nunder "Recommended companion skills" in the README — install whichever you prefer.'
     );
   } finally {
     ui.close();
