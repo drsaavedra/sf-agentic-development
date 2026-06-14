@@ -1,6 +1,6 @@
 # B2B Commerce — Storefront LWC
 
-> Optional Commerce domain pack for `salesforce-lwc-quality`. Read it when the component under review
+> Optional Commerce domain pack for `reviewing-lwc`. Read it when the component under review
 > is a B2B/B2C Commerce storefront artifact (LWR/Aura storefront, cart/checkout/PDP/PLP, quick order).
 > Apply these rules *on top of* the base LWC quality rules. For the current API surface, see the
 > [B2B/B2C Commerce Developer Guide](https://developer.salesforce.com/docs/commerce/salesforce-commerce/guide/b2b-b2c-comm-dev-guide.html)

@@ -1,8 +1,8 @@
 # @AuraEnabled and ConnectApi
 
-> Part of `salesforce-apex-quality` — see SKILL.md for the always-on Quick Reference and routing.
+> Part of `reviewing-apex` — see SKILL.md for the always-on Quick Reference and routing.
 
-> **Cross-domain boundary.** This file defines the Apex side of the Apex→LWC contract. If you are also building the LWC component that calls these methods, load `salesforce-lwc-quality` for the component-side rules.
+> **Cross-domain boundary.** This file defines the Apex side of the Apex→LWC contract. If you are also building the LWC component that calls these methods, load `reviewing-lwc` for the component-side rules.
 
 - Narrow inputs and outputs. Use typed wrapper classes — not raw JSON strings — for structured LWC responses.
 - `cacheable=true` only when the method performs no DML, callouts, cart/checkout mutations, or session-specific side effects.

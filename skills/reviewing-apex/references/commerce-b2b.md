@@ -1,6 +1,6 @@
 # B2B Commerce — Storefront Apex
 
-> Optional Commerce domain pack for `salesforce-apex-quality`. Read it when the Apex under review backs
+> Optional Commerce domain pack for `reviewing-apex`. Read it when the Apex under review backs
 > a B2B/B2C Commerce storefront — `ConnectApi` usage, `CartExtension` calculators, cacheable storefront
 > controllers, or SOQL/DML against Commerce objects. Apply these rules *on top of* the base Apex
 > quality rules. For the current API surface, see the

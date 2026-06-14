@@ -1,6 +1,6 @@
 # Template Directives and DOM Access
 
-> Part of `salesforce-lwc-quality` — see SKILL.md for the always-on Quick Reference and routing.
+> Part of `reviewing-lwc` — see SKILL.md for the always-on Quick Reference and routing.
 
 **`for:each` key must be a stable unique id from the data — never the loop index.** Using the index as the key breaks DOM reconciliation when the list is reordered or an item is removed.
 

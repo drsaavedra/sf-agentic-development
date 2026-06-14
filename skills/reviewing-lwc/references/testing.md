@@ -1,6 +1,6 @@
 # LWC Testing (Jest)
 
-> Part of `salesforce-lwc-quality` — see SKILL.md for the always-on Quick Reference and routing.
+> Part of `reviewing-lwc` — see SKILL.md for the always-on Quick Reference and routing.
 
 - Cover loading, data, and error states for every wire-driven component.
 - **Test black-box: assert on rendered DOM and dispatched events, never on internal fields.** `expect(element.shadowRoot.querySelector('lightning-spinner'))` — not `expect(component.isLoading)`. Never add an `@api` property just to make state reachable from a test; that freezes implementation detail into the public contract.

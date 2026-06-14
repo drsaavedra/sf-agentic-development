@@ -1,6 +1,6 @@
 # Async, State, Events, and Error Handling
 
-> Part of `salesforce-lwc-quality` — see SKILL.md for the always-on Quick Reference and routing.
+> Part of `reviewing-lwc` — see SKILL.md for the always-on Quick Reference and routing.
 
 - `@wire` for reactive state and Salesforce data. Imperative calls for user-triggered mutations (add to cart, update delivery method, address selection, checkout payment, file upload, wishlist changes).
 - Handle every failure path: wire adapters handle both `data` and `error` branches; imperative Apex uses `async`/`await` (not chained `.then()`) wrapped in `try/catch`. Surface failures through `ShowToastEvent`, inline state, or existing modal patterns.

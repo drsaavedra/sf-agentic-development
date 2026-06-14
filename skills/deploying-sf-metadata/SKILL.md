@@ -1,5 +1,5 @@
 ---
-name: salesforce-deployment
+name: deploying-sf-metadata
 description: Use when deploying Salesforce metadata, generating package.xml or a git delta (sfdx-git-delta), running validate/quick-deploy, planning CI/CD promotion, or deploying reference data with SFDMU — deployment safety rules and deployment commands.
 ---
 

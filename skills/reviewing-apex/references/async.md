@@ -1,6 +1,6 @@
 # Async
 
-> Part of `salesforce-apex-quality` — see SKILL.md for the always-on Quick Reference and routing.
+> Part of `reviewing-apex` — see SKILL.md for the always-on Quick Reference and routing.
 
 - **Reaching for `@future`** — cannot chain, cannot be called from Batch, cannot accept non-primitive types, returns no job ID. Legacy — must not appear in new code. Default to a `Queueable` (implementing `Database.AllowsCallouts` when it makes callouts) with a `System.Finalizer` attached for cleanup and recovery.
 - **Hard `@future` restrictions that compile cleanly and only fail at runtime under load:** a `@future` method cannot call another `@future` method (throws `System.AsyncException`), and cannot be called from Batch Apex `execute()`/`finish()`. Queueable chaining is the replacement; from Batch `finish()`, publish a Platform Event or chain the next Batch/Queueable directly.

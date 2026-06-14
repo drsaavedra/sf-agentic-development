@@ -1,6 +1,6 @@
 # Security
 
-> Part of `salesforce-apex-quality` — see SKILL.md for the always-on Quick Reference and routing.
+> Part of `reviewing-apex` — see SKILL.md for the always-on Quick Reference and routing.
 
 ## CRUD/FLS and sharing
 

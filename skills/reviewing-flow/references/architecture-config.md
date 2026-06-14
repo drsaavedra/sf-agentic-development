@@ -1,6 +1,6 @@
 # Architecture, Configuration, and Lifecycle
 
-> Part of `salesforce-flow-quality` — see SKILL.md for the always-on Quick Reference and routing.
+> Part of `reviewing-flow` — see SKILL.md for the always-on Quick Reference and routing.
 
 ## Hardcoded IDs and values
 
@@ -38,7 +38,7 @@ The recommended hybrid: a Record-Triggered Flow owns the entry criteria and orch
 
 *Fix:*
 - Create declarative **Flow Tests** for record-triggered flows covering each decision path — including the no-op path (entry conditions not met) and assertions on the records the flow should and should not change.
-- Any `@InvocableMethod` the flow calls gets full Apex test coverage under `salesforce-apex-quality` rules (bulk, negative, and security paths).
+- Any `@InvocableMethod` the flow calls gets full Apex test coverage under `reviewing-apex` rules (bulk, negative, and security paths).
 - Flow tests do not cover scheduled paths or screen flows — for those, document the manual test script alongside the flow.
 
 ## Naming and versioning

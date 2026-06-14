@@ -1,6 +1,6 @@
 # B2B Commerce — Flow automation
 
-> Optional Commerce domain pack for `salesforce-flow-quality`. Read it when the Flow under review
+> Optional Commerce domain pack for `reviewing-flow`. Read it when the Flow under review
 > automates B2B/B2C Commerce objects — record-triggered flows on `WebCart`, `CartItem`,
 > `CartDeliveryGroup`, `Order`/`OrderSummary`, pricing, or entitlement records, or flows that resolve
 > buyer/catalog/pricebook context. Apply these rules *on top of* the base Flow quality rules. For the

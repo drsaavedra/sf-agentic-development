@@ -1,6 +1,6 @@
 # Component Architecture and Data Sources
 
-> Part of `salesforce-lwc-quality` — see SKILL.md for the always-on Quick Reference and routing.
+> Part of `reviewing-lwc` — see SKILL.md for the always-on Quick Reference and routing.
 
 - Decide component architecture and data source **before** building. Compose small, single-responsibility components with minimal, explicit communication between them.
 - Prefer Lightning base components and SLDS utility classes for forms, modals, spinners, buttons, comboboxes, radio groups, file inputs, and checkout UI. Check the SLDS library before writing vanilla HTML.

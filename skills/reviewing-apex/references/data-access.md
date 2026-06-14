@@ -1,6 +1,6 @@
 # Data Access and Governor Limits
 
-> Part of `salesforce-apex-quality` — see SKILL.md for the always-on Quick Reference and routing.
+> Part of `reviewing-apex` — see SKILL.md for the always-on Quick Reference and routing.
 
 - **SOQL inside a loop** — each iteration issues a query; at 200 records per trigger batch you cross the 100-query limit (`System.LimitException: Too many SOQL queries: 101`). Query once outside the loop with `IN :idSet`, build a `Map` keyed by the relationship field (e.g., `Map<Id, List<Contact>>` filled from one query over `Trigger.newMap.keySet()`), and read from the map inside the loop. Use a relationship subquery when you need parent and child together.
 - **DML inside a loop** — hits the 150-DML-statement limit, and each statement re-fires cascading automation. Accumulate changed records into a `List` and issue one DML after the loop. DML only records that actually changed — compare against `Trigger.oldMap` first. In bulk/batch flows use `Database.update(toUpdate, false)` and process the `SaveResult[]` for per-record errors.

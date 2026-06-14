@@ -1,13 +1,13 @@
 ---
-name: salesforce-lwc-quality
-description: "Use when reviewing or auditing Lightning Web Components after generation, or when the task is explicitly a code review. Covers component architecture, LDS/Apex/GraphQL data sourcing, template directives, async/event patterns, performance, and Jest testing. Detailed rules live in references/ — read the file(s) matching the artifact's domains. If the component has an Apex controller, also load salesforce-apex-quality. For creating or editing LWC, use generating-lwc-components instead."
+name: reviewing-lwc
+description: "Use when reviewing or auditing Lightning Web Components after generation, or when the task is explicitly a code review. Covers component architecture, LDS/Apex/GraphQL data sourcing, template directives, async/event patterns, performance, and Jest testing. Detailed rules live in references/ — read the file(s) matching the artifact's domains. If the component has an Apex controller, also load reviewing-apex. For creating or editing LWC, use generating-lwc-components instead."
 ---
 
 # Salesforce LWC Quality
 
 Invoke after generating any `lwc/**` or `aura/**` file and when reviewing LWC components. These are the patterns that work in a developer sandbox but fail in Lightning Web Security, Experience Cloud/LWR, or at scale.
 
-**Cross-domain:** If this component has `@AuraEnabled` Apex methods backing it, also load `salesforce-apex-quality`. That skill covers the Apex side of the contract (its `references/aura-enabled.md` covers `@AuraEnabled` rules); this skill covers the LWC consumer side.
+**Cross-domain:** If this component has `@AuraEnabled` Apex methods backing it, also load `reviewing-apex`. That skill covers the Apex side of the contract (its `references/aura-enabled.md` covers `@AuraEnabled` rules); this skill covers the LWC consumer side.
 
 This skill complements `generating-lwc-components` (which covers how to produce a component) by specifying the quality bar it must meet.
 

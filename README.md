@@ -18,10 +18,10 @@ This repo evolves continuously: new Salesforce releases, better agentic patterns
 
 | Skill | Covers |
 |---|---|
-| `salesforce-apex-quality` | Governor limits, trigger design, security, architecture, async, error handling, testing |
-| `salesforce-lwc-quality` | Component architecture, data sourcing, directives, async/events, performance, Jest |
-| `salesforce-flow-quality` | Entry-condition discipline, loop/collection/Transform optimization, fault handling and Custom Error, async paths, recursion, hardcoded IDs, complexity, flow tests, naming |
-| `salesforce-deployment` | Deployment safety rules, `package.xml` / git-delta (sgd) generation, validate → quick-deploy, CI/CD patterns, and SFDMU data deployments |
+| `reviewing-apex` | Governor limits, trigger design, security, architecture, async, error handling, testing |
+| `reviewing-lwc` | Component architecture, data sourcing, directives, async/events, performance, Jest |
+| `reviewing-flow` | Entry-condition discipline, loop/collection/Transform optimization, fault handling and Custom Error, async paths, recursion, hardcoded IDs, complexity, flow tests, naming |
+| `deploying-sf-metadata` | Deployment safety rules, `package.xml` / git-delta (sgd) generation, validate → quick-deploy, CI/CD patterns, and SFDMU data deployments |
 
 The apex/lwc/flow quality skills also bundle an optional **B2B Commerce** reference pack
 (`references/commerce-b2b.md`) — storefront Apex (`ConnectApi`/`CartExtension`), storefront LWC
@@ -107,9 +107,9 @@ alongside the Salesforce skills.
 ### Commerce projects
 
 There is no separate Commerce skill. The B2B Commerce rules are folded into the three quality
-skills as `references/commerce-b2b.md` — Apex backend rules under `salesforce-apex-quality`,
-storefront LWC rules under `salesforce-lwc-quality`, and Commerce-object automation rules under
-`salesforce-flow-quality`. Each skill's routing table points at its `commerce-b2b.md` when the
+skills as `references/commerce-b2b.md` — Apex backend rules under `reviewing-apex`,
+storefront LWC rules under `reviewing-lwc`, and Commerce-object automation rules under
+`reviewing-flow`. Each skill's routing table points at its `commerce-b2b.md` when the
 artifact under review is a B2B Commerce storefront artifact, so the Commerce review pass rides the
 quality skill's own trigger — no manual invoke.
 
@@ -162,14 +162,14 @@ Each skill declares its own trigger in its `description` frontmatter, so the ass
 
 | Context | Skills |
 |---|---|
-| Apex classes / triggers / services | `generating-apex` · `salesforce-apex-quality` |
-| Apex test classes | `generating-apex-test` · `salesforce-apex-quality` |
-| LWC components | `generating-lwc-components` · `salesforce-lwc-quality` |
-| LWC + Apex controller | `salesforce-lwc-quality` · `salesforce-apex-quality` |
-| Flows | `generating-flow` · `salesforce-flow-quality` |
-| Flow + Apex invocable | `salesforce-flow-quality` · `salesforce-apex-quality` |
-| Deployment / package.xml / CI-CD | `salesforce-deployment` · `deploying-metadata` |
-| B2B Commerce storefront *(optional pack)* | The matching quality skill reads its `references/commerce-b2b.md` — Apex (`salesforce-apex-quality`), LWC (`salesforce-lwc-quality`), Flow (`salesforce-flow-quality`) |
+| Apex classes / triggers / services | `generating-apex` · `reviewing-apex` |
+| Apex test classes | `generating-apex-test` · `reviewing-apex` |
+| LWC components | `generating-lwc-components` · `reviewing-lwc` |
+| LWC + Apex controller | `reviewing-lwc` · `reviewing-apex` |
+| Flows | `generating-flow` · `reviewing-flow` |
+| Flow + Apex invocable | `reviewing-flow` · `reviewing-apex` |
+| Deployment / package.xml / CI-CD | `deploying-sf-metadata` · `deploying-metadata` |
+| B2B Commerce storefront *(optional pack)* | The matching quality skill reads its `references/commerce-b2b.md` — Apex (`reviewing-apex`), LWC (`reviewing-lwc`), Flow (`reviewing-flow`) |
 
 ---
 
@@ -294,7 +294,7 @@ Once dispatching, parallel or sequential:
 
 ### Checkpoint commits (opt-in)
 
-The git safety rule (never commit without an explicit request — see the `salesforce-deployment`
+The git safety rule (never commit without an explicit request — see the `deploying-sf-metadata`
 skill) means a long multi-brief run normally accumulates everything in the working tree — if
 work item four goes sideways, there is no stable point to roll back to.
 **Checkpoint mode** trades a single explicit grant for rollback safety, the same shape as the
@@ -319,7 +319,7 @@ TDD validate-loop exception (confirm once, then iterate automatically):
    back to a checkpoint, merging or squashing the branch into your branch, pushing, and deleting
    the branch all remain explicit requests from you.
 
-The full rule lives in the `salesforce-deployment` skill's Security and Deployment Safety section.
+The full rule lives in the `deploying-sf-metadata` skill's Security and Deployment Safety section.
 
 ### Prompting a pattern
 
@@ -510,7 +510,7 @@ other than the contract method
 Code against the contract exactly — wire getTable from RecordDatatableController with
 { configName: '$configName' }, expect TableResponse { columns, rows } — not against the org.
 **Expected outputs** — lwc/recordDatatable bundle (.js, .html, .js-meta.xml) + build summary entry
-**Validation criteria** — salesforce-lwc-quality pass; Jest spec recommended (generated on
+**Validation criteria** — reviewing-lwc pass; Jest spec recommended (generated on
 request); the combined validate deploy is deferred to the merge point
 ```
 
@@ -693,14 +693,14 @@ sequenced, so the contract never leaves the brief.
 **Expected outputs** — LeadRoundRobinAssigner.cls + test class, Lead_Round_Robin
 flow-meta.xml + flow test + build summary entry
 **Validation criteria** — all Apex scenarios green via validate deploy, ≥85% coverage,
-analyzer clean; salesforce-flow-quality pass on the flow; flow test asserting a queue-owned
+analyzer clean; reviewing-flow pass on the flow; flow test asserting a queue-owned
 created lead ends user-owned
 ```
 
 **The build — one instance, two artifact types, two skill chains.** The developer runs the
-Apex chain first (`generating-apex-test` → `generating-apex` → `salesforce-apex-quality`,
+Apex chain first (`generating-apex-test` → `generating-apex` → `reviewing-apex`,
 validate loop until the invocable's scenarios are green), then the Flow chain
-(`generating-flow` → `salesforce-flow-quality` — the routing table's "Flow + Apex invocable"
+(`generating-flow` → `reviewing-flow` — the routing table's "Flow + Apex invocable"
 pair loads both quality skills). Because the flow only fires on create and reassigns the lead
 to a user, the entry condition is also the recursion guard — a re-fired update never re-enters.
 The build summary entry:

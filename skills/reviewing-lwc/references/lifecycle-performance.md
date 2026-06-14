@@ -1,6 +1,6 @@
 # Lifecycle and Performance
 
-> Part of `salesforce-lwc-quality` — see SKILL.md for the always-on Quick Reference and routing.
+> Part of `reviewing-lwc` — see SKILL.md for the always-on Quick Reference and routing.
 
 - **Lifecycle ordering — `constructor` → `@api`/`@wire` provisioning → `connectedCallback` → `render` → `renderedCallback` — has two reviewable consequences:** `@api` values are `undefined` in the constructor (read them in `connectedCallback` or later), and `@wire` data arrives asynchronously *after* connection — reading `this.wiredX.data` in `connectedCallback` sees `undefined`; react in the wired function/property or a getter instead.
 - **No DOM manipulation in `constructor`** — the shadow DOM is not ready. `this.template.querySelector()` returns nothing there; move DOM access to `connectedCallback` or `renderedCallback`.

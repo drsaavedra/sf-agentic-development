@@ -1,13 +1,13 @@
 ---
-name: salesforce-flow-quality
-description: "Use when reviewing or auditing Salesforce Flows after generation, or when the task is explicitly a code review. Covers loop and collection optimization (Get Records in loop, Collection Filter/Sort, Transform, early exit), entry-condition discipline, Send Email limits, fault handling and Custom Error, DML-in-loop prevention, hardcoded ID elimination, recursion guards, async paths, complexity limits, flow tests, and naming conventions. Detailed rules live in references/ — read the file(s) matching the artifact's domains. If the Flow invokes Apex actions, also load salesforce-apex-quality. For creating new Flows, use generating-flow instead."
+name: reviewing-flow
+description: "Use when reviewing or auditing Salesforce Flows after generation, or when the task is explicitly a code review. Covers loop and collection optimization (Get Records in loop, Collection Filter/Sort, Transform, early exit), entry-condition discipline, Send Email limits, fault handling and Custom Error, DML-in-loop prevention, hardcoded ID elimination, recursion guards, async paths, complexity limits, flow tests, and naming conventions. Detailed rules live in references/ — read the file(s) matching the artifact's domains. If the Flow invokes Apex actions, also load reviewing-apex. For creating new Flows, use generating-flow instead."
 ---
 
 # Salesforce Flow Quality
 
 Invoke after generating any `flow-meta.xml` file and when reviewing Flows. These are the patterns that work in a developer sandbox but fail in production with real data volumes, non-admin profiles, or after deployment to a different org.
 
-**Cross-domain:** If this Flow calls an Apex action (`@InvocableMethod`), also load `salesforce-apex-quality` to apply Apex bulk safety, security, and testing rules to that action class.
+**Cross-domain:** If this Flow calls an Apex action (`@InvocableMethod`), also load `reviewing-apex` to apply Apex bulk safety, security, and testing rules to that action class.
 
 This skill complements `generating-flow` (which covers how to build a Flow) by specifying the quality bar it must meet.
 

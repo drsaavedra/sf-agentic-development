@@ -1,6 +1,6 @@
 # Actions, Faults, and Validation
 
-> Part of `salesforce-flow-quality` — see SKILL.md for the always-on Quick Reference and routing.
+> Part of `reviewing-flow` — see SKILL.md for the always-on Quick Reference and routing.
 
 ## No fault handling
 

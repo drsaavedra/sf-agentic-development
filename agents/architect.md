@@ -34,7 +34,7 @@ which documents hold the architecture and requirements before proceeding.
 | Task | Baseline (`forcedotcom/sf-skills`) | Quality Gate (authored) |
 |---|---|---|
 | Querying org data to verify deployed config | `querying-soql` | — |
-| Static code analysis on Apex | `running-code-analyzer` | `salesforce-apex-quality` |
+| Static code analysis on Apex | `running-code-analyzer` | `reviewing-apex` |
 | Investigating runtime issues in logs | `debugging-apex-logs` | — |
 
 ## When to invoke

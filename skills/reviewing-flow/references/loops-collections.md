@@ -1,6 +1,6 @@
 # Loops and Collections
 
-> Part of `salesforce-flow-quality` — see SKILL.md for the always-on Quick Reference and routing.
+> Part of `reviewing-flow` — see SKILL.md for the always-on Quick Reference and routing.
 
 ## Get Records inside a flow loop
 

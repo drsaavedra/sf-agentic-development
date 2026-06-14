@@ -1,6 +1,6 @@
 # Trigger Design
 
-> Part of `salesforce-apex-quality` — see SKILL.md for the always-on Quick Reference and routing.
+> Part of `reviewing-apex` — see SKILL.md for the always-on Quick Reference and routing.
 
 - **Business logic in the trigger body** — not unit-testable in isolation, not reusable, and cannot be ordered or toggled. The trigger does event routing only: all contexts route through a single trigger into its handler (`new AccountTriggerHandler().run()`); rules belong in domain/service classes.
 - **More than one trigger per object** — execution order across multiple triggers on the same object is undefined, producing intermittent, unreproducible bugs. One trigger per object; managed-package triggers are the only accepted exception.

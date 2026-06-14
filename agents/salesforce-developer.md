@@ -57,13 +57,13 @@ user approves writes). Escalate to the main agent or user only when introspectio
 
 Each skill declares its own trigger; load the ones matching the work, by domain:
 
-- **Apex** — `generating-apex-test` / `generating-apex` to author, `salesforce-apex-quality` to
+- **Apex** — `generating-apex-test` / `generating-apex` to author, `reviewing-apex` to
   review what you generated, `running-apex-tests` and `running-code-analyzer` to verify, and
   `debugging-apex-logs` for runtime errors.
-- **LWC** — `generating-lwc-components` to author, `salesforce-lwc-quality` to review. If the
-  component has an Apex controller, also load `salesforce-apex-quality`.
-- **Flow** — `generating-flow` to author, `salesforce-flow-quality` to review. If the Flow calls
-  an Apex invocable, also load `salesforce-apex-quality`.
+- **LWC** — `generating-lwc-components` to author, `reviewing-lwc` to review. If the
+  component has an Apex controller, also load `reviewing-apex`.
+- **Flow** — `generating-flow` to author, `reviewing-flow` to review. If the Flow calls
+  an Apex invocable, also load `reviewing-apex`.
 
 ## Workflow
 
@@ -71,19 +71,19 @@ Each skill declares its own trigger; load the ones matching the work, by domain:
 
 1. Read the test scenarios from the brief — your requirements expressed as concrete cases.
 2. `generating-apex-test` → write test classes mirroring the scenarios (they fail — expected) →
-   then `salesforce-apex-quality`.
-3. `generating-apex` → implement the minimum to make them pass → then `salesforce-apex-quality`.
+   then `reviewing-apex`.
+3. `generating-apex` → implement the minimum to make them pass → then `reviewing-apex`.
 4. `running-code-analyzer` → check quality.
 5. Fix and rerun until all pass.
 
 **LWC briefs:** author with `generating-lwc-components`, spot-check against
-`salesforce-lwc-quality`, and satisfy the brief's test scenarios (wire states, reactive
+`reviewing-lwc`, and satisfy the brief's test scenarios (wire states, reactive
 properties, error/empty states). Jest specs (sfdx-lwc-jest) are recommended, generated only when
 the brief asks. When the Apex controller is being built in parallel against a pinned contract,
 code against the contract in the brief — not against the org — and leave the combined validate
 to the main agent at the merge point.
 
-**Flow briefs:** author with `generating-flow`, review against `salesforce-flow-quality`, and
+**Flow briefs:** author with `generating-flow`, review against `reviewing-flow`, and
 verify via the validate loop like Apex.
 
 ## Output artifacts

@@ -2,6 +2,24 @@
 
 Notable changes to the toolkit, newest first. For full detail see `git log`.
 
+## 2026-06-14 (Authored skills renamed to verb-led names)
+
+The four authored skills are renamed to match the gerund verb-led convention of the upstream
+`forcedotcom/sf-skills` (`generating-apex`, `deploying-metadata`, …), so they read as actions rather
+than categories. Directory names and each `SKILL.md` `name:` field changed; all cross-references in
+the skills, references, agents, and README were updated to match. The installer enumerates skills from
+the directory listing, so it needed no code change.
+
+| Old | New |
+|---|---|
+| `salesforce-apex-quality` | `reviewing-apex` |
+| `salesforce-lwc-quality` | `reviewing-lwc` |
+| `salesforce-flow-quality` | `reviewing-flow` |
+| `salesforce-deployment` | `deploying-sf-metadata` |
+
+(`deploying-sf-metadata` keeps `sf` to stay distinct from the upstream `deploying-metadata`.) Earlier
+entries below retain the old names as an accurate record of those releases.
+
 ## 2026-06-14 (Commerce folded into the quality skills; installer is domain-aware)
 
 The standalone `salesforce-commerce-b2b` skill is dissolved into the three quality skills, and the
