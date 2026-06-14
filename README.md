@@ -22,7 +22,12 @@ This repo evolves continuously: new Salesforce releases, better agentic patterns
 | `salesforce-lwc-quality` | Component architecture, data sourcing, directives, async/events, performance, Jest |
 | `salesforce-flow-quality` | Entry-condition discipline, loop/collection/Transform optimization, fault handling and Custom Error, async paths, recursion, hardcoded IDs, complexity, flow tests, naming |
 | `salesforce-deployment` | Deployment safety rules, `package.xml` / git-delta (sgd) generation, validate → quick-deploy, CI/CD patterns, and SFDMU data deployments |
-| `salesforce-commerce-b2b` | B2B Commerce domain rules |
+
+The apex/lwc/flow quality skills also bundle an optional **B2B Commerce** reference pack
+(`references/commerce-b2b.md`) — storefront Apex (`ConnectApi`/`CartExtension`), storefront LWC
+(Storefront APIs, checkout adapters), and Commerce-object Flow automation. The installer includes
+it only if you select it; each quality skill routes to it automatically when reviewing a Commerce
+storefront artifact.
 
 ### Agents
 
@@ -48,9 +53,11 @@ npx github:drsaavedra/sf-agentic-development
 ```
 
 The installer asks which assistant you use (Claude Code / GitHub Copilot / Codex, arrow keys to
-pick), then which skills and which agents to install (spacebar to toggle checkboxes, `a` to
-select all, Enter to confirm) — then copies your picks into the right per-assistant directories.
-It writes no baseline file: the skills and agents are self-contained.
+pick), then which skills, which optional domain reference packs (e.g. **B2B Commerce** — included
+only if you check it, and only offered when a selected skill carries that pack), and which agents
+to install (spacebar to toggle checkboxes, `a` to select all, Enter to confirm) — then copies your
+picks into the right per-assistant directories. It writes no baseline file: the skills and agents
+are self-contained.
 
 It then checks whether the toolkit's one dependency — `forcedotcom/sf-skills`, the
 Salesforce-maintained base skills that do the generation this repo's quality gates sit on top
@@ -99,17 +106,22 @@ alongside the Salesforce skills.
 
 ### Commerce projects
 
-`salesforce-commerce-b2b` is **invoked manually** — it does not auto-trigger on file content.
-Load it on demand for B2B Commerce work: it overlays the `generating-*` skill during authoring
-(so generated Apex/LWC/Flow is Commerce-aware) and chains after the matching
-`salesforce-*-quality` skill as a Commerce-domain review pass. Just tell the agent you're doing
-Commerce work (e.g. *"review this with the Commerce skill"*) and it loads alongside the base
-LWC/Apex/Flow skill — never instead of it.
+There is no separate Commerce skill. The B2B Commerce rules are folded into the three quality
+skills as `references/commerce-b2b.md` — Apex backend rules under `salesforce-apex-quality`,
+storefront LWC rules under `salesforce-lwc-quality`, and Commerce-object automation rules under
+`salesforce-flow-quality`. Each skill's routing table points at its `commerce-b2b.md` when the
+artifact under review is a B2B Commerce storefront artifact, so the Commerce review pass rides the
+quality skill's own trigger — no manual invoke.
+
+The installer asks whether to include the **B2B Commerce** pack. Decline it and the
+`commerce-b2b.md` files and their routing rows are stripped from the installed skills (the base
+review rules are untouched). For a manual copy, just keep or delete `references/commerce-b2b.md`
+in each skill.
 
 ### Repository layout
 
 ```
-skills/<name>/              ← 5 authored Salesforce skills (canonical source: SKILL.md + references/)
+skills/<name>/              ← 4 authored Salesforce skills (canonical source: SKILL.md + references/)
 agents/<name>.md            ← 2 Salesforce agents (canonical source)
 scripts/install.js          ← the interactive installer (npx entry point)
 ```
@@ -157,7 +169,7 @@ Each skill declares its own trigger in its `description` frontmatter, so the ass
 | Flows | `generating-flow` · `salesforce-flow-quality` |
 | Flow + Apex invocable | `salesforce-flow-quality` · `salesforce-apex-quality` |
 | Deployment / package.xml / CI-CD | `salesforce-deployment` · `deploying-metadata` |
-| B2B Commerce *(invoke manually)* | `salesforce-commerce-b2b` — overlay during authoring + review pass after the quality skill |
+| B2B Commerce storefront *(optional pack)* | The matching quality skill reads its `references/commerce-b2b.md` — Apex (`salesforce-apex-quality`), LWC (`salesforce-lwc-quality`), Flow (`salesforce-flow-quality`) |
 
 ---
 

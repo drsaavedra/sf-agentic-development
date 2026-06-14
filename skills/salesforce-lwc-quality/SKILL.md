@@ -66,5 +66,6 @@ Load a reference file when either applies:
 | Imperative Apex, error handling, `CustomEvent` / LMS, navigation, cache refresh, `.js-meta.xml` | `references/async-events-errors.md` |
 | Lifecycle hooks, `errorCallback`, timers, lazy loading, third-party libraries, large lists/datatables, lint baseline | `references/lifecycle-performance.md` |
 | Jest tests (`__tests__/*.test.js`) | `references/testing.md` |
+| B2B Commerce storefront LWC — Storefront APIs, checkout adapters, product/search/quick-order, storefront caching & performance | `references/commerce-b2b.md` | <!-- domain:commerce -->
 
 A component usually spans several domains — read every file that applies before delivering the review.

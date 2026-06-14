@@ -76,5 +76,6 @@ Load a reference file when either applies:
 | Queueable, Batch, Schedulable, `@future`, callouts from trigger context | `references/async.md` |
 | try/catch, null safety, magic strings/numbers, debug logging, deep nesting | `references/error-handling-maintainability.md` |
 | Test classes (`*Test.cls` / `*_Test.cls`) | `references/testing.md` |
+| B2B Commerce storefront — ConnectApi, CartExtension calculators, cacheable storefront reads, Commerce-object SOQL, buyer/entitlement test data | `references/commerce-b2b.md` | <!-- domain:commerce -->
 
 A class usually spans several domains — read every file that applies before delivering the review.

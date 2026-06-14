@@ -2,6 +2,29 @@
 
 Notable changes to the toolkit, newest first. For full detail see `git log`.
 
+## 2026-06-14 (Commerce folded into the quality skills; installer is domain-aware)
+
+The standalone `salesforce-commerce-b2b` skill is dissolved into the three quality skills, and the
+installer can now include or omit domain reference packs per the user's choice.
+
+- **`salesforce-commerce-b2b` removed** — its rules are folded into a single
+  `references/commerce-b2b.md` under each quality skill: Apex backend (`ConnectApi`,
+  `CartExtension`, cacheable reads, Commerce-object SOQL, test data) in `salesforce-apex-quality`;
+  storefront LWC (Storefront APIs, checkout adapters, product/search, performance) in
+  `salesforce-lwc-quality`; and Commerce-object automation (buyer/entitlement/catalog/pricebook
+  context, checkout-owned state) in `salesforce-flow-quality`. The data-model/entitlement rules are
+  carried into both the Apex and Flow files, framed for each. Each quality skill's routing table now
+  points at its `commerce-b2b.md` for Commerce storefront artifacts, so the Commerce review rides the
+  skill's own trigger — no manual invoke.
+- **Installer gained a domain-pack question** — `scripts/install.js` now asks which optional domain
+  reference packs to include (currently **B2B Commerce**), offered only when a selected skill carries
+  that pack. Unselected packs are stripped from the installed copy: matching `references/*.md` files
+  are removed and their marker-tagged SKILL.md routing rows dropped; selected packs keep the row with
+  the marker comment stripped. Driven by a `DOMAIN_PACKS` registry so future domains are config, not
+  new logic.
+- **README updated** — removed the standalone Commerce skill from the Skills table and Skill Routing;
+  rewrote the Commerce projects section around the folded references and the installer pack question.
+
 ## 2026-06-14 (baseline removed — pure skills + agents toolkit)
 
 Breaking change: the toolkit no longer ships or generates a baseline file. A `CLAUDE.md` /

@@ -37,6 +37,56 @@ const assistants = [
   },
 ];
 
+// Optional domain reference packs. A skill's references/ may carry domain-specific
+// files (e.g. references/commerce-b2b.md) plus SKILL.md routing rows tagged with the
+// pack's `marker`. Unselected packs are filtered out of the installed copy:
+// matching reference files are removed and marked SKILL.md lines are dropped. To add
+// a future domain, append an entry here — no other installer logic changes.
+const DOMAIN_PACKS = [
+  { key: 'commerce', label: 'B2B Commerce', marker: 'domain:commerce', files: ['commerce-b2b.md'] },
+];
+
+// A pack applies to a skill if the skill's references/ contains any of the pack's files.
+function packAppliesToSkill(pack, skillName) {
+  return pack.files.some((f) =>
+    fs.existsSync(path.join(pkgRoot, 'skills', skillName, 'references', f))
+  );
+}
+
+// Post-process an installed skill copy for the chosen domain packs. For unselected
+// packs: delete their reference files and drop SKILL.md lines carrying their marker.
+// For selected packs: strip just the trailing marker comment so the file is clean.
+function applyDomainPacks(skillDest, selectedKeys) {
+  for (const pack of DOMAIN_PACKS) {
+    const selected = selectedKeys.includes(pack.key);
+    if (!selected) {
+      for (const f of pack.files) {
+        const refPath = path.join(skillDest, 'references', f);
+        if (fs.existsSync(refPath)) fs.rmSync(refPath);
+      }
+    }
+  }
+  const skillMd = path.join(skillDest, 'SKILL.md');
+  if (!fs.existsSync(skillMd)) return;
+  const markerRe = (m) => new RegExp('<!--\\s*' + m + '\\s*-->');
+  const kept = fs
+    .readFileSync(skillMd, 'utf8')
+    .split('\n')
+    .filter((line) => {
+      const pack = DOMAIN_PACKS.find((p) => markerRe(p.marker).test(line));
+      if (!pack) return true;
+      return selectedKeys.includes(pack.key); // drop the line if its pack was not selected
+    })
+    .map((line) => {
+      // strip the trailing marker comment from any kept line
+      for (const pack of DOMAIN_PACKS) {
+        line = line.replace(new RegExp('\\s*<!--\\s*' + pack.marker + '\\s*-->\\s*$'), '');
+      }
+      return line;
+    });
+  fs.writeFileSync(skillMd, kept.join('\n'));
+}
+
 // ---------------------------------------------------------------------------
 // TTY UI — raw-mode keypresses, no typed input
 // ---------------------------------------------------------------------------
@@ -254,6 +304,20 @@ async function main() {
     const skills = await ui.pickMany('Which skills do you want to install?', skillNames);
     if (skills.length === 0) console.log('No skills selected — skipping skills.');
 
+    // Domain reference packs — ask only about packs that apply to a selected skill.
+    const offeredPacks = DOMAIN_PACKS.filter((pack) =>
+      skills.some((s) => packAppliesToSkill(pack, s))
+    );
+    let selectedPackKeys = [];
+    if (offeredPacks.length) {
+      console.log('');
+      const chosen = await ui.pickMany(
+        'Which domain reference packs do you want to include?',
+        offeredPacks.map((p) => p.label)
+      );
+      selectedPackKeys = offeredPacks.filter((p) => chosen.includes(p.label)).map((p) => p.key);
+    }
+
     console.log('');
     const agents = await ui.pickMany(
       'Which agents do you want to install?',
@@ -265,6 +329,7 @@ async function main() {
     for (const name of skills) {
       const dest = path.join(target, assistant.skillsDir, name);
       fs.cpSync(path.join(pkgRoot, 'skills', name), dest, { recursive: true });
+      applyDomainPacks(dest, selectedPackKeys);
       console.log('installed skill  ' + path.join(assistant.skillsDir, name));
     }
     for (const name of agents) {

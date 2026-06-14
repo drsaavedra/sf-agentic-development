@@ -52,5 +52,6 @@ Load a reference file when either applies:
 | Record-triggered flows — entry conditions, before/after-save choice, recursion, trigger order, mixed automation | `references/triggers-recursion.md` |
 | Send Email, callouts/external services, fault connectors, Custom Error, async paths | `references/actions-faults.md` |
 | Hardcoded IDs, complexity / subflow / Apex extraction, flow tests, naming, versioning | `references/architecture-config.md` |
+| B2B Commerce automation — buyer entitlement / effective-account / catalog / pricebook context, Commerce-object record-triggered flows, checkout-owned state | `references/commerce-b2b.md` | <!-- domain:commerce -->
 
 A flow usually spans several domains — read every file that applies before delivering the review.
