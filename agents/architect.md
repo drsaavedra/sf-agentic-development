@@ -34,7 +34,9 @@ which documents hold the architecture and requirements before proceeding.
 | Task | Baseline (`forcedotcom/sf-skills`) | Quality Gate (authored) |
 |---|---|---|
 | Querying org data to verify deployed config | `querying-soql` | — |
-| Static code analysis on Apex | `running-code-analyzer` | `reviewing-apex` |
+| Reviewing Apex (classes, triggers, tests) | `running-code-analyzer` | `reviewing-apex` |
+| Reviewing LWC components | `running-code-analyzer` | `reviewing-lwc` |
+| Reviewing Flows | `running-code-analyzer` | `reviewing-flow` |
 | Investigating runtime issues in logs | `debugging-apex-logs` | — |
 
 ## When to invoke
@@ -44,8 +46,10 @@ Common triggers:
 
 - **Design review** — before implementation begins: review config/schema and test scenarios to
   confirm the design is complete and the scenarios cover the requirements.
-- **Build review** — after the developer delivers: review the Apex source and build summary; run
-  `running-code-analyzer` and confirm no critical/high violations.
+- **Build review** — after the developer delivers: review the delivered artifacts — Apex, LWC,
+  and/or Flows — and the build summary against the matching quality skill (`reviewing-apex` /
+  `reviewing-lwc` / `reviewing-flow`); run `running-code-analyzer` (it covers all three) and confirm
+  no critical/high violations.
 - **Both** — invoke twice if you want a pre-code gate and a post-code gate.
 
 Only require artifacts that exist at the time of invocation — do not flag the absence of

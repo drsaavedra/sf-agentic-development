@@ -35,6 +35,7 @@ Scan every flow against this checklist.
 | Flow: hardcoded IDs | Get Records by DeveloperName or Custom Metadata resource |
 | Flow: complex branching | Subflows first, then `@InvocableMethod` Apex action |
 | Flow: mixed automation | One automation strategy per object; document division; explicit trigger order for coexisting flows |
+| Flow: assumes the user's FLS/sharing applies | Record-triggered/autolaunched run in system context (record-triggered = without sharing) — set "How to Run the Flow" deliberately; enforce FLS in invocable Apex (`WITH USER_MODE`) if it matters |
 | Flow: no flow tests | Flow Tests per decision path; Apex tests for invocables |
 | Flow: stale versions | Deactivate and delete obsolete versions after deployment |
 | Flow: unlabeled decision outcomes | Label every outcome and loop element descriptively |

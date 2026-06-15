@@ -34,3 +34,13 @@
 *Fix:*
 - One automation strategy per object. If both a flow and a trigger are unavoidable, document the explicit division of labor (e.g., "flow handles notifications only; trigger owns data integrity") before building. Never silently add a flow to an object the Apex trigger already owns.
 - When multiple record-triggered flows must coexist on one object, set an explicit **trigger order** on each (Flow Trigger Explorer / the flow's advanced properties). Space the values — 10, 20, 30 — so a new flow slots in without renumbering the rest.
+
+## Flow run context and FLS/sharing
+
+*Why it fails:* Record-triggered and autolaunched flows run in **system context** by default — record-triggered flows in system context **without sharing**, which reads and writes all data and ignores the running user's object permissions, field-level security, and sharing rules. (Screen flows run in the running user's context.) Built and tested as an admin, the flow then exposes or writes fields and records the triggering user cannot access — a silent over-privilege that surfaces when a low-privilege or guest user triggers it. Crucially, **"system context with sharing" still ignores object permissions and FLS** — it only restores record-level sharing.
+
+*Fix:*
+- Set **"How to Run the Flow"** deliberately on autolaunched flows: *system context with sharing*, or user context when the flow should honor the running user — never *without sharing* unless it genuinely must access all data, and document why.
+- With-sharing still bypasses object/field permissions, so enforce FLS explicitly when it matters: gate the data, or move access-sensitive work into an `@InvocableMethod` running `WITH USER_MODE` (see `reviewing-apex`).
+- Treat **record-triggered flows as privileged** — they can't drop below system context; don't rely on them to enforce the triggering user's FLS, and watch what a record-triggered subflow surfaces back.
+- On **Experience Cloud / guest** contexts, default to with-sharing and never expose records or fields a guest shouldn't see.

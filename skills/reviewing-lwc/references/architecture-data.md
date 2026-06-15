@@ -25,6 +25,8 @@
 
 Prefer LDS over Apex for plain record CRUD — the framework manages cache and FLS for you. Same rule for metadata: use UI API wire adapters (`getObjectInfo`, `getPicklistValues`, list-view adapters) instead of Apex describe calls.
 
+**`@wire` needs a `cacheable=true` method; mutations go imperative.** Wiring to Apex only works when the method is cacheable, and cacheable methods must be read-only (no DML/callouts). Never `@wire` a save — call mutating, non-cacheable Apex imperatively from an event handler, then refresh the wired data (`refreshApex` / `notifyRecordUpdateAvailable`). Reaching for `@wire` on a method that writes is the tell.
+
 **Fetch discipline:**
 
 - Request only the fields you need with `getRecord` — never layout-based requests, and never `getRecordUi` (its metadata payload is often orders of magnitude larger than the data you need).
