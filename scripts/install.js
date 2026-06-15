@@ -225,7 +225,7 @@ function lineUI() {
           .toLowerCase();
         if (answer === '' || answer === 'none') return [];
         if (answer === 'all') return items.slice();
-        const nums = answer.split(/[,\s]+/).map(Number);
+        const nums = answer.split(/[,\s]+/).filter(Boolean).map(Number);
         if (nums.every((n) => Number.isInteger(n) && n >= 1 && n <= items.length)) {
           return [...new Set(nums)].map((n) => items[n - 1]);
         }

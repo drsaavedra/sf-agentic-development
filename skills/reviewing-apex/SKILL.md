@@ -35,7 +35,7 @@ Scan every artifact against this checklist.
 | No recursion control | Static `Set<Id>` guard — not a bare boolean |
 | Mixed automation on same object | One automation strategy per object |
 | No CRUD/FLS | `WITH USER_MODE` + `AccessLevel.USER_MODE` (the default at API v67+; check the class API version) |
-| `WITH SECURITY_ENFORCED` | Removed at API v67 — migrate to `WITH USER_MODE` |
+| `WITH SECURITY_ENFORCED` | Removed at API v67+ — migrate to `WITH USER_MODE` |
 | State-changing callout from LWC | Initiate from trigger / Platform Event, not a direct `@AuraEnabled` call |
 | State-changing `@HttpGet` / page-load action | CSRF — GET handlers stay read-only; mutate via POST |
 | SOQL injection | Bind variables / `Database.queryWithBinds`; allowlist dynamic names |
