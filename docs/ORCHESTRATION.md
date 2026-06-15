@@ -10,7 +10,8 @@ self-contained task briefs, progress tracked through summaries rather than raw c
 dependency-aware dispatch. Three APM mechanisms were deliberately **not** adopted — the file-based
 message bus and handoff procedures (Claude Code / Copilot / Codex subagents pass context natively
 via prompt and result), and the separate Planner agent (the main agent plans inline because it
-already holds your conversation context).
+already holds your conversation context). Only the ideas are borrowed — none of APM's files are
+copied or derived (APM is licensed MPL-2.0; this toolkit is MIT).
 
 ```mermaid
 sequenceDiagram

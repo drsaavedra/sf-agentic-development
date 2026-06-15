@@ -2,6 +2,8 @@
 
 A developer productivity toolkit for **Claude Code**, **GitHub Copilot**, and **Codex** — skills and agents that keep you in the driver's seat while AI handles the heavy lifting.
 
+High-quality Salesforce code shouldn't rest on a single line of defense, so these skills add an automatic review pass — bulk safety, security, architecture — over whatever generates it.
+
 The skills encode hard-won Salesforce quality rules — bulk safety, security, architecture patterns, anti-patterns — that fire automatically based on what you're building.
 
 The agents provide on-demand specialisation: the main agent plans config and QA inline, the `salesforce-developer` agent builds automation (Apex, LWC, Flows) in an isolated, parallelizable context, and the `architect` agent gives an independent technical review when you want one.
@@ -66,7 +68,7 @@ dependency — see [Recommended companion skills](#recommended-companion-skills)
 This step is only needed if you declined the installer's offer (or it couldn't detect an
 existing install):
 
-1. Install the Salesforce-maintained base skills — 50+ official skills (`generating-apex`,
+1. Install the Salesforce-maintained base skills — the official skills (`generating-apex`,
    `generating-lwc-components`, `deploying-metadata`, `querying-soql`, and more):
    ```bash
    npx skills add forcedotcom/sf-skills
@@ -170,8 +172,15 @@ sequenceDiagram
     A-->>M: Re-review, new dated report section
 ```
 
+> **What the gates actually catch:** asked to add Account address verification against a vendor API,
+> the `architect` reviewed the *design* — before any code — and blocked it: one synchronous callout
+> per changed record means a 200-record data-loader update fires 200 callouts in a single
+> transaction, over the 100-callout limit, so the bulk path fails by design. It also flagged the API
+> key sitting readable in custom metadata (belongs behind a Named Credential) and a missing
+> retry/status path. Three flaws fixed before a line of Apex existed.
+
 The full working guide — the lifecycle steps, the work-brief template, dispatch rules, checkpoint
-commits, prompting guidance, and four worked examples — lives in
+commits, prompting guidance, and four worked examples (including the one above) — lives in
 **[docs/ORCHESTRATION.md](docs/ORCHESTRATION.md)**.
 
 ---

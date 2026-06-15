@@ -14,8 +14,9 @@ rigorous solution; a vague one produces a confident, wrong one. So the leverage 
 agents cleverer — it is in making the **design contract** so complete that an agent can build, test,
 and ship from it without a human reading over its shoulder.
 
-The goal: an agentic workflow that **builds, tests, and deploys Salesforce solutions autonomously**,
-stopping only when it hits a genuine gap in the design it cannot responsibly resolve.
+The goal we are building toward — not what ships today — is an agentic workflow that **builds, tests,
+and deploys Salesforce solutions autonomously**, stopping only when it hits a genuine gap in the
+design it cannot responsibly resolve.
 
 ## 2. The shift: the human moves up the stack
 

@@ -27,7 +27,7 @@ Prefer LDS over Apex for plain record CRUD — the framework manages cache and F
 
 **Fetch discipline:**
 
-- Request only the fields you need with `getRecord` — never layout-based requests, and never `getRecordUi` (its metadata payload is 100–1000× the data payload).
+- Request only the fields you need with `getRecord` — never layout-based requests, and never `getRecordUi` (its metadata payload is often orders of magnitude larger than the data you need).
 - One fetch per page: when several components need the same data, pass it down via `@api` or distribute it from a UI-less service component that queries once — never let each component independently re-query.
 - Filter and sort data you already hold client-side (`Array.filter`/`sort`) instead of another server round trip.
 
