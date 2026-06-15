@@ -8,7 +8,7 @@ The agents provide on-demand specialisation: the main agent plans config and QA 
 
 Agents are deliberately thin — the domain knowledge lives in the skills, which every agent shares. Project-specific constraints (e.g. additive-only, or reusing an existing logging framework) are passed in the work brief, not hardcoded into the agents.
 
-This repo evolves continuously: new Salesforce releases, better agentic patterns, and improved practices get folded in over time. See [CHANGELOG.md](CHANGELOG.md) for what changed between pulls.
+This repo evolves continuously: new Salesforce releases, better agentic patterns, and improved practices get folded in over time.
 
 ---
 
