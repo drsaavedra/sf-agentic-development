@@ -37,7 +37,9 @@ see [B2B Commerce projects](#b2b-commerce-projects).
 
 See [docs/ORCHESTRATION.md](docs/ORCHESTRATION.md) for the full workflow: the work-brief template, when to parallelize developer instances, and the review/fix loop.
 
-This toolkit ships **no baseline file** (`CLAUDE.md` / `AGENTS.md` / `copilot-instructions.md`). Each skill and agent is self-contained: skills declare their own triggers and carry their own safety rules, and the agents ask for spec/architecture paths at dispatch time. Nothing is forced into a consumer's repo root.
+### Baselines
+
+`CLAUDE.md`, `AGENTS.md`, and `.github/copilot-instructions.md` are rendered from `templates/baseline.md` by `scripts/render-baselines.js` — one source of truth for **skill routing** across all three assistants. The baseline does one job: route to the right `generating-*` / `reviewing-*` skill (and chain them) from your project root, which fires reliably even in auto/autopilot modes where per-skill frontmatter triggers can be missed. Everything else stays in the skills — each skill carries its own safety rules, quality gates, and domain knowledge (including the B2B Commerce reference packs), and the agents ask for spec/architecture paths at dispatch time. The baseline is purely the routing layer on top of them.
 
 ---
 
@@ -55,7 +57,15 @@ The installer asks which assistant you use (Claude Code / GitHub Copilot / Codex
 pick), then which skills, which optional domain reference packs (e.g. **B2B Commerce** — included
 only if you check it, and only offered when a selected skill carries that pack), and which agents
 to install (spacebar to toggle checkboxes, `a` to select all, Enter to confirm) — then copies your
-picks into the right per-assistant directories.
+picks into the right per-assistant directories and drops the matching baseline file (`CLAUDE.md`,
+`.github/copilot-instructions.md`, or `AGENTS.md`) — the skill-routing layer — into your project
+root.
+
+These generated files are installed artifacts, not source — so the installer also adds them to your
+project's `.gitignore` (creating it if absent, appending if present, and skipping entries already
+there). For Claude that's `.claude/` and `CLAUDE.md`; for Codex `.agents/` and `AGENTS.md`; for
+Copilot the specific `.github/skills/`, `.github/agents/`, and `.github/copilot-instructions.md`
+(never all of `.github/`).
 
 It then checks whether the toolkit's one dependency — `forcedotcom/sf-skills`, the
 Salesforce-maintained base skills that do the generation this repo's quality gates sit on top
@@ -65,8 +75,8 @@ dependency — see [Recommended companion skills](#recommended-companion-skills)
 
 ### After the installer
 
-This step is only needed if you declined the installer's offer (or it couldn't detect an
-existing install):
+This step is only needed if you declined the installer's offer (or it couldn't detect an existing
+install):
 
 1. Install the Salesforce-maintained base skills — the official skills (`generating-apex`,
    `generating-lwc-components`, `deploying-metadata`, `querying-soql`, and more):
@@ -74,8 +84,9 @@ existing install):
    npx skills add forcedotcom/sf-skills
    ```
 
-There's nothing else to configure: the `salesforce-developer` and `architect` agents ask for
-your technical-spec and architecture document paths when you dispatch them.
+There's nothing else to configure: the baseline is skill routing only, and the
+`salesforce-developer` and `architect` agents ask for your technical-spec and architecture
+document paths when you dispatch them.
 
 ### B2B Commerce projects
 
@@ -86,7 +97,8 @@ storefront LWC rules under `reviewing-lwc`, and Commerce-object automation rules
 artifact under review is a B2B Commerce storefront artifact, so the Commerce review pass rides the
 quality skill's own trigger — no manual invoke.
 
-The installer asks whether to include the **B2B Commerce** pack. Decline it and the
+The installer asks whether to include the **B2B Commerce** pack. Include it and the
+`commerce-b2b.md` rules ride along inside the `reviewing-*` skills. Decline it and the
 `commerce-b2b.md` files and their routing rows are stripped from the installed skills (the base
 review rules are untouched). For a manual copy, just keep or delete `references/commerce-b2b.md`
 in each skill.
@@ -96,7 +108,12 @@ in each skill.
 ```
 skills/<name>/              ← 4 authored Salesforce skills (canonical source: SKILL.md + references/)
 agents/<name>.md            ← 2 Salesforce agents (canonical source)
+templates/baseline.md       ← single-source template for the three root files below
+scripts/render-baselines.js ← regenerates the three renders from the template
 scripts/install.js          ← the interactive installer (npx entry point)
+CLAUDE.md                   ← Claude Code baseline (rendered — do not edit directly)
+AGENTS.md                   ← Codex baseline (rendered — do not edit directly)
+.github/copilot-instructions.md ← Copilot baseline (rendered — do not edit directly)
 ```
 
 | Assistant | Reads SKILL.md from |
@@ -122,7 +139,15 @@ All three use the same `name` + `description` frontmatter format.
    cp -r agents/* .github/agents/    # GitHub Copilot
    cp -r agents/* .agents/agents/    # Codex
    ```
-3. Continue with [After the installer](#after-the-installer) above.
+3. Copy the matching baseline into your project root:
+
+   | Assistant | File to copy |
+   |---|---|
+   | Claude Code | `CLAUDE.md` |
+   | GitHub Copilot | `.github/copilot-instructions.md` |
+   | Codex | `AGENTS.md` |
+
+4. Continue with [After the installer](#after-the-installer) above.
 
 </details>
 
@@ -130,18 +155,30 @@ All three use the same `name` + `description` frontmatter format.
 
 ## Skill Routing
 
-Each skill declares its own trigger in its `description` frontmatter, so the assistant invokes it automatically based on context — there's no baseline routing table. The table below summarizes which skills cover which context. Cross-domain work (LWC + Apex controller, Flow + invocable Apex) loads both relevant skills, and each quality skill names its own cross-domain partner:
+The baseline's routing table maps each context to the right skill and fires it before any artifact is generated; each skill also declares its own trigger in its `description` frontmatter as a fallback. **Authoring always chains into review:** whenever a `generating-*` skill writes or edits code, the matching `reviewing-*` skill runs as a review pass over the result (`generating-apex`/`generating-apex-test` → `reviewing-apex`, `generating-lwc-components` → `reviewing-lwc`, `generating-flow` → `reviewing-flow`). The arrow rows below are that authoring → review chain; cross-domain work (LWC + Apex controller, Flow + invocable Apex) loads both relevant skills:
 
-| Context | Skills |
+| Context | Skills — invoke in order |
 |---|---|
-| Apex classes / triggers / services | `generating-apex` · `reviewing-apex` |
-| Apex test classes | `generating-apex-test` · `reviewing-apex` |
-| LWC components | `generating-lwc-components` · `reviewing-lwc` |
+| Apex classes / triggers / services | `generating-apex` → `reviewing-apex` |
+| Apex test classes | `generating-apex-test` → `reviewing-apex` |
+| LWC components | `generating-lwc-components` → `reviewing-lwc` |
+| Flows | `generating-flow` → `reviewing-flow` |
+| Review-only (no authoring) | `reviewing-apex` / `reviewing-lwc` / `reviewing-flow` |
 | LWC + Apex controller | `reviewing-lwc` · `reviewing-apex` |
-| Flows | `generating-flow` · `reviewing-flow` |
 | Flow + Apex invocable | `reviewing-flow` · `reviewing-apex` |
 | Deployment / package.xml / CI-CD | `deploying-sf-metadata` · `deploying-metadata` |
-| B2B Commerce storefront *(optional pack)* | The matching quality skill reads its `references/commerce-b2b.md` — Apex (`reviewing-apex`), LWC (`reviewing-lwc`), Flow (`reviewing-flow`) |
+
+B2B Commerce storefront rules ride inside the `reviewing-*` skills via their optional `references/commerce-b2b.md` pack — no separate routing step. See [B2B Commerce projects](#b2b-commerce-projects).
+
+### Making sure routing is followed
+
+The baseline lives in your project root, but agents don't always re-read it on every turn — especially right after you approve an implementation plan or tell the main agent to start coding. The reliable trigger is to **name the baseline in that go-ahead prompt**:
+
+> *"Proceed — and make sure to follow the skill routing in `CLAUDE.md`."*
+
+Use the baseline file your assistant reads: `CLAUDE.md` (Claude Code), `AGENTS.md` (Codex), or `.github/copilot-instructions.md` (GitHub Copilot). That one line re-anchors the routing table for the work about to happen, so the main agent fires the right `generating-*` skill and chains the matching `reviewing-*` pass instead of writing code unrouted.
+
+You only need this for the **main agent**. The `salesforce-developer` and `architect` agents already carry the skill routing in their own agent files, so a dispatched brief picks up the right skills automatically — no reminder needed.
 
 ---
 
@@ -242,6 +279,7 @@ alongside the Salesforce skills.
 ## Maintaining
 
 - **Skills & agents** — `skills/` and `agents/` are the only source of truth. Edit `skills/<name>/` (the `SKILL.md` and its `references/`) or `agents/<name>.md`, then re-run the installer (or re-copy) into the per-assistant directories. Never edit the installed copies — changes are lost on the next install.
+- **Baselines** — edit `templates/baseline.md` (its header comment documents the template token syntax), then run `node scripts/render-baselines.js` (or `npm run render`) to regenerate the three renders. Never edit `CLAUDE.md`, `AGENTS.md`, or `.github/copilot-instructions.md` by hand.
 
 ## License
 

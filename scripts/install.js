@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Interactive installer for the sf-agentic-development skills and agents.
+// Interactive installer for the sf-agentic-development skills, agents, and baselines.
 // Zero dependencies. Run from the root of your Salesforce project:
 //   npx github:drsaavedra/sf-agentic-development
 // or, from a local clone:  node <clone>/scripts/install.js
@@ -24,18 +24,49 @@ const assistants = [
     name: 'Claude Code',
     skillsDir: '.claude/skills',
     agentsDir: '.claude/agents',
+    baseline: 'CLAUDE.md',
+    // .claude/ is owned by the assistant, so ignore the whole dir + the baseline.
+    ignore: ['.claude/', 'CLAUDE.md'],
   },
   {
     name: 'GitHub Copilot',
     skillsDir: '.github/skills',
     agentsDir: '.github/agents',
+    baseline: path.join('.github', 'copilot-instructions.md'),
+    // .github/ also holds workflows etc. — ignore only the paths we install into.
+    ignore: ['.github/skills/', '.github/agents/', '.github/copilot-instructions.md'],
   },
   {
     name: 'Codex',
     skillsDir: '.agents/skills',
     agentsDir: '.agents/agents',
+    baseline: 'AGENTS.md',
+    // .agents/ is owned by the assistant, so ignore the whole dir + the baseline.
+    ignore: ['.agents/', 'AGENTS.md'],
   },
 ];
+
+// Append the generated assistant paths to the project's .gitignore (creating it if
+// absent). Idempotent: only entries not already present are added, under a marker
+// header so re-runs and manual edits stay clean.
+function updateGitignore(entries) {
+  const gitignorePath = path.join(target, '.gitignore');
+  const header = '# sf-agentic-development — generated assistant files';
+  const existing = fs.existsSync(gitignorePath) ? fs.readFileSync(gitignorePath, 'utf8') : '';
+  const present = new Set(existing.split(/\r?\n/).map((l) => l.trim()));
+  const toAdd = entries.filter((e) => !present.has(e));
+  if (toAdd.length === 0) {
+    console.log('.gitignore already covers the generated files — no change');
+    return;
+  }
+  const block = present.has(header) ? toAdd : [header, ...toAdd];
+  let out = existing;
+  if (out && !out.endsWith('\n')) out += '\n';
+  if (out) out += '\n'; // blank line before our block
+  out += block.join('\n') + '\n';
+  fs.writeFileSync(gitignorePath, out, 'utf8');
+  console.log((existing ? 'updated' : 'created') + ' .gitignore (+' + toAdd.length + ' entries)');
+}
 
 // Optional domain reference packs. A skill's references/ may carry domain-specific
 // files (e.g. references/commerce-b2b.md) plus SKILL.md routing rows tagged with the
@@ -339,6 +370,26 @@ async function main() {
       console.log('installed agent  ' + path.join(assistant.agentsDir, name + '.md'));
     }
 
+    // Copy the baseline (CLAUDE.md / AGENTS.md / .github/copilot-instructions.md).
+    // The baseline is skill routing only — safety, conventions, and Commerce rules live in
+    // the skills and their reference packs, so there is nothing to patch here.
+    const baselineDest = path.join(target, assistant.baseline);
+    let writeBaseline = true;
+    if (fs.existsSync(baselineDest)) {
+      writeBaseline = await ui.confirm('\n' + assistant.baseline + ' already exists. Overwrite?');
+    }
+    if (writeBaseline) {
+      const content = fs.readFileSync(path.join(pkgRoot, assistant.baseline), 'utf8');
+      fs.mkdirSync(path.dirname(baselineDest), { recursive: true });
+      fs.writeFileSync(baselineDest, content, 'utf8');
+      console.log('installed baseline ' + assistant.baseline);
+    } else {
+      console.log('kept existing ' + assistant.baseline);
+    }
+
+    // Keep the generated assistant files out of version control.
+    updateGitignore(assistant.ignore);
+
     // Dependency — sf-skills is the toolkit's one required base; detect and offer it now
     let needSfSkills = !sfSkillsInstalled(assistant);
 
@@ -355,10 +406,10 @@ async function main() {
       console.log('       npx skills add forcedotcom/sf-skills');
     }
     console.log(
-      '\nAgent notes: the salesforce-developer and architect agents ask for your spec/' +
-        'architecture\ndocument paths at dispatch time — no project file to fill in up front.' +
-        '\nOptional behavioral-guideline skills (karpathy-guidelines, superpowers) are listed' +
-        '\nunder "Recommended companion skills" in the README — install whichever you prefer.'
+      '\nAgent notes: the installed baseline (' +
+        assistant.baseline +
+        ') is skill routing only. The salesforce-developer and architect agents ask for your\n' +
+        'spec/architecture document paths at dispatch time — nothing to fill in up front.'
     );
   } finally {
     ui.close();
