@@ -24,6 +24,7 @@ Scan every artifact against this checklist.
 | LWC: layout / `getRecordUi` requests | `getRecord` with only the fields you need |
 | LWC: same data fetched per component | Pass down via `@api` or a UI-less service component; filter/sort client-side |
 | LWC: duplicated state fields | Single source of truth; derive the rest with getters |
+| LWC: public `@api` Boolean initialized to `true` | Default it `false` (else `LWC1503`); invert the property name or derive the effective value with a getter |
 | LWC: light DOM on sensitive data | Keep shadow DOM; light DOM only for styling/a11y-linking/analytics/SSR |
 | LWC: `for:each` index key | Use a stable id (`key={item.Id}`), never the loop index |
 | LWC: `if:true`/`if:false` | Superseded, slated for removal — use `lwc:if` / `lwc:elseif` / `lwc:else` |

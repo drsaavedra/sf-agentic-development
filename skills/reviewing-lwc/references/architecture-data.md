@@ -13,6 +13,7 @@
   - Group fields that change together into one object (e.g., `{ data, error, loading }`) so dependent state cannot desync.
   - Move business logic to module-level functions outside the class body — testable in isolation, liftable into shared modules.
   - Prefer `@api` properties over `@api` methods — properties are settable declaratively from a parent template; methods force the parent to query the DOM first.
+  - **A public (`@api`) Boolean must default to `false` — initializing one to `true` fails compilation with `LWC1503`.** Public Booleans follow HTML boolean-attribute semantics: an absent attribute means `false`, and markup cannot statically set `false` (`prop="false"` evaluates to `true`), so a `true` default is unreachable from a parent and the compiler rejects it. When the intended default is "on", invert the property so its `false` default expresses the intent — expose the negative case (e.g. `hideFooter` defaulting `false` instead of `showFooter` defaulting `true`) — or keep the public property `false`/undefined and derive the effective value with a private getter. This applies only to `@api` Booleans; private reactive fields may default to either value.
 
 **Data source decision guide:**
 
