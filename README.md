@@ -88,25 +88,24 @@ toolkit requires none. If you want one, two good options:
 
 - **[andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills)** —
   behavioral guidelines that curb common LLM coding mistakes (overcomplication, sweeping
-  changes, unstated assumptions).
-  - **Claude Code** (plugin — updates flow through automatically):
+  changes, unstated assumptions). Install as a plugin:
     ```
     /plugin marketplace add forrestchang/andrej-karpathy-skills
     /plugin install andrej-karpathy-skills@karpathy-skills
     ```
-  - **Codex / Copilot** (no plugin support — install as a skill):
-    ```bash
-    npx skills add forrestchang/andrej-karpathy-skills
-    ```
 - **[Superpowers](https://github.com/obra/superpowers)** — workflow skills for brainstorming,
-  plan-writing, TDD, and systematic debugging.
+  plan-writing, TDD, and systematic debugging. Install as a plugin:
+    ```
+    /plugin marketplace add obra/superpowers-marketplace
+    /plugin install superpowers@superpowers-marketplace
+    ```
 
 Neither is wired into anything — if you install one, it activates on its own triggers
 alongside the Salesforce skills.
 
-### Commerce projects
+### B2B Commerce projects
 
-There is no separate Commerce skill. The B2B Commerce rules are folded into the three quality
+There is no separate B2B Commerce skill. The B2B Commerce Domain rules are folded into the three quality
 skills as `references/commerce-b2b.md` — Apex backend rules under `reviewing-apex`,
 storefront LWC rules under `reviewing-lwc`, and Commerce-object automation rules under
 `reviewing-flow`. Each skill's routing table points at its `commerce-b2b.md` when the
