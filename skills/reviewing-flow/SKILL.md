@@ -1,6 +1,6 @@
 ---
 name: reviewing-flow
-description: "Use when reviewing or auditing Salesforce Flows after generation, or when the task is explicitly a code review. Covers loop and collection optimization (Get Records in loop, Collection Filter/Sort, Transform, early exit), entry-condition discipline, Send Email limits, fault handling and Custom Error, DML-in-loop prevention, hardcoded ID elimination, recursion guards, async paths, complexity limits, flow tests, and naming conventions. Detailed rules live in references/ — read the file(s) matching the artifact's domains. If the Flow invokes Apex actions, also load reviewing-apex. For creating new Flows, use generating-flow instead."
+description: "Use when reviewing or auditing Salesforce Flows after generation, or when the task is explicitly a code review. Covers loop and collection optimization (Get Records in loop, Collection Filter/Sort, Transform, early exit), entry-condition discipline, Send Email limits, fault handling and Custom Error, DML-in-loop prevention, hardcoded ID elimination, recursion guards, async paths, complexity limits, flow tests, and naming conventions. Detailed rules live in references/ — read the file(s) matching the artifact's domains. If the Flow invokes Apex actions, also load reviewing-apex. TRIGGER when: reviewing or auditing Flows, after generating any *.flow-meta.xml file, or when the task is an explicit Flow review. DO NOT TRIGGER as the authoring skill — for creating or editing Flows use generating-flow, then chain this skill as the review pass."
 ---
 
 # Salesforce Flow Quality

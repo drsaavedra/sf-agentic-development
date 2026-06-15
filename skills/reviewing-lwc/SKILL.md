@@ -1,6 +1,6 @@
 ---
 name: reviewing-lwc
-description: "Use when reviewing or auditing Lightning Web Components after generation, or when the task is explicitly a code review. Covers component architecture, LDS/Apex/GraphQL data sourcing, template directives, async/event patterns, performance, and Jest testing. Detailed rules live in references/ — read the file(s) matching the artifact's domains. If the component has an Apex controller, also load reviewing-apex. For creating or editing LWC, use generating-lwc-components instead."
+description: "Use when reviewing or auditing Lightning Web Components after generation, or when the task is explicitly a code review. Covers component architecture, LDS/Apex/GraphQL data sourcing, template directives, async/event patterns, performance, and Jest testing. Detailed rules live in references/ — read the file(s) matching the artifact's domains. If the component has an Apex controller, also load reviewing-apex. TRIGGER when: reviewing or auditing LWC, after generating files under lwc/**/*.js, .html, .css, .js-meta.xml (or aura/**), or when the task is an explicit LWC review. DO NOT TRIGGER as the authoring skill — for creating or editing LWC use generating-lwc-components, then chain this skill as the review pass."
 ---
 
 # Salesforce LWC Quality
