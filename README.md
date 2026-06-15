@@ -4,7 +4,7 @@ A developer productivity toolkit for **Claude Code**, **GitHub Copilot**, and **
 
 The skills encode hard-won Salesforce quality rules — bulk safety, security, architecture patterns, anti-patterns — that fire automatically based on what you're building.
 
-The agents provide on-demand specialisation. The main agent handles config planning and QA reasoning inline, since it already has your conversation context. The `salesforce-developer` agent runs automation work — Apex, LWC, Flows — in an isolated context, parallelizable across several instances at once. The `architect` agent gives you an independent technical review when you want one. How the three work together — the work brief, dispatch rules, and review loop — is covered in [docs/ORCHESTRATION.md](docs/ORCHESTRATION.md).
+The agents provide on-demand specialisation: the main agent plans config and QA inline, the `salesforce-developer` agent builds automation (Apex, LWC, Flows) in an isolated, parallelizable context, and the `architect` agent gives an independent technical review when you want one.
 
 Agents are deliberately thin — the domain knowledge lives in the skills, which every agent shares. Project-specific constraints (e.g. additive-only, or reusing an existing logging framework) are passed in the work brief, not hardcoded into the agents.
 
@@ -23,11 +23,8 @@ This repo evolves continuously: new Salesforce releases, better agentic patterns
 | `reviewing-flow` | Entry-condition discipline, loop/collection/Transform optimization, fault handling and Custom Error, async paths, recursion, hardcoded IDs, complexity, flow tests, naming |
 | `deploying-sf-metadata` | Deployment safety rules, `package.xml` / git-delta (sgd) generation, validate → quick-deploy, CI/CD patterns, and SFDMU data deployments |
 
-The apex/lwc/flow quality skills also bundle an optional **B2B Commerce** reference pack
-(`references/commerce-b2b.md`) — storefront Apex (`ConnectApi`/`CartExtension`), storefront LWC
-(Storefront APIs, checkout adapters), and Commerce-object Flow automation. The installer includes
-it only if you select it; each quality skill routes to it automatically when reviewing a Commerce
-storefront artifact.
+The apex/lwc/flow quality skills also bundle an optional **B2B Commerce** reference pack —
+see [B2B Commerce projects](#b2b-commerce-projects).
 
 ### Agents
 
@@ -56,8 +53,7 @@ The installer asks which assistant you use (Claude Code / GitHub Copilot / Codex
 pick), then which skills, which optional domain reference packs (e.g. **B2B Commerce** — included
 only if you check it, and only offered when a selected skill carries that pack), and which agents
 to install (spacebar to toggle checkboxes, `a` to select all, Enter to confirm) — then copies your
-picks into the right per-assistant directories. It writes no baseline file: the skills and agents
-are self-contained.
+picks into the right per-assistant directories.
 
 It then checks whether the toolkit's one dependency — `forcedotcom/sf-skills`, the
 Salesforce-maintained base skills that do the generation this repo's quality gates sit on top
@@ -124,8 +120,7 @@ All three use the same `name` + `description` frontmatter format.
    cp -r agents/* .github/agents/    # GitHub Copilot
    cp -r agents/* .agents/agents/    # Codex
    ```
-3. Continue with [After the installer](#after-the-installer) above. There's no baseline file to
-   copy — the skills and agents are self-contained.
+3. Continue with [After the installer](#after-the-installer) above.
 
 </details>
 
@@ -153,10 +148,7 @@ Each skill declares its own trigger in its `description` frontmatter, so the ass
 How the main agent and the two repo agents work together on a feature. The pattern is adapted
 from [Agentic Project Management (APM)](https://github.com/sdi2200262/agentic-project-management):
 self-contained task briefs, progress tracked through summaries rather than raw code, and
-dependency-aware dispatch. Three APM mechanisms were deliberately **not** adopted — the file-based
-message bus and handoff procedures (Claude Code / Copilot / Codex subagents pass context natively
-via prompt and result), and the separate Planner agent (the main agent plans inline because it
-already holds your conversation context).
+dependency-aware dispatch.
 
 ### The lifecycle
 
