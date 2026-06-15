@@ -2,6 +2,17 @@
 
 Notable changes to the toolkit, newest first. For full detail see `git log`.
 
+## 2026-06-15 (README slimmed; supporting docs moved into docs/)
+
+The README's Agent Orchestration section was over two-thirds of the file. The full working guide —
+lifecycle steps, the work-brief template, dispatch rules, checkpoint commits, prompting guidance,
+and the four worked examples — moved to `docs/ORCHESTRATION.md`. The README keeps the summary intro
+and the lifecycle diagram, with a pointer to the new doc; the two inbound links were repointed.
+
+`VISION.md` also moved to `docs/VISION.md` (its README link repointed), and the **Recommended
+companion skills** subsection moved out of Setup to its own top-level section between Roadmap and
+Maintaining.
+
 ## 2026-06-14 (Authored skills renamed to verb-led names)
 
 The four authored skills are renamed to match the gerund verb-led convention of the upstream
