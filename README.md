@@ -172,11 +172,11 @@ B2B Commerce storefront rules ride inside the `reviewing-*` skills via their opt
 
 ### Making sure routing is followed
 
-The baseline lives in your project root, but agents don't always re-read it on every turn — especially right after you approve an implementation plan or tell the main agent to start coding. The reliable trigger is to **name the baseline in that go-ahead prompt**:
+Each authored skill self-declares a file-glob `TRIGGER when:` clause in its `description`, so the review and deploy skills usually auto-activate once the relevant files (`.cls`, `.trigger`, `lwc/**`, `*.flow-meta.xml`, `package.xml`) are in play — no prompt needed. But the baseline lives in your project root, and agents don't always re-read it on every turn — especially right after you approve an implementation plan or tell the main agent to start coding. For belt-and-suspenders reliability, **name the baseline in that go-ahead prompt**:
 
 > *"Proceed — and make sure to follow the skill routing in `CLAUDE.md`."*
 
-Use the baseline file your assistant reads: `CLAUDE.md` (Claude Code), `AGENTS.md` (Codex), or `.github/copilot-instructions.md` (GitHub Copilot). That one line re-anchors the routing table for the work about to happen, so the main agent fires the right `generating-*` skill and chains the matching `reviewing-*` pass instead of writing code unrouted.
+Use the baseline file your assistant reads: `CLAUDE.md` (Claude Code), `AGENTS.md` (Codex), or `.github/copilot-instructions.md` (GitHub Copilot). The skill triggers handle *which* skill fires on a given file; naming the baseline re-anchors what a description can't — the authoring→review **ordering**, **review-only** routing, and **cross-domain pairing** (LWC+Apex controller, Flow+invocable Apex) — so the main agent chains the matching `reviewing-*` pass instead of writing code unrouted.
 
 You only need this for the **main agent**. The `salesforce-developer` and `architect` agents already carry the skill routing in their own agent files, so a dispatched brief picks up the right skills automatically — no reminder needed.
 

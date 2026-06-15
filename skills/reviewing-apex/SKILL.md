@@ -1,6 +1,6 @@
 ---
 name: reviewing-apex
-description: "Use when reviewing or auditing Apex code after generation, or when the task is explicitly a code review. Covers governor limits, trigger design, security, architecture, async patterns, error handling, and test quality. Detailed rules live in references/ — read the file(s) matching the artifact's domains. If the Apex includes @AuraEnabled methods, also load reviewing-lwc. For writing or refactoring Apex, use generating-apex or generating-apex-test instead."
+description: "Use when reviewing or auditing Apex code after generation, or when the task is explicitly a code review. Covers governor limits, trigger design, security, architecture, async patterns, error handling, and test quality. Detailed rules live in references/ — read the file(s) matching the artifact's domains. If the Apex includes @AuraEnabled methods, also load reviewing-lwc. TRIGGER when: reviewing or auditing Apex, immediately after generating any .cls or .trigger file (force-app/**/classes/*.cls, force-app/**/triggers/*.trigger), or when the task is an explicit Apex code review. DO NOT TRIGGER as the authoring skill — for writing or refactoring Apex use generating-apex or generating-apex-test, then chain this skill as the review pass."
 ---
 
 # Salesforce Apex Quality
