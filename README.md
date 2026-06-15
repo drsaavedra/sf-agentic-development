@@ -170,6 +170,16 @@ The baseline's routing table maps each context to the right skill and fires it b
 
 B2B Commerce storefront rules ride inside the `reviewing-*` skills via their optional `references/commerce-b2b.md` pack — no separate routing step. See [B2B Commerce projects](#b2b-commerce-projects).
 
+### Making sure routing is followed
+
+The baseline lives in your project root, but agents don't always re-read it on every turn — especially right after you approve an implementation plan or tell the main agent to start coding. The reliable trigger is to **name the baseline in that go-ahead prompt**:
+
+> *"Proceed — and make sure to follow the skill routing in `CLAUDE.md`."*
+
+Use the baseline file your assistant reads: `CLAUDE.md` (Claude Code), `AGENTS.md` (Codex), or `.github/copilot-instructions.md` (GitHub Copilot). That one line re-anchors the routing table for the work about to happen, so the main agent fires the right `generating-*` skill and chains the matching `reviewing-*` pass instead of writing code unrouted.
+
+You only need this for the **main agent**. The `salesforce-developer` and `architect` agents already carry the skill routing in their own agent files, so a dispatched brief picks up the right skills automatically — no reminder needed.
+
 ---
 
 ## Agent Orchestration
