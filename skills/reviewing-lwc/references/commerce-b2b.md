@@ -51,7 +51,7 @@ Prefer these `commerce/*` and `experience/*` modules over hand-rolled Apex when 
 
 ## Commerce context
 
-- Pass or derive `webstoreId`, `effectiveAccountId`, `cartId`, `productId`, `recordId`, and `siteId`
+- Pass or derive `webstoreId`, `effectiveAccountId`, `cartId`, `productId`, `recordId`, `communityId`, and `siteId`
   explicitly and deliberately; never hard-code them.
 - For components that appear on PDP, PLP, cart, checkout, and modal contexts, support both `recordId`
   and an explicitly passed `productId`/`cartId` when the existing project does so.
