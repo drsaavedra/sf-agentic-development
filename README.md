@@ -2,7 +2,7 @@
 
 A developer productivity toolkit for **Claude Code**, **GitHub Copilot**, and **Codex** — skills and agents that keep you in the driver's seat while AI handles the heavy lifting.
 
-High-quality Salesforce code shouldn't rest on a single line of defense, so these skills add an automatic review pass — bulk safety, security, architecture — over whatever generates it.
+These skills are standalone Salesforce code reviewers — point one at an existing codebase for a quality audit, an anti-pattern and performance sweep, or an ad-hoc review of bulk safety, security, and architecture. They *also* slot in automatically as a review pass over freshly generated code, because high-quality Salesforce code shouldn't rest on a single line of defense.
 
 The skills encode hard-won Salesforce quality rules — bulk safety, security, architecture patterns, anti-patterns — that fire automatically based on what you're building.
 
@@ -40,6 +40,28 @@ See [docs/ORCHESTRATION.md](docs/ORCHESTRATION.md) for the full workflow: the wo
 ### Baselines
 
 `CLAUDE.md`, `AGENTS.md`, and `.github/copilot-instructions.md` are rendered from `templates/baseline.md` by `scripts/render-baselines.js` — one source of truth for **skill routing** across all three assistants. The baseline does one job: route to the right `generating-*` / `reviewing-*` skill (and chain them) from your project root, which fires reliably even in auto/autopilot modes where per-skill frontmatter triggers can be missed. Everything else stays in the skills — each skill carries its own safety rules, quality gates, and domain knowledge (including the B2B Commerce reference packs), and the agents ask for spec/architecture paths at dispatch time. The baseline is purely the routing layer on top of them.
+
+---
+
+## Using the review skills
+
+Invoke a `reviewing-*` skill **by name** and point it at code you
+already have. Each one is a complete Salesforce reviewer — the same governor-limit, security, and
+architecture rules apply whether the code is five seconds or five years old — so it runs just as
+well on an inherited org as on a line you just wrote. No generation step required.
+
+| Use it for | Example prompt |
+|---|---|
+| **Ad-hoc code review** — one class, a PR diff, a file you're about to change | `/reviewing-apex` review `OrderService.cls` for bulk safety and security |
+| **Codebase quality audit** — assess the overall health of an existing or inherited org; great for onboarding or scoping tech debt | `/reviewing-apex` can you scan the codebase and assess the quality of the existing codebase |
+| **Anti-pattern / performance sweep** — surface what's making automations slow and inefficient | `/reviewing-apex` can you scan the codebase and find anti-patterns that exist that make the automations slow and not efficient |
+| **LWC review** — component performance, wire/async patterns, Jest gaps | `/reviewing-lwc` audit the components under `force-app/**/lwc/` for performance, wire/async issues, and Jest gaps |
+| **Flow review** — loop/collection efficiency, fault paths, recursion | `/reviewing-flow` scan my flows for Get-Records-in-loop, missing fault paths, and recursion |
+| **Deployment / package.xml** — manifest and git-delta generation, validate/quick-deploy, CI/CD | `/deploying-sf-metadata` generate a package.xml from current commit HEAD to [commit hash or reference branch] |
+
+These standalone reviews are the headline. The skills *also* fire automatically as a review pass
+whenever a `generating-*` skill writes code — that authoring → review chain is described under
+[Skill Routing](#skill-routing) below — but you don't need to be generating anything to use them.
 
 ---
 
