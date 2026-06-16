@@ -1,6 +1,6 @@
 ---
 name: deploying-sf-metadata
-description: Use when deploying Salesforce metadata, generating package.xml or a git delta (sfdx-git-delta), running validate/quick-deploy, planning CI/CD promotion, or deploying reference data with SFDMU — deployment safety rules and deployment commands. TRIGGER when: deploying metadata, generating package.xml / a manifest, building a git delta (sfdx-git-delta) from a commit or range, running sf project deploy validate / quick-deploy, deploying reference data with SFDMU, or touching package.xml / manifest XML in a deploy context. DO NOT TRIGGER when: authoring the metadata itself (use the matching generating-* skill) or querying org data (use querying-soql / handling-sf-data).
+description: "Use when deploying Salesforce metadata, generating package.xml or a git delta (sfdx-git-delta), running validate/quick-deploy, planning CI/CD promotion, or deploying reference data with SFDMU — deployment safety rules and deployment commands. TRIGGER when: deploying metadata, generating package.xml / a manifest, building a git delta (sfdx-git-delta) from a commit or range, running sf project deploy validate / quick-deploy, deploying reference data with SFDMU, or touching package.xml / manifest XML in a deploy context. DO NOT TRIGGER when: authoring the metadata itself (use the matching generating-* skill) or querying org data (use querying-soql / handling-sf-data)."
 ---
 
 # Salesforce Deployment Rules
