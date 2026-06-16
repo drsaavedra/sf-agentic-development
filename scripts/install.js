@@ -25,26 +25,70 @@ const assistants = [
     skillsDir: '.claude/skills',
     agentsDir: '.claude/agents',
     baseline: 'CLAUDE.md',
-    // .claude/ is owned by the assistant, so ignore the whole dir + the baseline.
-    ignore: ['.claude/', 'CLAUDE.md'],
+    // .claude/ is owned by the assistant, so ignore the whole dir. The root CLAUDE.md is
+    // NOT ignored — it carries our managed block alongside the user's own instructions.
+    ignore: ['.claude/'],
   },
   {
     name: 'GitHub Copilot',
     skillsDir: '.github/skills',
     agentsDir: '.github/agents',
     baseline: path.join('.github', 'copilot-instructions.md'),
-    // .github/ also holds workflows etc. — ignore only the paths we install into.
-    ignore: ['.github/skills/', '.github/agents/', '.github/copilot-instructions.md'],
+    // .github/ also holds workflows etc. — ignore only the skills/agents dirs we install
+    // into. copilot-instructions.md is NOT ignored — it carries our managed block.
+    ignore: ['.github/skills/', '.github/agents/'],
   },
   {
     name: 'Codex',
     skillsDir: '.agents/skills',
     agentsDir: '.agents/agents',
     baseline: 'AGENTS.md',
-    // .agents/ is owned by the assistant, so ignore the whole dir + the baseline.
-    ignore: ['.agents/', 'AGENTS.md'],
+    // .agents/ is owned by the assistant, so ignore the whole dir. The root AGENTS.md is
+    // NOT ignored — it carries our managed block alongside the user's own instructions.
+    ignore: ['.agents/'],
   },
 ];
+
+// The baseline is injected into the target file (CLAUDE.md / AGENTS.md /
+// .github/copilot-instructions.md) as a marker-delimited managed block, so it can
+// coexist with any project instructions the user already keeps there.
+const BASELINE_BEGIN = '<!-- BEGIN sf-agentic-development (managed block — do not edit) -->';
+const BASELINE_END = '<!-- END sf-agentic-development (managed block) -->';
+
+// Write the rendered baseline as a managed block. Idempotent on re-runs:
+//   - file absent                  → create it from the block alone
+//   - file exists, markers present → replace only the content between them (in place)
+//   - file exists, no markers      → append the block, preserving the user's content
+// A second `npx` run therefore updates the block in place instead of duplicating it —
+// the markers are how an existing managed block is detected.
+function writeBaseline(dest, rendered) {
+  const block = BASELINE_BEGIN + '\n\n' + rendered.trim() + '\n\n' + BASELINE_END;
+  if (!fs.existsSync(dest)) {
+    fs.mkdirSync(path.dirname(dest), { recursive: true });
+    fs.writeFileSync(dest, block + '\n', 'utf8');
+    return 'created';
+  }
+  const cur = fs.readFileSync(dest, 'utf8');
+  const i = cur.indexOf(BASELINE_BEGIN);
+  const j = cur.indexOf(BASELINE_END);
+  if (i !== -1 && j !== -1 && j > i) {
+    const updated = cur.slice(0, i) + block + cur.slice(j + BASELINE_END.length);
+    if (updated === cur) return 'unchanged';
+    fs.writeFileSync(dest, updated, 'utf8');
+    return 'updated';
+  }
+  // A lone/partial marker means a prior block was hand-edited — warn rather than guess,
+  // and append a fresh, well-formed block so routing is still installed.
+  if (i !== -1 || j !== -1) {
+    console.warn(
+      '  ! ' + dest + ': partial managed-block marker found; appending a fresh block. ' +
+        'Remove the stray marker if that is wrong.'
+    );
+  }
+  const out = cur.replace(/\s*$/, '') + '\n\n' + block + '\n';
+  fs.writeFileSync(dest, out, 'utf8');
+  return 'appended';
+}
 
 // Append the generated assistant paths to the project's .gitignore (creating it if
 // absent). Idempotent: only entries not already present are added, under a marker
@@ -384,22 +428,19 @@ async function main() {
       console.log('installed agent  ' + path.join(assistant.agentsDir, name + '.md'));
     }
 
-    // Copy the baseline (CLAUDE.md / AGENTS.md / .github/copilot-instructions.md).
-    // The baseline is skill routing only — safety, conventions, and Commerce rules live in
-    // the skills and their reference packs, so there is nothing to patch here.
+    // Inject the baseline (CLAUDE.md / AGENTS.md / .github/copilot-instructions.md) as a
+    // marker-delimited managed block. The baseline is skill routing only — safety,
+    // conventions, and Commerce rules live in the skills — so it slots in alongside any
+    // project instructions the user already keeps in that file, and updates in place on
+    // re-runs rather than clobbering it or prompting to overwrite.
     const baselineDest = path.join(target, assistant.baseline);
-    let writeBaseline = true;
-    if (fs.existsSync(baselineDest)) {
-      writeBaseline = await ui.confirm('\n' + assistant.baseline + ' already exists. Overwrite?');
-    }
-    if (writeBaseline) {
-      const content = fs.readFileSync(path.join(pkgRoot, assistant.baseline), 'utf8');
-      fs.mkdirSync(path.dirname(baselineDest), { recursive: true });
-      fs.writeFileSync(baselineDest, content, 'utf8');
-      console.log('installed baseline ' + assistant.baseline);
-    } else {
-      console.log('kept existing ' + assistant.baseline);
-    }
+    const rendered = fs.readFileSync(path.join(pkgRoot, assistant.baseline), 'utf8');
+    const action = writeBaseline(baselineDest, rendered);
+    console.log(
+      action === 'unchanged'
+        ? 'baseline up to date ' + assistant.baseline + ' (managed block)'
+        : action + ' baseline ' + assistant.baseline + ' (managed block)'
+    );
 
     // Keep the generated assistant files out of version control.
     updateGitignore(assistant.ignore);
