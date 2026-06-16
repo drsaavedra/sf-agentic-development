@@ -2,15 +2,9 @@
 
 A developer productivity toolkit for **Claude Code**, **GitHub Copilot**, and **Codex** — skills and agents that keep you in the driver's seat while AI handles the heavy lifting.
 
-High-quality Salesforce code shouldn't rest on a single line of defense, so these skills add an automatic review pass — bulk safety, security, architecture — over whatever generates it.
+The **skills** are standalone Salesforce code reviewers encoding hard-won quality rules — bulk safety, security, architecture, anti-patterns. Point one at an existing codebase for a quality audit or performance sweep, or let it slot in automatically as a review pass over freshly generated code.
 
-The skills encode hard-won Salesforce quality rules — bulk safety, security, architecture patterns, anti-patterns — that fire automatically based on what you're building.
-
-The agents provide on-demand specialisation: the main agent plans config and QA inline, the `salesforce-developer` agent builds automation (Apex, LWC, Flows) in an isolated, parallelizable context, and the `architect` agent gives an independent technical review when you want one.
-
-Agents are deliberately thin — the domain knowledge lives in the skills, which every agent shares. Project-specific constraints (e.g. additive-only, or reusing an existing logging framework) are passed in the work brief, not hardcoded into the agents.
-
-This repo evolves continuously: new Salesforce releases, better agentic patterns, and improved practices get folded in over time.
+The **agents** add on-demand specialisation: the `salesforce-developer` agent builds automation (Apex, LWC, Flows) in an isolated, parallelizable context, and the `architect` agent gives an independent technical review when you want one. Agents are deliberately thin — the domain knowledge lives in the shared skills; project-specific constraints (e.g. additive-only) are passed in the work brief, not hardcoded.
 
 ---
 
@@ -26,7 +20,7 @@ This repo evolves continuously: new Salesforce releases, better agentic patterns
 | `deploying-sf-metadata` | Deployment safety rules, `package.xml` / git-delta (sgd) generation, validate → quick-deploy, CI/CD patterns, and SFDMU data deployments |
 
 The apex/lwc/flow quality skills also bundle an optional **B2B Commerce** reference pack —
-see [B2B Commerce projects](#b2b-commerce-projects).
+see [Domain Specific skills](#domain-specific-skills).
 
 ### Agents
 
@@ -39,7 +33,39 @@ See [docs/ORCHESTRATION.md](docs/ORCHESTRATION.md) for the full workflow: the wo
 
 ### Baselines
 
-`CLAUDE.md`, `AGENTS.md`, and `.github/copilot-instructions.md` are rendered from `templates/baseline.md` by `scripts/render-baselines.js` — one source of truth for **skill routing** across all three assistants. The baseline does one job: route to the right `generating-*` / `reviewing-*` skill (and chain them) from your project root, which fires reliably even in auto/autopilot modes where per-skill frontmatter triggers can be missed. Everything else stays in the skills — each skill carries its own safety rules, quality gates, and domain knowledge (including the B2B Commerce reference packs), and the agents ask for spec/architecture paths at dispatch time. The baseline is purely the routing layer on top of them.
+`CLAUDE.md`, `AGENTS.md`, and `.github/copilot-instructions.md` are rendered from `templates/baseline.md` — one source of truth for **skill routing** across all three assistants. The baseline does one job: route to the right `generating-*` / `reviewing-*` skill and chain them. Everything else — safety rules, quality gates, domain knowledge (including the B2B Commerce packs) — lives in the skills themselves.
+
+---
+
+## Using the review skills
+
+Invoke a `reviewing-*` skill **by name** and point it at code you already have. Each is a complete
+Salesforce reviewer — the same governor-limit, security, and architecture rules apply to an
+inherited org as to a line you just wrote. No generation step required.
+
+| Use it for | Example prompt |
+|---|---|
+| **Ad-hoc code review** — one class, a PR diff, a file you're about to change | `/reviewing-apex` review `OrderService.cls` for bulk safety and security |
+| **Codebase quality audit** — assess the overall health of an existing or inherited org; great for onboarding or scoping tech debt | `/reviewing-apex` can you scan the codebase and assess the quality of the existing codebase |
+| **Anti-pattern / performance sweep** — surface what's making automations slow and inefficient | `/reviewing-apex` can you scan the codebase and find anti-patterns that exist that make the automations slow and not efficient |
+| **LWC review** — component performance, wire/async patterns, Jest gaps | `/reviewing-lwc` audit the components under `force-app/**/lwc/` for performance, wire/async issues, and Jest gaps |
+| **Flow review** — loop/collection efficiency, fault paths, recursion | `/reviewing-flow` scan my flows for Get-Records-in-loop, missing fault paths, and recursion |
+| **Deployment / package.xml** — manifest and git-delta generation, validate/quick-deploy, CI/CD | `/deploying-sf-metadata` generate a package.xml from current commit HEAD to [commit hash or reference branch] |
+
+The skills *also* fire automatically as a review pass whenever a `generating-*` skill writes code —
+the authoring → review chain under [Skill Routing](#skill-routing) below — but standalone use needs
+no generation step.
+
+### Domain Specific skills
+
+There is no separate skill per domain. The Commerce Domain rules are folded into the three
+`reviewing-*` skills as optional `references/commerce-b2b.md` — Apex backend rules under
+`reviewing-apex`, storefront LWC under `reviewing-lwc`, Commerce-object automation under
+`reviewing-flow` — and ride each skill's own trigger when the artifact is a Commerce storefront
+artifact, no manual invoke.
+
+Include the pack via the installer's prompt, or keep/delete `references/commerce-b2b.md` manually.
+Declining it strips only those files; the base review rules are untouched.
 
 ---
 
@@ -53,55 +79,18 @@ From the **root of your Salesforce project** (requires Node 18+):
 npx github:drsaavedra/sf-agentic-development
 ```
 
-The installer asks which assistant you use (Claude Code / GitHub Copilot / Codex, arrow keys to
-pick), then which skills, which optional domain reference packs (e.g. **B2B Commerce** — included
-only if you check it, and only offered when a selected skill carries that pack), and which agents
-to install (spacebar to toggle checkboxes, `a` to select all, Enter to confirm) — then copies your
-picks into the right per-assistant directories and drops the matching baseline file (`CLAUDE.md`,
-`.github/copilot-instructions.md`, or `AGENTS.md`) — the skill-routing layer — into your project
-root.
-
-These generated files are installed artifacts, not source — so the installer also adds them to your
-project's `.gitignore` (creating it if absent, appending if present, and skipping entries already
-there). For Claude that's `.claude/` and `CLAUDE.md`; for Codex `.agents/` and `AGENTS.md`; for
-Copilot the specific `.github/skills/`, `.github/agents/`, and `.github/copilot-instructions.md`
-(never all of `.github/`).
-
-It then checks whether the toolkit's one dependency — `forcedotcom/sf-skills`, the
-Salesforce-maintained base skills that do the generation this repo's quality gates sit on top
-of — is already installed (project and user-level skill directories), and offers to run
-`npx skills add` for it if it's missing. Behavioral-guideline skills are your choice, not a
-dependency — see [Recommended companion skills](#recommended-companion-skills).
-
 ### After the installer
 
-This step is only needed if you declined the installer's offer (or it couldn't detect an existing
-install):
+Only needed if you declined the installer's offer (or it couldn't detect an existing install) —
+install the Salesforce base skills (`generating-apex`, `generating-lwc-components`,
+`deploying-metadata`, `querying-soql`, and more):
 
-1. Install the Salesforce-maintained base skills — the official skills (`generating-apex`,
-   `generating-lwc-components`, `deploying-metadata`, `querying-soql`, and more):
-   ```bash
-   npx skills add forcedotcom/sf-skills
-   ```
+```bash
+npx skills add forcedotcom/sf-skills
+```
 
-There's nothing else to configure: the baseline is skill routing only, and the
-`salesforce-developer` and `architect` agents ask for your technical-spec and architecture
-document paths when you dispatch them.
-
-### B2B Commerce projects
-
-There is no separate B2B Commerce skill. The B2B Commerce Domain rules are folded into the three quality
-skills as `references/commerce-b2b.md` — Apex backend rules under `reviewing-apex`,
-storefront LWC rules under `reviewing-lwc`, and Commerce-object automation rules under
-`reviewing-flow`. Each skill's routing table points at its `commerce-b2b.md` when the
-artifact under review is a B2B Commerce storefront artifact, so the Commerce review pass rides the
-quality skill's own trigger — no manual invoke.
-
-The installer asks whether to include the **B2B Commerce** pack. Include it and the
-`commerce-b2b.md` rules ride along inside the `reviewing-*` skills. Decline it and the
-`commerce-b2b.md` files and their routing rows are stripped from the installed skills (the base
-review rules are untouched). For a manual copy, just keep or delete `references/commerce-b2b.md`
-in each skill.
+Nothing else to configure: the baseline is skill routing only, and the `salesforce-developer` and
+`architect` agents ask for your spec/architecture paths when you dispatch them.
 
 ### Repository layout
 
@@ -155,7 +144,7 @@ All three use the same `name` + `description` frontmatter format.
 
 ## Skill Routing
 
-The baseline's routing table maps each context to the right skill and fires it before any artifact is generated; each skill also declares its own trigger in its `description` frontmatter as a fallback. **Authoring always chains into review:** whenever a `generating-*` skill writes or edits code, the matching `reviewing-*` skill runs as a review pass over the result (`generating-apex`/`generating-apex-test` → `reviewing-apex`, `generating-lwc-components` → `reviewing-lwc`, `generating-flow` → `reviewing-flow`). The arrow rows below are that authoring → review chain; cross-domain work (LWC + Apex controller, Flow + invocable Apex) loads both relevant skills:
+**Authoring chains into review:** whenever a `generating-*` skill writes code, the matching `reviewing-*` skill runs as a review pass over the result. The arrow rows below are that chain; cross-domain work (LWC + Apex controller, Flow + invocable Apex) loads both skills. Each skill also self-triggers from its `description` frontmatter on the relevant file types as a fallback.
 
 | Context | Skills — invoke in order |
 |---|---|
@@ -168,17 +157,15 @@ The baseline's routing table maps each context to the right skill and fires it b
 | Flow + Apex invocable | `reviewing-flow` · `reviewing-apex` |
 | Deployment / package.xml / CI-CD | `deploying-sf-metadata` · `deploying-metadata` |
 
-B2B Commerce storefront rules ride inside the `reviewing-*` skills via their optional `references/commerce-b2b.md` pack — no separate routing step. See [B2B Commerce projects](#b2b-commerce-projects).
+B2B Commerce storefront rules ride inside the `reviewing-*` skills via their optional `references/commerce-b2b.md` pack — no separate routing step. See [Domain Specific skills](#domain-specific-skills).
 
 ### Making sure routing is followed
 
-Each authored skill self-declares a file-glob `TRIGGER when:` clause in its `description`, so the review and deploy skills usually auto-activate once the relevant files (`.cls`, `.trigger`, `lwc/**`, `*.flow-meta.xml`, `package.xml`) are in play — no prompt needed. But the baseline lives in your project root, and agents don't always re-read it on every turn — especially right after you approve an implementation plan or tell the main agent to start coding. For belt-and-suspenders reliability, **name the baseline in that go-ahead prompt**:
+Skills auto-activate once the relevant files (`.cls`, `.trigger`, `lwc/**`, `*.flow-meta.xml`, `package.xml`) are in play. But the baseline lives in your project root and the **main agent** doesn't always re-read it — especially right after you approve a plan and say "start coding." For belt-and-suspenders reliability, name the baseline in that go-ahead prompt:
 
-> *"Proceed — and make sure to follow the skill routing in `CLAUDE.md`."*
+> *"Proceed — and follow the skill routing in `CLAUDE.md`."* (or `AGENTS.md` / `.github/copilot-instructions.md`)
 
-Use the baseline file your assistant reads: `CLAUDE.md` (Claude Code), `AGENTS.md` (Codex), or `.github/copilot-instructions.md` (GitHub Copilot). The skill triggers handle *which* skill fires on a given file; naming the baseline re-anchors what a description can't — the authoring→review **ordering**, **review-only** routing, and **cross-domain pairing** (LWC+Apex controller, Flow+invocable Apex) — so the main agent chains the matching `reviewing-*` pass instead of writing code unrouted.
-
-You only need this for the **main agent**. The `salesforce-developer` and `architect` agents already carry the skill routing in their own agent files, so a dispatched brief picks up the right skills automatically — no reminder needed.
+This re-anchors the authoring→review **ordering** and **cross-domain pairing** that a per-file trigger can't. The `salesforce-developer` and `architect` agents carry the routing in their own files, so dispatched briefs need no reminder.
 
 ---
 
@@ -209,53 +196,38 @@ sequenceDiagram
     A-->>M: Re-review, new dated report section
 ```
 
-> **What the gates actually catch:** asked to add Account address verification against a vendor API,
-> the `architect` reviewed the *design* — before any code — and blocked it: one synchronous callout
-> per changed record means a 200-record data-loader update fires 200 callouts in a single
-> transaction, over the 100-callout limit, so the bulk path fails by design. It also flagged the API
-> key sitting readable in custom metadata (belongs behind a Named Credential) and a missing
-> retry/status path. Three flaws fixed before a line of Apex existed.
+> **What the gates actually catch:** asked to add Account address verification via a vendor API, the
+> `architect` reviewed the *design* before any code and blocked it — a synchronous callout per record
+> blows the 100-callout limit on a 200-record load. Three flaws fixed before a line of Apex existed.
 
-The full working guide — the lifecycle steps, the work-brief template, dispatch rules, checkpoint
-commits, prompting guidance, and four worked examples (including the one above) — lives in
-**[docs/ORCHESTRATION.md](docs/ORCHESTRATION.md)**.
+The full working guide — lifecycle steps, the work-brief template, dispatch rules, checkpoint
+commits, and four worked examples — lives in **[docs/ORCHESTRATION.md](docs/ORCHESTRATION.md)**.
 
 ---
 
 ## Roadmap
 
-This toolkit is a developer productivity tool today — you stay at the wheel. The direction it's
-heading is an **autonomous delivery workflow**: agents that build, test, and deploy Salesforce
-solutions from a rigorous design contract, escalating only at genuine gaps. The human's role moves
-from *operator* (approving each command) to *author* (curating the design the workflow executes).
-The full rationale and target operating model live in [docs/VISION.md](docs/VISION.md).
+This toolkit is a developer productivity tool today — you stay at the wheel. The direction is an
+**autonomous delivery workflow**: agents that build, test, and deploy from a rigorous design
+contract, escalating only at genuine gaps, with the human moving from *operator* to design
+*author*. The capability gaps to get there, in build order (the first is the keystone that makes
+autonomy safe to grant):
 
-The capability gaps between today's tool and that target, in build order — the first is the
-keystone that makes autonomy safe to grant:
+1. **Design contract + completeness gate** *(keystone)* — refuses to build an incomplete design.
+2. **Autonomy + escalation model** — machine-gated safety conditions plus a "genuine gap" detector.
+3. **Self-verifying build/deploy loop** — validate→correct→re-validate closes itself.
+4. **Durable run state** — a persisted work-ledger so a long run survives context compaction.
+5. **Environment ladder** — full autonomy through sandboxes; a human signature kept at production.
 
-1. **Design contract + completeness gate** *(keystone)* — a machine-checkable CONTEXT/spec schema
-   and a gate that refuses to build an incomplete design. Makes autonomy safe to grant.
-2. **Autonomy + escalation model** — convert today's human-confirmation safety gates to
-   machine-gated conditions, plus a concrete "genuine gap" detector and the autonomy boundaries
-   (what never gets delegated).
-3. **Self-verifying build/deploy loop** — the validate→correct→re-validate loop closes itself:
-   retry budget, machine-checkable "done," automatic BLOCKED→fix routing.
-4. **Durable run state** — a persisted work-ledger (done / blocked / deployed-where) so a long run
-   survives context compaction and is auditable, instead of living only in chat context.
-5. **Environment ladder** — total autonomy through scratch orgs and CI sandboxes; a human
-   signature kept at production.
-
-> Direction-setting, not a commitment schedule. Today's human-at-the-wheel safety rules stay in
-> force until each gate above is built and proven.
+Full rationale and operating model in [docs/VISION.md](docs/VISION.md). Direction-setting, not a
+commitment schedule — today's safety rules hold until each gate is built and proven.
 
 ---
 
 ## Recommended companion skills
 
-This toolkit is deliberately Salesforce-only: `forcedotcom/sf-skills` does the base generation
-(maintained by Salesforce), and the authored `salesforce-*` skills add the quality gates. It
-takes no opinion on general coding-behavior skills — those are a personal preference, so the
-toolkit requires none. If you want one, two good options:
+This toolkit is deliberately Salesforce-only and takes no opinion on general coding-behavior
+skills — they're optional. Two good options if you want one:
 
 - **[andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills)** —
   behavioral guidelines that curb common LLM coding mistakes (overcomplication, sweeping
@@ -278,8 +250,8 @@ alongside the Salesforce skills.
 
 ## Maintaining
 
-- **Skills & agents** — `skills/` and `agents/` are the only source of truth. Edit `skills/<name>/` (the `SKILL.md` and its `references/`) or `agents/<name>.md`, then re-run the installer (or re-copy) into the per-assistant directories. Never edit the installed copies — changes are lost on the next install.
-- **Baselines** — edit `templates/baseline.md` (its header comment documents the template token syntax), then run `node scripts/render-baselines.js` (or `npm run render`) to regenerate the three renders. Never edit `CLAUDE.md`, `AGENTS.md`, or `.github/copilot-instructions.md` by hand.
+- **Skills & agents** — `skills/` and `agents/` are the only source of truth. Edit them, then re-run the installer (or re-copy) into the per-assistant directories. Never edit the installed copies — they're lost on the next install.
+- **Baselines** — edit `templates/baseline.md`, then run `node scripts/render-baselines.js` (or `npm run render`) to regenerate the three renders. Never edit `CLAUDE.md`, `AGENTS.md`, or `.github/copilot-instructions.md` by hand.
 
 ## License
 
