@@ -48,13 +48,27 @@ const assistants = [
 
 // Append the generated assistant paths to the project's .gitignore (creating it if
 // absent). Idempotent: only entries not already present are added, under a marker
-// header so re-runs and manual edits stay clean.
+// header so re-runs and manual edits stay clean. Presence is matched on a normalized
+// path so equivalent entries (e.g. `.claude`, `.claude/`, `/.claude/`) compare equal,
+// and an entry is also treated as covered when an ancestor directory is already
+// ignored (e.g. `.claude/` makes `.claude/skills/` redundant) — neither gets re-added.
 function updateGitignore(entries) {
   const gitignorePath = path.join(target, '.gitignore');
   const header = '# sf-agentic-development — generated assistant files';
   const existing = fs.existsSync(gitignorePath) ? fs.readFileSync(gitignorePath, 'utf8') : '';
-  const present = new Set(existing.split(/\r?\n/).map((l) => l.trim()));
-  const toAdd = entries.filter((e) => !present.has(e));
+  // Strip a leading and trailing slash so slash variants compare equal.
+  const normalize = (l) => l.trim().replace(/^\//, '').replace(/\/$/, '');
+  const present = new Set(existing.split(/\r?\n/).map(normalize).filter(Boolean));
+  // An entry is covered if its own normalized form is present, or any ancestor
+  // directory of it is — a directory pattern ignores everything beneath it.
+  const isCovered = (e) => {
+    const parts = normalize(e).split('/');
+    for (let i = 1; i <= parts.length; i++) {
+      if (present.has(parts.slice(0, i).join('/'))) return true;
+    }
+    return false;
+  };
+  const toAdd = entries.filter((e) => !isCovered(e));
   if (toAdd.length === 0) {
     console.log('.gitignore already covers the generated files — no change');
     return;
