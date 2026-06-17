@@ -48,9 +48,9 @@ metadata) here. End by handing off to `/sf-build`.
    Flow → Apex trigger, plus async/scheduled choices) and `references/ui-decision.md` (page layout /
    Dynamic Forms → Screen Flow → LWC, and placement). Standard object before custom. Record each
    decision with its reason.
-4. **Schema design (verified)** — pin the data model with real API names: standard vs custom
-   objects and fields, types, relationships, sharing. This becomes each work item's *Schema
-   context*.
+4. **Schema design (verified)** — pin the data model with real API names, working from
+   `references/data-model-decision.md`: standard vs custom object, relationship type, where
+   config/data lives, and large-data-volume design. This becomes each work item's *Schema context*.
 5. **Approaches** — offer 2–3 options with Salesforce tradeoffs (Screen Flow vs LWC, Flow vs trigger, sync vs async) and recommend one.
 6. **Write the spec** — to `docs/tech-spec.md`, per the Output contract below. Scale detail to
    complexity; do not pad a small change.
@@ -102,6 +102,8 @@ them up front:
 - `references/automation-decision.md` — roll-up / validation rule / record-triggered Flow / Apex
   trigger, plus async and scheduled choices.
 - `references/ui-decision.md` — page layout & Dynamic Forms / Screen Flow / LWC, and placement.
+- `references/data-model-decision.md` — standard vs custom object, relationship type, where
+  config/data lives (CMT / custom setting / Big Object / External Object), and large-data-volume design.
 
 These are curated decision criteria, not a snapshot of the platform's current state. When a
 decision is **uncertain or hinges on a current capability or limit** (e.g. whether today's Screen
