@@ -23,9 +23,12 @@ metadata) here. End by handing off to `/sf-build`.
   (`force-app/**`) first, then the org — the org wins on divergence. Use read-only sf CLI freely:
   `sf sobject list`, `sf sobject describe --sobject <Name>`, `sf data query --query "..."`. Never
   ask the user to run Developer Console or anonymous Apex for anything these answer.
-- **Declarative-first.** Prefer standard objects and config — fields, roll-up summaries,
-  validation rules, Flows, permission sets — over Apex. Write code only for what the platform
-  cannot do declaratively. Record the decision and the reason for each capability.
+- **Declarative-first, from the decision packs — not from memory.** Prefer standard objects and
+  config — fields, roll-up summaries, validation rules, Flows, permission sets — over Apex; write
+  code only for what the platform cannot do declaratively. Make each call from the matching pack in
+  `references/` (see *Decision references* below), and record the decision and its reason. When a
+  call is uncertain or hinges on a current platform capability or limit, ground it with the
+  `fetching-salesforce-docs` skill before committing it to the spec.
 - **Reuse before invent.** Follow the naming, utility, selector, and test-factory patterns already
   in the repo; do not introduce new abstractions the codebase doesn't already use.
 
@@ -40,9 +43,11 @@ metadata) here. End by handing off to `/sf-build`.
    time, in prose, offering the deduced choices and your recommendation for each. Resolve the
    decision tree branch by branch — including purpose and success criteria — until nothing material
    is ambiguous. Don't re-ask what you already confirmed from the code or org.
-3. **Declarative-vs-code triage** — for each capability decide config or code: standard object
-   before custom; field / roll-up / validation rule / Flow before Apex; LDS or `@wire` before an
-   Apex controller. Record each decision with its reason.
+3. **Declarative-vs-code triage** — for each capability decide config or code, working from the
+   decision packs: `references/automation-decision.md` (roll-up → validation rule → record-triggered
+   Flow → Apex trigger, plus async/scheduled choices) and `references/ui-decision.md` (page layout /
+   Dynamic Forms → Screen Flow → LWC, and placement). Standard object before custom. Record each
+   decision with its reason.
 4. **Schema design (verified)** — pin the data model with real API names: standard vs custom
    objects and fields, types, relationships, sharing. This becomes each work item's *Schema
    context*.
@@ -88,3 +93,17 @@ Also record an **`Architect review: recommended | not needed`** line with a one-
 Recommend it when the design shows concrete complexity signals — a new or changed data model,
 cross-object automation, callouts / async (governor-limit risk), or a multi-domain or many-item
 build; otherwise mark it *not needed*.
+
+## Decision references
+
+Read the pack that matches the fork you're resolving — progressive disclosure, don't load all of
+them up front:
+
+- `references/automation-decision.md` — roll-up / validation rule / record-triggered Flow / Apex
+  trigger, plus async and scheduled choices.
+- `references/ui-decision.md` — page layout & Dynamic Forms / Screen Flow / LWC, and placement.
+
+These are curated decision criteria, not a snapshot of the platform's current state. When a
+decision is **uncertain or hinges on a current capability or limit** (e.g. whether today's Screen
+Flow covers a given interaction), ground it against official documentation with the
+`fetching-salesforce-docs` skill before committing the choice to the spec.
