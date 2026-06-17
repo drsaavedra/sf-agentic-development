@@ -1,6 +1,10 @@
 #!/usr/bin/env node
 // Renders CLAUDE.md, AGENTS.md, and .github/copilot-instructions.md from
 // templates/baseline.md. Zero dependencies. Usage: node scripts/render-baselines.js
+//
+// Required directly → renders and writes the files. Required as a module (tests) →
+// exposes the pure render helpers without writing anything, so a drift test can
+// re-render in memory and compare against the committed files.
 
 'use strict';
 
@@ -9,7 +13,6 @@ const path = require('path');
 
 const root = path.join(__dirname, '..');
 const templatePath = path.join(root, 'templates', 'baseline.md');
-const template = fs.readFileSync(templatePath, 'utf8').replace(/\r\n/g, '\n');
 
 const targets = [
   {
@@ -56,19 +59,23 @@ const targets = [
   },
 ];
 
-const bodyMarker = '<!-- BODY -->';
-const markerIdx = template.indexOf(bodyMarker);
-if (markerIdx === -1) {
-  console.error('templates/baseline.md: missing ' + bodyMarker + ' marker');
-  process.exit(1);
+const BODY_MARKER = '<!-- BODY -->';
+
+// Extract the renderable body — everything after the BODY marker. Throws if absent.
+function extractBody(template) {
+  const normalized = template.replace(/\r\n/g, '\n');
+  const markerIdx = normalized.indexOf(BODY_MARKER);
+  if (markerIdx === -1) {
+    throw new Error('templates/baseline.md: missing ' + BODY_MARKER + ' marker');
+  }
+  return normalized.slice(markerIdx + BODY_MARKER.length).replace(/^\n/, '');
 }
-const body = template.slice(markerIdx + bodyMarker.length).replace(/^\n/, '');
 
-for (const t of targets) {
-  let out = body;
-
+// Render one target's full file content (header + resolved body) from the body text.
+// Throws on any unresolved template syntax so a typo can never reach a committed file.
+function renderTarget(body, t) {
   // <!-- only:claude codex --> ... <!-- end:only --> — keep only for listed targets
-  out = out.replace(
+  let out = body.replace(
     /<!-- only:([a-z ]+) -->\n([\s\S]*?)<!-- end:only -->\n/g,
     (match, ids, content) => (ids.trim().split(/\s+/).includes(t.id) ? content : '')
   );
@@ -82,8 +89,7 @@ for (const t of targets) {
 
   const leftover = out.match(/\{\{[^}]+\}\}|<!-- (only|end):/);
   if (leftover) {
-    console.error(t.file + ': unresolved template syntax: ' + leftover[0]);
-    process.exit(1);
+    throw new Error(t.file + ': unresolved template syntax: ' + leftover[0]);
   }
 
   const header = [
@@ -101,6 +107,33 @@ for (const t of targets) {
     '',
   ].join('\n');
 
-  fs.writeFileSync(path.join(root, t.file), header + out, 'utf8');
-  console.log('rendered ' + t.file);
+  return header + out;
 }
+
+// Render every target from a template string → { [file]: content }. No IO.
+function renderAll(template) {
+  const body = extractBody(template);
+  const out = {};
+  for (const t of targets) out[t.file] = renderTarget(body, t);
+  return out;
+}
+
+function main() {
+  const template = fs.readFileSync(templatePath, 'utf8');
+  const rendered = renderAll(template);
+  for (const t of targets) {
+    fs.writeFileSync(path.join(root, t.file), rendered[t.file], 'utf8');
+    console.log('rendered ' + t.file);
+  }
+}
+
+if (require.main === module) {
+  try {
+    main();
+  } catch (err) {
+    console.error(err.message || err);
+    process.exit(1);
+  }
+}
+
+module.exports = { targets, extractBody, renderTarget, renderAll, templatePath, BODY_MARKER };

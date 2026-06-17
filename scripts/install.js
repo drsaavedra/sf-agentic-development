@@ -513,6 +513,8 @@ module.exports = {
   planGitignore,
   updateGitignore,
   writeBaseline,
+  applyDomainPacks,
+  DOMAIN_PACKS,
   GITIGNORE_HEADER,
   BASELINE_BEGIN,
   BASELINE_END,
