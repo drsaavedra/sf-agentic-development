@@ -1,0 +1,24 @@
+name: tests
+
+# Run the node:test suite on every pull request (and on pushes to main, so the
+# default branch stays green). The installer is zero-dependency, so there is no
+# install step — `npm test` runs `node --test` directly.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Mirror package.json "engines": node >=18.
+        node-version: [18.x, 20.x]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm test
