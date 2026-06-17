@@ -43,9 +43,14 @@ frontmatter flag, so it holds across every assistant.
    - `reviewing-lwc` for `lwc/**`,
    - `reviewing-flow` for `*.flow-meta.xml`.
    Feed any findings back to `salesforce-developer` as a fix brief and re-review until clean.
-5. **Architect build review (on demand).** Invoke the `architect` agent for an independent build
-   review when the work warrants it (per the orchestration rules). A **BLOCKED** report re-briefs
-   `salesforce-developer` with its Recommended Actions; re-review afterward.
+5. **Architect build review — only when triggered, never by your own judgment.** Invoke the
+   `architect` agent only if one of these holds; otherwise skip it and say so in the final report:
+   - the **spec flags** `Architect review: recommended`,
+   - the **user asked** for an architect or design review (now or during planning),
+   - the **review gate (step 4) can't reach clean** after a fix round — escalate to the architect
+     to adjudicate.
+   A **BLOCKED** report re-briefs `salesforce-developer` with its Recommended Actions; re-review
+   afterward.
 
 ## Rules
 

@@ -82,3 +82,9 @@ This table is the `/sf-build` dispatch list. Its columns align with the work-bri
 [`docs/ORCHESTRATION.md`](../../docs/ORCHESTRATION.md): Objective, Spec reference, Schema context,
 Test scenarios, Constraints, Dependencies, Expected outputs, Validation criteria. Write each
 row complete enough that `/sf-build` can cut a brief from it without rediscovering anything.
+
+Also record an **`Architect review: recommended | not needed`** line with a one-line reason, so
+`/sf-build` knows whether to invoke the `architect` agent without having to judge it itself.
+Recommend it when the design shows concrete complexity signals — a new or changed data model,
+cross-object automation, callouts / async (governor-limit risk), or a multi-domain or many-item
+build; otherwise mark it *not needed*.
