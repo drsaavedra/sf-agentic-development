@@ -19,33 +19,30 @@ const pkgRoot = path.join(__dirname, '..');
 const target = process.cwd();
 const isTTY = Boolean(process.stdin.isTTY && process.stdout.isTTY);
 
+// Gitignore strategy: we ignore ONLY the specific skill and agent paths this run
+// installs (e.g. `.claude/skills/deploying-sf-metadata/`), never the whole assistant
+// directory. That keeps the user's own files under `.claude/` (or `.github/`, `.agents/`)
+// tracked, and never touches what they already ignore — see gitignoreEntriesFor /
+// updateGitignore. The baseline file (CLAUDE.md / AGENTS.md / copilot-instructions.md) is
+// never ignored either: it carries our managed block alongside the user's own instructions.
 const assistants = [
   {
     name: 'Claude Code',
     skillsDir: '.claude/skills',
     agentsDir: '.claude/agents',
     baseline: 'CLAUDE.md',
-    // .claude/ is owned by the assistant, so ignore the whole dir. The root CLAUDE.md is
-    // NOT ignored — it carries our managed block alongside the user's own instructions.
-    ignore: ['.claude/'],
   },
   {
     name: 'GitHub Copilot',
     skillsDir: '.github/skills',
     agentsDir: '.github/agents',
     baseline: path.join('.github', 'copilot-instructions.md'),
-    // .github/ also holds workflows etc. — ignore only the skills/agents dirs we install
-    // into. copilot-instructions.md is NOT ignored — it carries our managed block.
-    ignore: ['.github/skills/', '.github/agents/'],
   },
   {
     name: 'Codex',
     skillsDir: '.agents/skills',
     agentsDir: '.agents/agents',
     baseline: 'AGENTS.md',
-    // .agents/ is owned by the assistant, so ignore the whole dir. The root AGENTS.md is
-    // NOT ignored — it carries our managed block alongside the user's own instructions.
-    ignore: ['.agents/'],
   },
 ];
 
@@ -90,21 +87,30 @@ function writeBaseline(dest, rendered) {
   return 'appended';
 }
 
-// Append the generated assistant paths to the project's .gitignore (creating it if
-// absent). Idempotent: only entries not already present are added, under a marker
-// header so re-runs and manual edits stay clean. Presence is matched on a normalized
-// path so equivalent entries (e.g. `.claude`, `.claude/`, `/.claude/`) compare equal,
-// and an entry is also treated as covered when an ancestor directory is already
-// ignored (e.g. `.claude/` makes `.claude/skills/` redundant) — neither gets re-added.
-function updateGitignore(entries) {
-  const gitignorePath = path.join(target, '.gitignore');
-  const header = '# sf-agentic-development — generated assistant files';
-  const existing = fs.existsSync(gitignorePath) ? fs.readFileSync(gitignorePath, 'utf8') : '';
-  // Strip a leading and trailing slash so slash variants compare equal.
+const GITIGNORE_HEADER = '# sf-agentic-development — generated assistant files';
+
+// The exact paths to ignore for one install: one entry per installed skill
+// (`<skillsDir>/<name>/`) and per installed agent (`<agentsDir>/<name>.md`) — nothing
+// broader. Always forward-slashed (gitignore syntax), regardless of host OS. The baseline
+// file is deliberately absent: it stays tracked.
+function gitignoreEntriesFor(assistant, skills, agents) {
+  return [
+    ...skills.map((name) => assistant.skillsDir + '/' + name + '/'),
+    ...agents.map((name) => assistant.agentsDir + '/' + name + '.md'),
+  ];
+}
+
+// Pure core (no IO — unit-tested): given the current .gitignore text and the entries to
+// add, return { content, added } where `content` is the new text and `added` lists what
+// was actually appended. Strictly additive — existing lines are never modified, removed,
+// or reordered. An entry is skipped when it is already present, or when an ancestor
+// directory is already ignored (e.g. a pre-existing `.claude/` covers
+// `.claude/skills/foo/`). Matching is on a normalized path so slash variants
+// (`.claude/skills/foo`, `/.claude/skills/foo/`) compare equal, and entries added within
+// this batch also cover later ones beneath them.
+function planGitignore(existing, entries) {
   const normalize = (l) => l.trim().replace(/^\//, '').replace(/\/$/, '');
   const present = new Set(existing.split(/\r?\n/).map(normalize).filter(Boolean));
-  // An entry is covered if its own normalized form is present, or any ancestor
-  // directory of it is — a directory pattern ignores everything beneath it.
   const isCovered = (e) => {
     const parts = normalize(e).split('/');
     for (let i = 1; i <= parts.length; i++) {
@@ -112,18 +118,37 @@ function updateGitignore(entries) {
     }
     return false;
   };
-  const toAdd = entries.filter((e) => !isCovered(e));
-  if (toAdd.length === 0) {
-    console.log('.gitignore already covers the generated files — no change');
-    return;
+  const toAdd = [];
+  for (const e of entries) {
+    if (!normalize(e) || isCovered(e)) continue;
+    toAdd.push(e);
+    present.add(normalize(e)); // a later entry beneath this one is now covered too
   }
-  const block = present.has(header) ? toAdd : [header, ...toAdd];
+  if (toAdd.length === 0) return { content: existing, added: [] };
+  const block = present.has(GITIGNORE_HEADER) ? toAdd : [GITIGNORE_HEADER, ...toAdd];
   let out = existing;
   if (out && !out.endsWith('\n')) out += '\n';
   if (out) out += '\n'; // blank line before our block
   out += block.join('\n') + '\n';
-  fs.writeFileSync(gitignorePath, out, 'utf8');
-  console.log((existing ? 'updated' : 'created') + ' .gitignore (+' + toAdd.length + ' entries)');
+  return { content: out, added: toAdd };
+}
+
+// Append the installed assistant paths to the project's .gitignore (creating it if
+// absent), via the additive planGitignore core. Idempotent across re-runs.
+function updateGitignore(entries, targetDir) {
+  const gitignorePath = path.join(targetDir, '.gitignore');
+  const existing = fs.existsSync(gitignorePath) ? fs.readFileSync(gitignorePath, 'utf8') : '';
+  const { content, added } = planGitignore(existing, entries);
+  if (added.length === 0) {
+    console.log(
+      entries.length
+        ? '.gitignore already covers the generated files — no change'
+        : 'no skills or agents installed — .gitignore unchanged'
+    );
+    return;
+  }
+  fs.writeFileSync(gitignorePath, content, 'utf8');
+  console.log((existing ? 'updated' : 'created') + ' .gitignore (+' + added.length + ' entries)');
 }
 
 // Optional domain reference packs. A skill's references/ may carry domain-specific
@@ -442,8 +467,9 @@ async function main() {
         : action + ' baseline ' + assistant.baseline + ' (managed block)'
     );
 
-    // Keep the generated assistant files out of version control.
-    updateGitignore(assistant.ignore);
+    // Keep the generated assistant files out of version control — only the exact skill
+    // and agent paths installed this run, never the user's other files or the baseline.
+    updateGitignore(gitignoreEntriesFor(assistant, skills, agents), target);
 
     // Dependency — sf-skills is the toolkit's one required base; detect and offer it now
     let needSfSkills = !sfSkillsInstalled(assistant);
@@ -471,8 +497,23 @@ async function main() {
   }
 }
 
-main().catch((err) => {
-  process.stdout.write('\x1b[?25h');
-  console.error(err.message || err);
-  process.exit(1);
-});
+// Run only when invoked directly (`node install.js` / `npx`). When required as a module
+// (the test suite), expose the pure helpers without launching the interactive flow.
+if (require.main === module) {
+  main().catch((err) => {
+    process.stdout.write('\x1b[?25h');
+    console.error(err.message || err);
+    process.exit(1);
+  });
+}
+
+module.exports = {
+  assistants,
+  gitignoreEntriesFor,
+  planGitignore,
+  updateGitignore,
+  writeBaseline,
+  GITIGNORE_HEADER,
+  BASELINE_BEGIN,
+  BASELINE_END,
+};
