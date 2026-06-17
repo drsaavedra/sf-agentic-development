@@ -105,6 +105,13 @@ recommendation for each:
 Once you've agreed, it writes `docs/tech-spec.md` (the LWC, its Apex controller, the child-contacts
 view, and test scenarios). You review it, then `/sf-build` builds and reviews against that spec.
 
+**Grounding (no runtime dependency).** `/sf-plan` makes its declarative-vs-code calls from curated
+decision packs bundled with the skill (`skills/sf-plan/references/`) — not from the model's memory,
+and **not by fetching docs at runtime**, so the repo stays lightweight and ships no Playwright or
+network dependency. The packs are kept current against official Salesforce documentation by the
+maintainer and re-validated every release (see [Maintaining](#maintaining)). What's written here is
+vetted, not guessed.
+
 Full detail — the grilling pattern, the spec / work-item contract, why it replaces plan mode, and
 how it feeds the agents — is in **[docs/PIPELINE.md](docs/PIPELINE.md)**.
 
@@ -293,7 +300,6 @@ alongside the Salesforce skills.
 
 - **Skills & agents** — `skills/` and `agents/` are the only source of truth. Edit them, then re-run the installer (or re-copy) into the per-assistant directories. Never edit the installed copies — they're lost on the next install.
 - **Baselines** — edit `templates/baseline.md`, then run `node scripts/render-baselines.js` (or `npm run render`) to regenerate the three renders. Never edit `CLAUDE.md`, `AGENTS.md`, or `.github/copilot-instructions.md` by hand.
-
 ## License
 
 [MIT](LICENSE)

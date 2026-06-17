@@ -65,5 +65,5 @@ or hundreds of GB of storage — design for it before you reach it.
 - **Verify against the org first** (sf-plan's schema rule): confirm standard objects/fields and any
   existing custom objects before declaring new ones; the data model feeds each work item's
   *Schema context* with real API names.
-- When a choice hinges on a current limit or capability (Big Object query options, External Object
-  features, master-detail constraints), ground it with `fetching-salesforce-docs` before committing.
+- These criteria are maintained against official Salesforce docs; if a choice hinges on a limit or
+  capability that looks like it may have changed, flag it for the maintainer rather than guessing.

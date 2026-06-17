@@ -26,9 +26,9 @@ metadata) here. End by handing off to `/sf-build`.
 - **Declarative-first, from the decision packs — not from memory.** Prefer standard objects and
   config — fields, roll-up summaries, validation rules, Flows, permission sets — over Apex; write
   code only for what the platform cannot do declaratively. Make each call from the matching pack in
-  `references/` (see *Decision references* below), and record the decision and its reason. When a
-  call is uncertain or hinges on a current platform capability or limit, ground it with the
-  `fetching-salesforce-docs` skill before committing it to the spec.
+  `references/` (see *Decision references* below), and record the decision and its reason. The packs
+  are maintained against official Salesforce docs; if a pack looks out of date or contradicts what
+  the org shows, flag it rather than guessing — don't fetch docs at runtime.
 - **Reuse before invent.** Follow the naming, utility, selector, and test-factory patterns already
   in the repo; do not introduce new abstractions the codebase doesn't already use.
 
@@ -105,7 +105,6 @@ them up front:
 - `references/data-model-decision.md` — standard vs custom object, relationship type, where
   config/data lives (CMT / custom setting / Big Object / External Object), and large-data-volume design.
 
-These are curated decision criteria, not a snapshot of the platform's current state. When a
-decision is **uncertain or hinges on a current capability or limit** (e.g. whether today's Screen
-Flow covers a given interaction), ground it against official documentation with the
-`fetching-salesforce-docs` skill before committing the choice to the spec.
+These are curated decision criteria, kept current against official Salesforce documentation by the
+repo maintainer (re-validated each release). Decide from them; if a pack looks out of date or
+conflicts with what the org shows, say so and flag it — don't fetch docs at runtime.
