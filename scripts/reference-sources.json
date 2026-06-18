@@ -1,0 +1,460 @@
+{
+  "_comment": "Maintainer manifest for skill/agent reference packs AND each skill's own SKILL.md body (the Quick Reference carries the same release-sensitive claims, so it is audited too). Tracks which are grounded in official Salesforce docs, the sources they were grounded against, and when each was last re-validated. Run `npm run validate:refs` each release; re-ground flagged entries by fetching their sources with the fetching-salesforce-docs skill, update the file, and bump lastValidated. URLs here are audit TARGETS — the grounding pass confirms each one resolves and repairs it if Salesforce moved or retired the page. Prefer the newer /docs/platform/... developer-doc URLs: the fetching-salesforce-docs extractor renders their article body cleanly, whereas legacy atlas.en-us.* pages often return only a shell. Pure process/orchestration skills (sf-plan, sf-build) are basis 'expertise' — workflow, not platform facts. See docs/MAINTAINING.md.",
+  "stalenessDays": 180,
+  "references": {
+    "skills/reviewing-apex/SKILL.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-06-18",
+      "sources": [
+        {
+          "url": "https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_classes_enforce_usermode.htm",
+          "anchors": ["WITH USER_MODE", "version 67.0", "WITH SECURITY_ENFORCED"]
+        },
+        {
+          "url": "https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_gov_limits.htm",
+          "anchors": ["SOQL queries", "DML statements", "callouts", "heap size"]
+        },
+        {
+          "url": "https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_triggers.htm",
+          "anchors": ["Trigger.new", "addError", "one trigger per object"]
+        }
+      ],
+      "_note": "Quick Reference summary of the reviewing-apex packs; grounded against the same canonical pages."
+    },
+    "skills/reviewing-flow/SKILL.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-06-18",
+      "sources": [
+        {
+          "url": "https://help.salesforce.com/s/articleView?id=platform.flow_concepts_trigger_record.htm&type=5",
+          "anchors": ["record-triggered", "before-save", "ISCHANGED"]
+        },
+        {
+          "url": "https://help.salesforce.com/s/articleView?id=platform.flow_ref_elements_transform.htm&type=5",
+          "anchors": ["Transform element", "Collection Filter"]
+        }
+      ],
+      "_note": "Quick Reference summary of the reviewing-flow packs; grounded against the same canonical pages."
+    },
+    "skills/reviewing-lwc/SKILL.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-06-18",
+      "sources": [
+        {
+          "url": "https://developer.salesforce.com/docs/platform/lwc/guide/data-guidelines.html",
+          "anchors": ["Lightning Data Service", "wire", "GraphQL"]
+        },
+        {
+          "url": "https://developer.salesforce.com/docs/platform/lwc/guide/create-conditional.html",
+          "anchors": ["lwc:if", "if:true"]
+        },
+        {
+          "url": "https://www.lightningdesignsystem.com/2e1ef8501/p/591960-global-styling-hooks",
+          "anchors": ["--slds-g-", "SLDS 2", "styling hooks"]
+        }
+      ],
+      "_note": "Quick Reference summary of the reviewing-lwc packs; grounded against the same canonical pages."
+    },
+    "skills/deploying-sf-metadata/SKILL.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-06-18",
+      "sources": [
+        {
+          "url": "https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_project_commands_unified.htm",
+          "anchors": ["sf project deploy validate", "sf project deploy quick", "sf project deploy start", "test-level"]
+        }
+      ],
+      "_note": "Deployment commands grounded against the Salesforce CLI Command Reference. sfdx-git-delta (sgd) and SFDMU are community-maintained tools, not Salesforce docs — verify those against their own project docs."
+    },
+    "skills/sf-build/SKILL.md": {
+      "basis": "expertise",
+      "_note": "Build-orchestration process skill — dispatch and review-gate sequencing. No platform-fact claims to ground."
+    },
+    "skills/sf-plan/SKILL.md": {
+      "basis": "expertise",
+      "_note": "Planning/orchestration process skill — workflow, grilling discipline, output contract. Its doc-grounded decision criteria live in the sf-plan reference packs, tracked separately."
+    },
+    "skills/reviewing-apex/references/architecture.md": {
+      "basis": "expertise",
+      "_note": "Service-Selector-Domain layering and naming conventions are an enterprise design pattern (Apex Enterprise Patterns / Well-Architected), not a single normative reference page. Its versioned claims (v67 sharing default, PMD rule names) are audited via security.md and running-code-analyzer. No doc source tracked."
+    },
+    "skills/reviewing-apex/references/async.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-06-18",
+      "sources": [
+        {
+          "url": "https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_async_overview.htm",
+          "anchors": ["Queueable", "System.Finalizer", "Batch Apex", "future method", "Database.AllowsCallouts"]
+        },
+        {
+          "url": "https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_queueing_jobs.htm",
+          "anchors": ["AsyncOptions", "MaximumQueueableStackDepth", "MinimumQueueableDelayInMinutes", "one child"]
+        },
+        {
+          "url": "https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_dedupe_queueable.htm",
+          "anchors": ["QueueableDuplicateSignature", "DuplicateSignature", "DuplicateMessageException"]
+        },
+        {
+          "url": "https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_gov_limits.htm",
+          "anchors": ["asynchronous", "concurrent batch", "queueable", "50 million records"]
+        }
+      ]
+    },
+    "skills/reviewing-apex/references/aura-enabled.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-06-18",
+      "sources": [
+        {
+          "url": "https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_classes_annotation_AuraEnabled.htm",
+          "anchors": ["cacheable", "AuraHandledException", "@AuraEnabled"]
+        },
+        {
+          "url": "https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_security_sharing_chapter.htm",
+          "anchors": ["WITH USER_MODE", "with sharing", "CRUD", "FLS"]
+        }
+      ]
+    },
+    "skills/reviewing-apex/references/data-access.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-06-18",
+      "sources": [
+        {
+          "url": "https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_gov_limits.htm",
+          "anchors": ["Total number of SOQL queries", "Total number of DML statements", "Total number of callouts", "heap size", "CPU time", "queryMore"]
+        },
+        {
+          "url": "https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/langCon_apex_loops_for_SOQL.htm",
+          "anchors": ["SOQL for loop", "200 records", "batches"]
+        }
+      ]
+    },
+    "skills/reviewing-apex/references/error-handling-maintainability.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-06-18",
+      "sources": [
+        {
+          "url": "https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_exception_handling.htm",
+          "anchors": ["custom exception", "getMessage", "cause"]
+        },
+        {
+          "url": "https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/langCon_apex_transaction_control.htm",
+          "anchors": ["setSavepoint", "rollback", "Savepoint"]
+        }
+      ]
+    },
+    "skills/reviewing-apex/references/security.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-06-18",
+      "sources": [
+        {
+          "url": "https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_classes_enforce_usermode.htm",
+          "anchors": ["WITH USER_MODE", "AccessLevel.USER_MODE", "WITH SYSTEM_MODE", "default to user mode", "version 67.0"]
+        },
+        {
+          "url": "https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_classes_keywords_sharing.htm",
+          "anchors": ["with sharing", "without sharing", "inherited sharing", "default"]
+        },
+        {
+          "url": "https://help.salesforce.com/s/articleView?id=release-notes.rn_apex_removed_withSecurityEnforced.htm&type=5",
+          "anchors": ["WITH SECURITY_ENFORCED", "removed", "compiler error", "version 67.0"]
+        },
+        {
+          "url": "https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_dynamic_soql.htm",
+          "anchors": ["Database.queryWithBinds", "escapeSingleQuotes", "bind variable"]
+        }
+      ]
+    },
+    "skills/reviewing-apex/references/testing.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-06-18",
+      "sources": [
+        {
+          "url": "https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_testing.htm",
+          "anchors": ["Test.startTest", "Test.stopTest", "@TestSetup", "SeeAllData", "runAs", "HttpCalloutMock"]
+        },
+        {
+          "url": "https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_methods_system_assert.htm",
+          "anchors": ["Assert.areEqual", "Assert.isTrue", "Assert.fail"]
+        },
+        {
+          "url": "https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_testing_stub_api.htm",
+          "anchors": ["StubProvider", "Test.createStub"]
+        }
+      ]
+    },
+    "skills/reviewing-apex/references/trigger-design.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-06-18",
+      "sources": [
+        {
+          "url": "https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_triggers.htm",
+          "anchors": ["Trigger.new", "Trigger.oldMap", "addError", "before trigger", "after trigger", "context variables"]
+        },
+        {
+          "url": "https://architect.salesforce.com/docs/architect/decision-guides/guide/record-triggered",
+          "anchors": ["record-triggered", "automation density", "invocable Apex", "one automation"]
+        }
+      ]
+    },
+    "skills/reviewing-apex/references/commerce-b2b.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-06-18",
+      "sources": [
+        {
+          "url": "https://developer.salesforce.com/docs/commerce/salesforce-commerce/guide/b2b-b2c-comm-dev-guide.html",
+          "anchors": ["ConnectApi", "CartExtension", "CommerceEntitlementPolicy", "WebStore", "effectiveAccountId", "cacheable"]
+        }
+      ]
+    },
+    "skills/reviewing-flow/references/actions-faults.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-06-18",
+      "sources": [
+        {
+          "url": "https://help.salesforce.com/s/articleView?id=platform.flow_build_logic_fault.htm&type=5",
+          "anchors": ["fault connector", "$Flow.FaultMessage", "Customize What Happens When a Flow Fails"]
+        },
+        {
+          "url": "https://help.salesforce.com/s/articleView?id=platform.flow_ref_elements_custom_error.htm&type=5",
+          "anchors": ["Custom Error", "before-save", "roll back"]
+        },
+        {
+          "url": "https://help.salesforce.com/s/articleView?id=platform.flow_ref_elements_actions_sendemail.htm&type=5",
+          "anchors": ["Send Email", "150 or fewer", "combined number of recipients", "CC Addresses", "BCC Addresses"]
+        }
+      ]
+    },
+    "skills/reviewing-flow/references/architecture-config.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-06-18",
+      "sources": [
+        {
+          "url": "https://help.salesforce.com/s/articleView?id=platform.flow_prep_bestpractices.htm&type=5",
+          "anchors": ["best practices", "subflow", "Custom Metadata", "before-save"]
+        },
+        {
+          "url": "https://help.salesforce.com/s/articleView?id=platform.flow_concepts_testing.htm&type=5",
+          "anchors": ["Flow Test", "record-triggered", "assertion"]
+        }
+      ]
+    },
+    "skills/reviewing-flow/references/loops-collections.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-06-18",
+      "sources": [
+        {
+          "url": "https://help.salesforce.com/s/articleView?id=platform.flow_ref_elements_filter.htm&type=5",
+          "anchors": ["Collection Filter", "Collection Sort"]
+        },
+        {
+          "url": "https://help.salesforce.com/s/articleView?id=platform.flow_ref_elements_transform.htm&type=5",
+          "anchors": ["Transform element", "map", "aggregate"]
+        },
+        {
+          "url": "https://help.salesforce.com/s/articleView?id=platform.flow_considerations_limit_transaction.htm&type=5",
+          "anchors": ["per-transaction", "SOQL queries", "DML", "elements executed"]
+        }
+      ]
+    },
+    "skills/reviewing-flow/references/triggers-recursion.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-06-18",
+      "sources": [
+        {
+          "url": "https://help.salesforce.com/s/articleView?id=platform.flow_concepts_trigger_record.htm&type=5",
+          "anchors": ["record-triggered", "before-save", "after-save", "ISCHANGED", "Run Asynchronously"]
+        },
+        {
+          "url": "https://help.salesforce.com/s/articleView?id=platform.flow_distribute_context.htm&type=5",
+          "anchors": ["system context", "without sharing", "How to Run the Flow"]
+        }
+      ]
+    },
+    "skills/reviewing-flow/references/commerce-b2b.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-06-18",
+      "sources": [
+        {
+          "url": "https://developer.salesforce.com/docs/commerce/salesforce-commerce/guide/b2b-b2c-comm-dev-guide.html",
+          "anchors": ["WebCart", "CartDeliveryGroup", "CommerceEntitlementPolicy", "effective account", "pricebook"]
+        }
+      ]
+    },
+    "skills/reviewing-lwc/references/architecture-data.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-06-18",
+      "sources": [
+        {
+          "url": "https://developer.salesforce.com/docs/platform/lwc/guide/data-guidelines.html",
+          "anchors": ["Lightning Data Service", "wire", "cacheable", "GraphQL"]
+        },
+        {
+          "url": "https://developer.salesforce.com/docs/platform/lwc/guide/reactivity-public.html",
+          "anchors": ["@api", "public property", "Boolean", "LWC1503"]
+        },
+        {
+          "url": "https://www.lightningdesignsystem.com/2e1ef8501/p/591960-global-styling-hooks",
+          "anchors": ["--slds-g-", "global styling hooks", "SLDS 2"]
+        }
+      ]
+    },
+    "skills/reviewing-lwc/references/async-events-errors.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-06-18",
+      "sources": [
+        {
+          "url": "https://developer.salesforce.com/docs/platform/lwc/guide/events-create-dispatch.html",
+          "anchors": ["CustomEvent", "bubbles", "composed", "detail"]
+        },
+        {
+          "url": "https://developer.salesforce.com/docs/platform/lwc/guide/data-wire-service-about.html",
+          "anchors": ["refreshApex", "wire", "error", "notifyRecordUpdateAvailable"]
+        },
+        {
+          "url": "https://developer.salesforce.com/docs/platform/lwc/guide/data-refreshview-api.html",
+          "anchors": ["RefreshView", "lightning/refresh", "RefreshEvent"]
+        },
+        {
+          "url": "https://developer.salesforce.com/docs/platform/lwc/guide/use-message-channel-intro.html",
+          "anchors": ["Lightning Message Service", "subscribe", "unsubscribe"]
+        }
+      ]
+    },
+    "skills/reviewing-lwc/references/lifecycle-performance.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-06-18",
+      "sources": [
+        {
+          "url": "https://developer.salesforce.com/docs/platform/lwc/guide/create-lifecycle-hooks.html",
+          "anchors": ["connectedCallback", "renderedCallback", "constructor", "errorCallback"]
+        },
+        {
+          "url": "https://developer.salesforce.com/docs/platform/lwc/guide/perf-intro.html",
+          "anchors": ["lazy", "performance", "lwc:if"]
+        },
+        {
+          "url": "https://developer.salesforce.com/docs/platform/lwc/guide/js-dynamic-components.html",
+          "anchors": ["dynamic import", "statically analyzable"]
+        }
+      ]
+    },
+    "skills/reviewing-lwc/references/templates-dom.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-06-18",
+      "sources": [
+        {
+          "url": "https://developer.salesforce.com/docs/platform/lwc/guide/create-conditional.html",
+          "anchors": ["lwc:if", "lwc:elseif", "lwc:else", "if:true"]
+        },
+        {
+          "url": "https://developer.salesforce.com/docs/platform/lwc/guide/create-lists.html",
+          "anchors": ["for:each", "key", "iterator"]
+        },
+        {
+          "url": "https://developer.salesforce.com/docs/platform/lwc/guide/create-components-dom-work.html",
+          "anchors": ["lwc:ref", "this.refs", "querySelector"]
+        }
+      ]
+    },
+    "skills/reviewing-lwc/references/testing.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-06-18",
+      "sources": [
+        {
+          "url": "https://developer.salesforce.com/docs/platform/lwc/guide/unit-testing-using-jest-patterns.html",
+          "anchors": ["Jest", "flushPromises", "appendChild", "removeChild"]
+        },
+        {
+          "url": "https://developer.salesforce.com/docs/platform/lwc/guide/unit-testing-using-wire-utility.html",
+          "anchors": ["wire-service-jest-util", "emit", "error", "LDS"]
+        }
+      ]
+    },
+    "skills/reviewing-lwc/references/commerce-b2b.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-06-18",
+      "sources": [
+        {
+          "url": "https://developer.salesforce.com/docs/commerce/salesforce-commerce/guide/b2b-b2c-comm-display-lwc-apis.html",
+          "anchors": ["commerce/cartApi", "commerce/checkoutApi", "commerce/productApi", "commerce/actionApi", "Storefront APIs"]
+        },
+        {
+          "url": "https://developer.salesforce.com/docs/commerce/salesforce-commerce/guide/b2b-b2c-comm-checkout-checkoutsavable.html",
+          "anchors": ["useCheckoutComponent", "checkout", "mixin"]
+        }
+      ]
+    },
+    "skills/sf-plan/references/data-model-decision.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-06-17",
+      "sources": [
+        {
+          "url": "https://help.salesforce.com/s/articleView?id=platform.relationships_considerations.htm&type=5",
+          "anchors": ["master-detail", "junction", "lookup", "roll-up summary"]
+        },
+        {
+          "url": "https://architect.salesforce.com/well-architected/trusted/reliable",
+          "anchors": ["large data volume", "ownership skew", "data tier", "aggregation"]
+        }
+      ]
+    },
+    "skills/sf-plan/references/automation-decision.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-06-18",
+      "sources": [
+        {
+          "url": "https://architect.salesforce.com/docs/architect/decision-guides/guide/record-triggered",
+          "anchors": ["record-triggered", "before-save", "flow vs apex", "invocable"]
+        },
+        {
+          "url": "https://architect.salesforce.com/docs/architect/decision-guides/guide/async-processing.html",
+          "anchors": ["Queueable", "Batch", "Platform Event", "scheduled"]
+        },
+        {
+          "url": "https://help.salesforce.com/s/articleView?id=platform.relationships_considerations.htm&type=5",
+          "anchors": ["roll-up summary", "master-detail", "lookup"]
+        }
+      ]
+    },
+    "skills/sf-plan/references/ui-decision.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-06-18",
+      "sources": [
+        {
+          "url": "https://developer.salesforce.com/docs/platform/lwc/guide/get-started-introduction.html",
+          "anchors": ["Lightning Web Component", "Screen Flow", "reactive"]
+        },
+        {
+          "url": "https://help.salesforce.com/s/articleView?id=platform.flow_build_reactive_screen_flow_components.htm&type=5",
+          "anchors": ["reactive screen", "Screen Flow", "components"]
+        },
+        {
+          "url": "https://help.salesforce.com/s/articleView?id=platform.dynamic_forms.htm&type=5",
+          "anchors": ["Dynamic Forms", "page layout"]
+        }
+      ]
+    },
+    "skills/sf-plan/references/integration-decision.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-06-18",
+      "sources": [
+        {
+          "url": "https://developer.salesforce.com/docs/atlas.en-us.integration_patterns_and_practices.meta/integration_patterns_and_practices/integ_pat_intro_overview.htm",
+          "anchors": ["Request and Reply", "Fire and Forget", "Remote Call-In", "Batch Data Synchronization", "Data Virtualization"]
+        },
+        {
+          "url": "https://developer.salesforce.com/docs/platform/named-credentials/guide/get-started.html",
+          "anchors": ["Named Credential", "External Credential", "extensible"]
+        },
+        {
+          "url": "https://help.salesforce.com/s/articleView?id=sf.external_services_intro_openapi_2_3_support.htm&type=5",
+          "anchors": ["External Services", "OpenAPI 2.0", "OpenAPI 3.0"]
+        },
+        {
+          "url": "https://developer.salesforce.com/docs/atlas.en-us.platform_events.meta/platform_events/platform_events_intro.htm",
+          "anchors": ["Platform Event", "Change Data Capture", "Pub/Sub API"]
+        }
+      ]
+    }
+  }
+}

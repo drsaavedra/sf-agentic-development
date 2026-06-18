@@ -111,7 +111,7 @@ view, and test scenarios). You review it, then `/sf-build` builds and reviews ag
 decision packs bundled with the skill (`skills/sf-plan/references/`) — not from the model's memory,
 and **not by fetching docs at runtime**, so the repo stays lightweight and ships no Playwright or
 network dependency. The packs are kept current against official Salesforce documentation by the
-maintainer and re-validated every release (see [Maintaining](#maintaining)). What's written here is
+maintainer and re-validated every release (see [docs/MAINTAINING.md](docs/MAINTAINING.md)). What's written here is
 vetted, not guessed.
 
 Full detail — the grilling pattern, the spec / work-item contract, why it replaces plan mode, and
@@ -141,27 +141,6 @@ npx skills add forcedotcom/sf-skills
 
 Nothing else to configure: the baseline is skill routing only, and the `salesforce-developer` and
 `architect` agents ask for your spec/architecture paths when you dispatch them.
-
-### Repository layout
-
-```
-skills/<name>/              ← 4 authored Salesforce skills (canonical source: SKILL.md + references/)
-agents/<name>.md            ← 2 Salesforce agents (canonical source)
-templates/baseline.md       ← single-source template for the three root files below
-scripts/render-baselines.js ← regenerates the three renders from the template
-scripts/install.js          ← the interactive installer (npx entry point)
-CLAUDE.md                   ← Claude Code baseline (rendered — do not edit directly)
-AGENTS.md                   ← Codex baseline (rendered — do not edit directly)
-.github/copilot-instructions.md ← Copilot baseline (rendered — do not edit directly)
-```
-
-| Assistant | Reads SKILL.md from |
-|---|---|
-| Claude Code | `.claude/skills/<name>/SKILL.md` |
-| Copilot (VS Code) | `.claude/skills/`, `.github/skills/`, or `.agents/skills/` — any one |
-| Codex | `.agents/skills/<name>/SKILL.md` |
-
-All three use the same `name` + `description` frontmatter format.
 
 <details>
 <summary><strong>Manual setup (no installer)</strong></summary>
@@ -279,7 +258,7 @@ commitment schedule — today's safety rules hold until each gate is built and p
 This toolkit is deliberately Salesforce-only and takes no opinion on general coding-behavior
 skills — they're optional. Two good options if you want one:
 
-- **[andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills)** —
+- **[andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills)** —
   behavioral guidelines that curb common LLM coding mistakes (overcomplication, sweeping
   changes, unstated assumptions). Install as a plugin:
     ```
@@ -300,8 +279,9 @@ alongside the Salesforce skills.
 
 ## Maintaining
 
-- **Skills & agents** — `skills/` and `agents/` are the only source of truth. Edit them, then re-run the installer (or re-copy) into the per-assistant directories. Never edit the installed copies — they're lost on the next install.
-- **Baselines** — edit `templates/baseline.md`, then run `node scripts/render-baselines.js` (or `npm run render`) to regenerate the three renders. Never edit `CLAUDE.md`, `AGENTS.md`, or `.github/copilot-instructions.md` by hand.
+Maintaining this repo — re-rendering baselines, re-grounding the reference packs, bumping the
+sf-skills pin, and the repository layout — is documented in **[docs/MAINTAINING.md](docs/MAINTAINING.md)**.
+
 ## License
 
 [MIT](LICENSE)
