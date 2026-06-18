@@ -33,8 +33,11 @@ frontmatter flag, so it holds across every assistant.
 2. **Build config rows inline** with the matching `generating-*` skill — `generating-custom-object`,
    `generating-custom-field`, `generating-validation-rule`, `generating-permission-set`,
    `generating-flexipage`, `generating-list-view`, etc. These stay with the main agent; they are
-   not dispatched to a subagent. For a row whose metadata already exists, modify it additively
-   rather than regenerating over local changes.
+   not dispatched to a subagent. **Integration config** — Named Credentials, External Credentials,
+   External Services, Platform Events, CDC — is built with `building-sf-integrations` (a code row
+   that also needs Apex callout logic goes to `salesforce-developer`, which applies the same skill).
+   For a row whose metadata already exists, modify it additively rather than regenerating over local
+   changes.
 3. **Build code rows via `salesforce-developer`.** For each code row, cut a **work brief** from the
    spec — Objective, Spec reference `§N`, Schema context, Test scenarios, Constraints,
    Dependencies, Expected outputs, Validation criteria — and dispatch the `salesforce-developer`
