@@ -14,7 +14,7 @@ A two-skill pipeline for planned feature work:
 2. **`sf-build`** — an orchestrator that builds and reviews *against that spec* (dispatches
    `salesforce-developer` and `architect`, then runs the `reviewing-*` battery).
 
-`sf-plan` replaces our reliance on Claude Code's native **plan mode**. `sf-build` is
+`sf-plan` replaces reliance on the CLI agent's native **plan mode**. `sf-build` is
 model-invocable but gated by a tight TRIGGER / DO NOT TRIGGER description so it doesn't fire
 before the spec is reviewed. The two are joined by a file on disk (`docs/tech-spec.md`), not by
 conversation context.
@@ -29,17 +29,15 @@ conversation context.
 ### Plan mode is the wrong mechanism
 
 Plan mode is an enforced read-only permission gate — good at *safety*, but bad as the front of an
-orchestrated build, for three reasons:
+orchestrated build, for two reasons:
 
 1. **"Accept plan and build" can't live in a slash command.** While plan mode is active the gate is
    closed; typing `/sf-build accept plan` does nothing useful. Approval is a dialog action, not
    prose, so it can't be folded into the build command.
 2. **Approval can wipe context.** The exit dialog has an option that clears context on approval. If
    chosen, `/sf-build` wakes with no memory of the plan it is supposed to execute.
-3. **Plan mode can drop mid-session** on long conversations, so the build can start while you think
-   you are still gated.
 
-All three are symptoms of the same root causes: a *hard gate* plus *ephemeral context*. A planning
+Both are symptoms of the same root causes: a *hard gate* plus *ephemeral context*. A planning
 skill fixes both — it runs in normal mode (context preserved) and **persists the plan to a file**
 (`docs/tech-spec.md`) instead of relying on the conversation. That persistence also feeds
 infrastructure we already have: `salesforce-developer` reads a **Technical Specification**; the
@@ -59,12 +57,19 @@ a Salesforce build is a fundamentally different shape of problem:
 | Security is something you design | FLS / CRUD / sharing are platform primitives | Security becomes a **permission-set + `with sharing`** decision, not an auth design |
 | "What framework / stack?" | It's **Apex** (Java-*ish*, not Java) and **LWC** (its own framework) — non-negotiable | Skips stack questions; asks the Salesforce fork questions (Screen Flow vs LWC, Flow vs Apex, sync vs async) |
 | Brainstorm → `writing-plans` → implement | Our `/sf-build` + work-brief template already do task decomposition | **Collapse** brainstorm + writing-plans into one skill; the output feeds `/sf-build` directly |
+| You build integrations (auth, servers, API plumbing) | **Connected Apps**, **Named Credentials**, and **External Services** are platform primitives | Routes integration to Named Credential / External Service config (`building-sf-integrations`), not bespoke plumbing |
+| You build and host an external-facing web app / SPA | **Experience Cloud** delivers external-facing sites on-platform | Routes a public/partner site to an **Experience site**, not a from-scratch web app |
+| Unconstrained OOP / high-level paradigms | **Governor limits** cap SOQL / DML / CPU / heap per transaction — the same patterns don't carry over | Designs **bulk-safe by construction**: no per-record SOQL/DML, batch/async for volume |
 
 The distinctive Salesforce move — the one a generic skill cannot have — is the **config-vs-code
 gate**: for every requirement, ask whether a rollup field, validation rule, Flow, or standard
 object can do it *before* any Apex is written. We do not stand up databases or build auth; we decide
-what the platform already does declaratively, and write code only for what it can't. Two more
-Salesforce-native habits follow: schema is **verified against the org, not guessed**, and scale is
+what the platform already does declaratively, and write code only for what it can't. The same gate
+runs for UI: **Screen Flow vs LWC** turns on complexity and use case — a guided, admin-maintainable
+process leans Screen Flow, rich client-side interactivity leans LWC — and because Screen Flow's
+reach grows each release (it now supports reactive screens and can embed LWCs), `sf-plan` makes the
+call from the maintainer-grounded `ui-decision` pack, not stale assumptions about what Screen Flow
+can't do. Two more Salesforce-native habits follow: schema is **verified against the org, not guessed**, and scale is
 treated as a **constant** — every design is bulk-safe by construction, never sized per feature.
 
 That is the whole answer: a Salesforce-native planning skill that persists a reviewable design

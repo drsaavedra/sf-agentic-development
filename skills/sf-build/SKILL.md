@@ -7,13 +7,12 @@ allowed-tools: Agent, Skill, Read, Grep, Glob, Bash
 # Salesforce Build Orchestrator (sf-build)
 
 Build and review against the approved spec at `docs/tech-spec.md`. Run **inline** (this skill is
-never forked) so the spec and conversation context stay available. This skill assumes the spec has
-already been reviewed by the user (and developer/architect if they chose) — that review is a
-manual step that happens **before** this skill is invoked.
+never forked) so the spec and conversation context stay available.
 
-**Only run when the user has indicated they want to build.** If you're arriving straight from
-`/sf-plan`, confirm the user wants to proceed before dispatching — the spec is meant to be reviewed
-first. This human checkpoint lives in the trigger conditions and this instruction, not in a
+**Only run when the user has indicated they want to build.** The spec is meant to be reviewed first
+(by the user, and developer/architect if they chose) — a manual step that happens **before** this
+skill runs. If you're arriving straight from `/sf-plan`, confirm the user wants to proceed before
+dispatching. This human checkpoint lives in the trigger conditions and this instruction, not a
 frontmatter flag, so it holds across every assistant.
 
 ## Preconditions
@@ -25,18 +24,28 @@ frontmatter flag, so it holds across every assistant.
 ## Orchestration (in order)
 
 1. **Parse the spec.** Read `docs/tech-spec.md`; split the work-item table into **config rows**
-   and **code rows**. Verify object/field API names against the org (read-only `sf sobject
-   describe`) before acting on any row.
+   and **code rows**, and order the build by the table's **`Depends on`** column — a row builds only
+   after the rows it depends on, config or code. Verify object/field API names against the org
+   (read-only `sf sobject describe`) before acting on any row. Then **check each row against
+   `force-app/**`: if its artifact already exists** (a revised spec, or a re-run), mark it for
+   *additive modification*, not recreation — build greenfield only the rows with no existing
+   artifact, and never clobber a row the change doesn't touch.
 2. **Build config rows inline** with the matching `generating-*` skill — `generating-custom-object`,
    `generating-custom-field`, `generating-validation-rule`, `generating-permission-set`,
    `generating-flexipage`, `generating-list-view`, etc. These stay with the main agent; they are
-   not dispatched to a subagent.
+   not dispatched to a subagent. **Integration config** — Named Credentials, External Credentials,
+   External Services, Platform Events, CDC — is built with `building-sf-integrations` (a code row
+   that also needs Apex callout logic goes to `salesforce-developer`, which applies the same skill).
+   For a row whose metadata already exists, modify it additively rather than regenerating over local
+   changes.
 3. **Build code rows via `salesforce-developer`.** For each code row, cut a **work brief** from the
    spec — Objective, Spec reference `§N`, Schema context, Test scenarios, Constraints,
    Dependencies, Expected outputs, Validation criteria — and dispatch the `salesforce-developer`
-   agent with the `Agent` tool. Run independent items in **parallel**; sequence a dependent chain
-   in a **single** brief, or pin the integration contract up front and verify at one combined
-   validate at the merge point.
+   agent with the `Agent` tool. Fold the relevant entries from the spec's **Decisions & assumptions**
+   into the brief's *Constraints* so the build can't contradict a recorded decision. If the row's
+   artifact already exists, brief the developer to **modify it additively**, preserving existing
+   behavior. Run independent items in **parallel**; sequence a dependent chain in a **single** brief,
+   or pin the integration contract up front and verify at one combined validate at the merge point.
 4. **Review gate.** After the developer returns, run the `reviewing-*` battery over the produced
    artifacts via the `Skill` tool — every applicable one, so the gate is deterministic:
    - `reviewing-apex` for `.cls` / `.trigger`,
@@ -60,5 +69,5 @@ frontmatter flag, so it holds across every assistant.
 - **Never run git** (commit, push, branch, or any variant) unless the user explicitly asked in the
   current request.
 - Track progress through **build summaries**, not raw diffs. Subagents never run git.
-- **Report at the end:** what was built (config + code), the review-gate results, and any BLOCKED
-  items still open.
+- **Report at the end:** what was built, modified, or skipped as already-current (config + code),
+  the review-gate results, and any BLOCKED items still open.

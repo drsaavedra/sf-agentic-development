@@ -77,8 +77,10 @@ Declining it strips only those files; the base review rules are untouched.
 For a *planned* feature — not an ad-hoc fix — two skills form a deliberate pipeline:
 
 - **`/sf-plan`** explores your code and org, then grills you to shared understanding (one prose
-  question at a time, with recommended choices), makes the declarative-vs-code calls, verifies the
-  schema, and writes a completeness-checked design contract to `docs/tech-spec.md`.
+  question at a time, with recommended choices) — settling the overall solution shape before the
+  per-capability declarative-vs-code calls — verifies the schema, and writes a completeness-checked
+  design contract to `docs/tech-spec.md`. Run it again when requirements change and it **revises the
+  existing spec in place**, grilling the change against the prior decisions instead of overwriting.
 - **`/sf-build`** builds and reviews against that contract: it dispatches the config skills and the
   `salesforce-developer` agent per work item, then runs the `reviewing-*` battery as a gate.
   Deploys stay human-gated.
