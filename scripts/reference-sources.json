@@ -1,0 +1,35 @@
+{
+  "_comment": "Maintainer manifest for skill/agent reference packs. Tracks which packs are grounded in official Salesforce docs, the sources they were grounded against, and when each was last re-validated. Run `npm run validate:refs` each release; re-ground flagged packs by fetching their sources with the fetching-salesforce-docs skill, update the pack, and bump lastValidated. See README -> Maintaining.",
+  "stalenessDays": 180,
+  "references": {
+    "skills/sf-plan/references/data-model-decision.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-06-17",
+      "sources": [
+        {
+          "url": "https://help.salesforce.com/s/articleView?id=platform.relationships_considerations.htm&type=5",
+          "anchors": ["master-detail", "junction", "lookup", "roll-up summary"]
+        },
+        {
+          "url": "https://architect.salesforce.com/well-architected/trusted/reliable",
+          "anchors": ["large data volume", "ownership skew", "data tier", "aggregation"]
+        }
+      ]
+    },
+    "skills/sf-plan/references/automation-decision.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": null,
+      "sources": [
+        {
+          "url": "https://architect.salesforce.com/well-architected/trusted/reliable",
+          "anchors": ["record-triggered", "before-save"]
+        }
+      ]
+    },
+    "skills/sf-plan/references/ui-decision.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": null,
+      "sources": []
+    }
+  }
+}

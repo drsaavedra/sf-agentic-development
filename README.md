@@ -300,6 +300,8 @@ alongside the Salesforce skills.
 
 - **Skills & agents** — `skills/` and `agents/` are the only source of truth. Edit them, then re-run the installer (or re-copy) into the per-assistant directories. Never edit the installed copies — they're lost on the next install.
 - **Baselines** — edit `templates/baseline.md`, then run `node scripts/render-baselines.js` (or `npm run render`) to regenerate the three renders. Never edit `CLAUDE.md`, `AGENTS.md`, or `.github/copilot-instructions.md` by hand.
+- **Reference packs** — the skills' decision/quality reference packs are kept grounded in official Salesforce docs by the maintainer, so installs ship no runtime doc-fetch dependency. Each release, run `npm run validate:refs`: it audits `scripts/reference-sources.json` and flags packs that are stale, never-validated, or untracked, with the sources to re-check. Re-ground a flagged pack by fetching its sources with the [`fetching-salesforce-docs`](https://github.com/forcedotcom/sf-skills) skill, updating the pack, then bumping its `lastValidated` date in the manifest. (On Windows, invoke that skill's extractor with its isolated Python directly — the `os.execve` re-exec segfaults under Git Bash.)
+
 ## License
 
 [MIT](LICENSE)
