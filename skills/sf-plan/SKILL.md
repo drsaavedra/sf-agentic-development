@@ -56,10 +56,10 @@ metadata) here. End by handing off to `/sf-build`.
    real-time vs event-driven/async as the overall style. The chosen shape frames the triage and
    schema below. Skip this phase when one shape is obviously right — don't manufacture alternatives.
 4. **Declarative-vs-code triage (per capability)** — within the chosen shape, decide config or code
-   for each capability, working from the automation and UI decision packs (see *Decision
-   references*). This is the per-piece tool choice (e.g. this rollup → roll-up summary field; this UI
-   → Screen Flow or LWC), not the whole-solution fork above. Standard object before custom. Record
-   each decision with its reason.
+   for each capability, working from the automation, UI, and integration decision packs (see
+   *Decision references*). This is the per-piece tool choice (e.g. this rollup → roll-up summary
+   field; this UI → Screen Flow or LWC; this callout → External Service / Named Credential), not the
+   whole-solution fork above. Standard object before custom. Record each decision with its reason.
 5. **Schema design (verified)** — pin the data model with real API names, working from the
    data-model decision pack (see *Decision references*): standard vs custom object, relationship
    type, where config/data lives, and large-data-volume design. This becomes each work item's
@@ -140,6 +140,9 @@ them up front:
 - `references/ui-decision.md` — page layout & Dynamic Forms / Screen Flow / LWC, and placement.
 - `references/data-model-decision.md` — standard vs custom object, relationship type, where
   config/data lives (CMT / custom setting / Big Object / External Object), and large-data-volume design.
+- `references/integration-decision.md` — talking to an external system: Named Credential auth, the
+  External Services / Flow callout / Apex ladder, pattern selection, Platform Events vs CDC, and
+  Salesforce Connect for external data.
 
 These are curated decision criteria, kept current against official Salesforce documentation by the
 repo maintainer (re-validated each release). Decide from them; if a pack looks out of date or
