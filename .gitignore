@@ -20,6 +20,13 @@ node_modules/
 # Local agent and skill data — installed third-party skills (`npx skills add`) and
 # per-machine Claude data. skills-lock.json IS committed (pins sf-skills versions);
 # a shared .claude/settings.json may be committed, settings.local.json is not.
+# The installed sf-skills tree under .claude/skills/ stays ignored; only the named
+# maintainer-only skills for THIS repo are committed (not under the shipped skills/
+# tree, so the installer never offers them). Add a line per maintainer skill.
 .agents/
 .claude/*
 !.claude/settings.json
+!.claude/skills/
+.claude/skills/*
+!.claude/skills/regrounding-references/
+!.claude/skills/updating-sf-skills/
