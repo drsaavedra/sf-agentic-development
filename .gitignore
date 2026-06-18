@@ -17,7 +17,9 @@ Thumbs.db
 # Node (if tooling is ever added alongside)
 node_modules/
 
-# Local agent and skill data
-.claude/
+# Local agent and skill data — installed third-party skills (`npx skills add`) and
+# per-machine Claude data. skills-lock.json IS committed (pins sf-skills versions);
+# a shared .claude/settings.json may be committed, settings.local.json is not.
 .agents/
-skills-lock.json
+.claude/*
+!.claude/settings.json
