@@ -47,14 +47,23 @@ metadata) here. End by handing off to `/sf-build`.
    time, in prose, offering the deduced choices and your recommendation for each. Resolve the
    decision tree branch by branch — including purpose and success criteria — until nothing material
    is ambiguous. Don't re-ask what you already confirmed from the code or org.
-3. **Declarative-vs-code triage** — for each capability decide config or code, working from the
-   automation and UI decision packs (see *Decision references*). Standard object before custom.
-   Record each decision with its reason.
-4. **Schema design (verified)** — pin the data model with real API names, working from the
+3. **Solution shape (only when there's a real architectural fork)** — when the requirement admits
+   genuinely different *whole-solution* architectures, present 2–3 shapes with their cross-cutting
+   Salesforce tradeoffs and recommend one, using the same grill discipline (options + reason). These
+   are architecture-level forks that span work items — e.g. extend a standard object vs introduce a
+   new custom-object model; declarative orchestration (record-triggered Flow + invocable Apex) vs an
+   Apex-trigger-owned domain; configure an existing feature/managed package vs build custom;
+   real-time vs event-driven/async as the overall style. The chosen shape frames the triage and
+   schema below. Skip this phase when one shape is obviously right — don't manufacture alternatives.
+4. **Declarative-vs-code triage (per capability)** — within the chosen shape, decide config or code
+   for each capability, working from the automation and UI decision packs (see *Decision
+   references*). This is the per-piece tool choice (e.g. this rollup → roll-up summary field; this UI
+   → Screen Flow or LWC), not the whole-solution fork above. Standard object before custom. Record
+   each decision with its reason.
+5. **Schema design (verified)** — pin the data model with real API names, working from the
    data-model decision pack (see *Decision references*): standard vs custom object, relationship
    type, where config/data lives, and large-data-volume design. This becomes each work item's
    *Schema context*.
-5. **Approaches** — offer 2–3 options with Salesforce tradeoffs (Screen Flow vs LWC, Flow vs trigger, sync vs async) and recommend one.
 6. **Write the spec** — to `docs/tech-spec.md`, per the Output contract below. Scale detail to
    complexity; do not pad a small change.
 7. **Completeness self-review (the gate)** — refuse to finish if any of these fail; fix and
