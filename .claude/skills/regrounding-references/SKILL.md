@@ -70,7 +70,7 @@ render every Salesforce surface. Route by URL shape:
 | `lightningdesignsystem.com/…` | `fetching-salesforce-docs` |
 | **`developer.salesforce.com/docs/atlas.en-us.*`** (most Apex docs) | **WebSearch / WebFetch against developer.salesforce.com** — headless Chromium returns only the cookie-consent shell here, even with `--stealth`. Use the indexed snippet + current canonical URL instead. |
 
-One-time runtime setup for the extractor lives in README → Maintaining (isolated Python venv at
+One-time runtime setup for the extractor lives in docs/MAINTAINING.md (isolated Python venv at
 `~/.claude/.fetching-salesforce-docs-runtime/`; on Windows invoke that Python directly with
 `SF_DOCS_RUNTIME_ACTIVE=1` — the `os.execve` re-exec segfaults under Git Bash).
 
