@@ -16,3 +16,8 @@ Thumbs.db
 
 # Node (if tooling is ever added alongside)
 node_modules/
+
+# Local agent and skill data
+.claude/
+.agents/
+skills-lock.json
