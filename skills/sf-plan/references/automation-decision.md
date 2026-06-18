@@ -56,6 +56,6 @@ orchestration; invocable Apex does the heavy lifting it calls.
 - **One automation strategy per object.** Don't run a record-triggered Flow and an Apex trigger
   doing overlapping work on the same object without a deliberate, documented ordering — they
   interleave per the save order of execution and become unpredictable.
-- Never add new Process Builder or Workflow Rule automation (being retired).
+- Never add new Process Builder or Workflow Rule automation — Salesforce ended support for both on Dec 31, 2025; build all new automation in Flow and migrate existing ones with the Migrate to Flow tool.
 - Whatever you pick must be **bulk-safe by construction** (no per-record SOQL/DML/callout in a
   loop) — the build is reviewed against that bar (`reviewing-apex` / `reviewing-flow`).

@@ -19,7 +19,7 @@
 
 ## Send Email action recipient limit
 
-*Why it fails:* The Send Email core action accepts at most **150 recipients** per invocation across its comma-separated recipient address lists (raised from 5 in Winter '25, which also added the CC and BCC Recipient Address Lists). A recipient list built dynamically from a Get Records result can silently grow past the cap and fault the flow at runtime — and blank or invalid addresses in the list fault it too.
+*Why it fails:* The Send Email core action accepts at most **150 recipients per invocation, counted across the Recipient, CC, BCC, and Recipient ID fields combined** (Winter '25 added the CC and BCC Recipient Address Lists). A recipient list built dynamically from a Get Records result can silently grow past the combined cap and fault the flow at runtime — and blank or invalid addresses in the list fault it too.
 
 *Fix:*
 - Validate the assembled recipient list: non-empty, valid addresses, and ≤ 150 entries before the action runs.

@@ -60,6 +60,20 @@ test('discovery finds the sf-plan decision packs', () => {
   }
 });
 
+test('discovery includes each skill SKILL.md body', () => {
+  const files = discoverReferenceFiles(root);
+  for (const f of [
+    'skills/reviewing-apex/SKILL.md',
+    'skills/reviewing-flow/SKILL.md',
+    'skills/reviewing-lwc/SKILL.md',
+    'skills/deploying-sf-metadata/SKILL.md',
+    'skills/sf-plan/SKILL.md',
+    'skills/sf-build/SKILL.md',
+  ]) {
+    assert.ok(files.includes(f), 'expected discovery to include ' + f);
+  }
+});
+
 // --- classifier logic (fixtures, fixed clock — never time-bombs) --------------------------------
 
 test('classify flags stale, untracked, missing, never-validated, and passes fresh/expertise', () => {

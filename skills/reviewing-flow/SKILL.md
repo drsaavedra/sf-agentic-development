@@ -39,7 +39,7 @@ Scan every flow against this checklist.
 | Flow: no flow tests | Flow Tests per decision path; Apex tests for invocables |
 | Flow: stale versions | Deactivate and delete obsolete versions after deployment |
 | Flow: unlabeled decision outcomes | Label every outcome and loop element descriptively |
-| Flow: Process Builder | Do not extend — being retired; migrate to Record-Triggered Flow or Apex |
+| Flow: Process Builder | Do not extend — support ended Dec 31, 2025; migrate to Record-Triggered Flow or Apex |
 
 ## Detailed Rules (read the file matching the artifact)
 

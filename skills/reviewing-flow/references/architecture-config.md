@@ -30,7 +30,7 @@
 | Routing with a few decision branches | Error recovery with partial-success handling and retry |
 | Calling an invocable Apex action | An Apex trigger already owns the object (stay additive — do not split the strategy) |
 
-The recommended hybrid: a Record-Triggered Flow owns the entry criteria and orchestration; complex operations live in Invocable Apex it calls. Never add new Process Builder automation (being retired).
+The recommended hybrid: a Record-Triggered Flow owns the entry criteria and orchestration; complex operations live in Invocable Apex it calls. Never add new Process Builder automation — Salesforce ended Workflow Rules and Process Builder support on Dec 31, 2025.
 
 ## No flow tests
 

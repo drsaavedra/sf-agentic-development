@@ -23,7 +23,9 @@ const path = require('path');
 const root = path.join(__dirname, '..');
 const manifestPath = path.join(root, 'scripts', 'reference-sources.json');
 
-// Discover reference packs: skills/<name>/references/*.md and agents/<name>/references/*.md.
+// Discover groundable docs: each skill/agent's own body (skills/<name>/SKILL.md) plus its
+// reference packs (skills/<name>/references/*.md and agents/<name>/references/*.md). The SKILL.md
+// Quick Reference carries the same release-sensitive claims as the packs, so it is audited too.
 // Returns repo-relative POSIX paths so they match the manifest keys on every OS.
 function discoverReferenceFiles(repoRoot) {
   const found = [];
@@ -32,6 +34,9 @@ function discoverReferenceFiles(repoRoot) {
     if (!fs.existsSync(topDir)) continue;
     for (const entry of fs.readdirSync(topDir, { withFileTypes: true })) {
       if (!entry.isDirectory()) continue;
+      // The skill/agent body itself, tracked alongside its reference packs.
+      const skillFile = path.join(topDir, entry.name, 'SKILL.md');
+      if (fs.existsSync(skillFile)) found.push(`${top}/${entry.name}/SKILL.md`);
       const refsDir = path.join(topDir, entry.name, 'references');
       if (!fs.existsSync(refsDir)) continue;
       for (const f of fs.readdirSync(refsDir)) {
