@@ -22,6 +22,9 @@ The **agents** add on-demand specialisation: the `salesforce-developer` agent bu
 The apex/lwc/flow quality skills also bundle an optional **B2B Commerce** reference pack —
 see [Domain Specific skills](#domain-specific-skills).
 
+For **planned feature work**, two workflow skills — `sf-plan` and `sf-build` — drive a plan→build
+pipeline end to end; see [Planning and building a feature](#planning-and-building-a-feature).
+
 ### Agents
 
 | Agent | Role |
@@ -66,6 +69,53 @@ artifact, no manual invoke.
 
 Include the pack via the installer's prompt, or keep/delete `references/commerce-b2b.md` manually.
 Declining it strips only those files; the base review rules are untouched.
+
+---
+
+## Planning and building a feature
+
+For a *planned* feature — not an ad-hoc fix — two skills form a deliberate pipeline:
+
+- **`/sf-plan`** explores your code and org, then grills you to shared understanding (one prose
+  question at a time, with recommended choices) — settling the overall solution shape before the
+  per-capability declarative-vs-code calls — verifies the schema, and writes a completeness-checked
+  design contract to `docs/tech-spec.md`. Run it again when requirements change and it **revises the
+  existing spec in place**, grilling the change against the prior decisions instead of overwriting.
+- **`/sf-build`** builds and reviews against that contract: it dispatches the config skills and the
+  `salesforce-developer` agent per work item, then runs the `reviewing-*` battery as a gate.
+  Deploys stay human-gated.
+
+You review the spec between the two steps — `/sf-build` won't fire straight out of planning. This
+is the **planned** path; for everything else — ad-hoc edits, fixes, reviews, audits, single config
+items — use the skills under [Skill Routing](#skill-routing) directly.
+
+### Example
+
+```text
+/sf-plan I want to build a datatable that shows Account records and the fields Salutation,
+Name, AccountNumber, Phone, Rating and has a button to show the child contacts under the
+chosen account
+```
+
+`/sf-plan` reads your org and existing components first, then grills the open decisions with a
+recommendation for each:
+
+- *"A datatable with a row action points to an **LWC** rather than a Screen Flow — agree?"*
+- *"Where should it live — an Account record page, an app page, or an Experience Cloud page?"*
+- *"What should the button do — open the child contacts in a modal, navigate to a list, or expand the row inline?"*
+
+Once you've agreed, it writes `docs/tech-spec.md` (the LWC, its Apex controller, the child-contacts
+view, and test scenarios). You review it, then `/sf-build` builds and reviews against that spec.
+
+**Grounding (no runtime dependency).** `/sf-plan` makes its declarative-vs-code calls from curated
+decision packs bundled with the skill (`skills/sf-plan/references/`) — not from the model's memory,
+and **not by fetching docs at runtime**, so the repo stays lightweight and ships no Playwright or
+network dependency. The packs are kept current against official Salesforce documentation by the
+maintainer and re-validated every release (see [Maintaining](#maintaining)). What's written here is
+vetted, not guessed.
+
+Full detail — the grilling pattern, the spec / work-item contract, why it replaces plan mode, and
+how it feeds the agents — is in **[docs/PIPELINE.md](docs/PIPELINE.md)**.
 
 ---
 
@@ -252,7 +302,6 @@ alongside the Salesforce skills.
 
 - **Skills & agents** — `skills/` and `agents/` are the only source of truth. Edit them, then re-run the installer (or re-copy) into the per-assistant directories. Never edit the installed copies — they're lost on the next install.
 - **Baselines** — edit `templates/baseline.md`, then run `node scripts/render-baselines.js` (or `npm run render`) to regenerate the three renders. Never edit `CLAUDE.md`, `AGENTS.md`, or `.github/copilot-instructions.md` by hand.
-
 ## License
 
 [MIT](LICENSE)
