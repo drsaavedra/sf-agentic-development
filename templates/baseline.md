@@ -97,7 +97,9 @@ Each `reviewing-*` skill names its cross-domain partner under its own **Cross-Sk
 
 For the deep code-quality gate after a build, dispatch the `code-reviewer` agent — it runs the
 table above plus {{skill:running-code-analyzer}} over the delivered artifacts and reports defects
-by severity. The `architect` agent is the separate governance gate (spec/scope completeness).
+by severity. The `architect` agent is the separate solution-design governance gate — it clears the
+design before code and inspects the assembled build against the design contract (completeness, scope,
+design conformance), not code quality.
 
 The authored skills in this repo — {{skill:reviewing-apex}}, {{skill:reviewing-lwc}}, and
 {{skill:reviewing-flow}} — install into `{{SKILLS_DIR}}/` at setup (see the README). All other

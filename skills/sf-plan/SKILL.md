@@ -119,10 +119,11 @@ contract files. It holds:
   - `Commit` — leave empty (`—`); `/sf-build` fills the short commit hash here when the row passes
     review, but only if checkpoint commits are enabled (below).
 - **`Architect review: recommended | not needed`** — one line with a one-line reason, so `/sf-build`
-  knows whether to invoke the `architect` agent without having to judge it itself. Recommend it when
-  the design shows concrete complexity signals — a new or changed data model, cross-object
-  automation, callouts / async (governor-limit risk), or a multi-domain or many-item build;
-  otherwise mark it *not needed*.
+  knows whether to invoke the `architect` agent (the solution-design gate — design review and the
+  end-of-sprint whole-build inspection against the design contract) without having to judge it
+  itself. Recommend it when the design shows concrete complexity signals — a new or changed data
+  model, cross-object automation, callouts / async (governor-limit risk), or a multi-domain or
+  many-item build; otherwise mark it *not needed*.
 - **`Checkpoint commits: enabled | disabled`** — one line recording the user's answer to the
   handoff checkpoint question (Phase 8). On `enabled`, `/sf-build` commits each work item on the
   current branch as it passes review and fills the `Commit` column / contract Build log; on
