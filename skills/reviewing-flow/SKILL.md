@@ -7,7 +7,7 @@ description: "Use when reviewing or auditing Salesforce Flows — a review pass 
 
 Invoke when reviewing or auditing Flows — as the end-of-build quality pass or on demand. These are the patterns that work in a developer sandbox but fail in production with real data volumes, non-admin profiles, or after deployment to a different org.
 
-**Cross-domain:** an `@InvocableMethod` Apex action pairs with `reviewing-apex` — see Cross-Skill Integration below.
+**Cross-domain:** an `@InvocableMethod` Apex action pairs with `reviewing-apex`, an embedded LWC screen component with `reviewing-lwc` — see Cross-Skill Integration below.
 
 This skill complements `generating-flow` (which covers how to build a Flow) by specifying the quality bar it must meet.
 
@@ -64,5 +64,6 @@ This skill owns the Flow side of a review. Delegate the rest:
 | Need | Delegate to |
 |---|---|
 | Flow invokes an `@InvocableMethod` Apex action | `reviewing-apex` — load alongside to apply bulk safety, security, and testing rules to the action class |
+| Screen Flow embeds a custom LWC screen component, or an LWC launches this Flow | `reviewing-lwc` — load alongside to review the component side of the integration |
 | Author or edit the Flow under review | `generating-flow` |
 | Static analysis (Flow scanner, SFGE) over the reviewed Flow | `running-code-analyzer` |

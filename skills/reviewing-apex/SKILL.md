@@ -7,7 +7,7 @@ description: "Use when reviewing or auditing Apex code — a review pass over ex
 
 Invoke when reviewing or auditing Apex — as the end-of-build quality pass or on demand. These are the patterns that compile and pass a single-record test but fail at scale, under a non-admin profile, or after deployment. When in doubt, prefer the strict form even for "just a quick" request.
 
-**Cross-domain:** `@AuraEnabled` methods pair with `reviewing-lwc` — see Cross-Skill Integration below.
+**Cross-domain:** `@AuraEnabled` methods pair with `reviewing-lwc`, `@InvocableMethod` actions with `reviewing-flow` — see Cross-Skill Integration below.
 
 This skill complements `generating-apex` and `generating-apex-test` (which cover how to produce an artifact) by specifying the quality bar those artifacts must meet.
 
@@ -87,6 +87,7 @@ This skill owns the Apex side of a review. Delegate the rest:
 | Need | Delegate to |
 |---|---|
 | Class exposes `@AuraEnabled` methods to a component | `reviewing-lwc` — load alongside; this skill reviews the Apex contract, `reviewing-lwc` reviews the consumer |
+| Class exposes an `@InvocableMethod` action called by a Flow | `reviewing-flow` — load alongside to review the Flow that calls this action |
 | Author or refactor the Apex under review | `generating-apex` |
 | Author or fix the test class under review | `generating-apex-test` |
 | Static analysis (PMD, SFGE) over the reviewed code | `running-code-analyzer` |

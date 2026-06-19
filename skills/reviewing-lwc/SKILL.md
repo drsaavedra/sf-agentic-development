@@ -7,7 +7,7 @@ description: "Use when reviewing or auditing Lightning Web Components — a revi
 
 Invoke when reviewing or auditing LWC components — as the end-of-build quality pass or on demand. These are the patterns that work in a developer sandbox but fail in Lightning Web Security, Experience Cloud/LWR, or at scale.
 
-**Cross-domain:** an `@AuraEnabled` Apex controller pairs with `reviewing-apex` — see Cross-Skill Integration below.
+**Cross-domain:** an `@AuraEnabled` Apex controller pairs with `reviewing-apex`, a Flow screen component or embedded Flow with `reviewing-flow` — see Cross-Skill Integration below.
 
 This skill complements `generating-lwc-components` (which covers how to produce a component) by specifying the quality bar it must meet.
 
@@ -78,6 +78,7 @@ This skill owns the LWC side of a review. Delegate the rest:
 | Need | Delegate to |
 |---|---|
 | Component is backed by an `@AuraEnabled` Apex controller | `reviewing-apex` — load alongside; this skill reviews the consumer, `reviewing-apex` reviews the Apex contract |
+| Component targets `lightning__FlowScreen`, or launches/embeds a Flow (`lightning-flow`, `lightning/flowSupport`) | `reviewing-flow` — load alongside to review the Flow side of the integration |
 | Author or edit the component under review | `generating-lwc-components` |
 | Audit the component for SLDS compliance | `validating-slds` |
 | Static analysis (ESLint, RetireJS) over the reviewed code | `running-code-analyzer` |
