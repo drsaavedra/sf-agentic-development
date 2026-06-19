@@ -83,7 +83,7 @@ path reference forces the agent to rediscover context it can't see from your con
 | Field | What goes in it |
 |---|---|
 | Objective | The unit of work in plain language — what exists when this brief is done |
-| Spec reference | Path to the Technical Specification plus the sections that apply to this task |
+| Spec reference | Path to the design contract that applies to this task — for the `/sf-plan` pipeline, the story's `docs/contracts/<slug>.md` (with the work item `§N` within it); for other projects, the spec/HLD path plus sections |
 | Schema context | The data model the code touches, written out in the brief. The developer runs isolated — don't make it rediscover the schema. Gather it verified, not guessed: `sf sobject describe` and read-only queries against the org (the developer agent's "Org introspection & schema truth" rule) |
 | Test scenarios | The TDD requirements. The developer writes these as failing tests first, so they must be concrete enough to assert on |
 | Constraints | Project-specific rules from the spec or your conversation. Constraints live in the brief, never hardcoded in the agent |
@@ -220,7 +220,7 @@ trigger; briefing Apex for that burns a developer instance on config work.
 
 **Objective** — Maintain Account.Open_Case_Count__c as the count of the account's open Cases,
 updated on case insert, update (status change or reparent), delete, undelete.
-**Spec reference** — docs/tech-spec.md §4.2 "Account rollups"
+**Spec reference** — docs/contracts/account-rollups.md §1 "Open-case rollup"
 **Schema context** — Case.AccountId (lookup — no Roll-Up Summary possible on it, and flows
 can't trigger on undelete: hence Apex). Account.Open_Case_Count__c: Number(8,0), already
 deployed. Open = IsClosed = false.
@@ -306,7 +306,7 @@ integration contracts are fixed before anyone builds:
 
 **Objective** — Apex controller that loads a Datatable_Config__mdt record by developer name,
 builds one dynamic SOQL query from it, and returns the columns and rows for the datatable LWC.
-**Spec reference** — docs/tech-spec.md §6.1 "Configurable datatable"
+**Spec reference** — docs/contracts/configurable-datatable.md §1 "Configurable datatable"
 **Schema context** — Datatable_Config__mdt: Object_API_Name__c (Text), Columns__c (LongTextArea,
 JSON array of {fieldApiName, label, type}), Filter__c (Text, optional WHERE clause),
 Order_By__c (Text), Row_Limit__c (Number). Records Account_Table / Contact_Table /
@@ -334,7 +334,7 @@ half of a parallel dispatch is a first-class work item, not a footnote:
 
 **Objective** — Generic LWC that renders a lightning-datatable for any object, driven entirely
 by the Datatable_Config__mdt record named in its public config-name property.
-**Spec reference** — docs/tech-spec.md §6.1 "Configurable datatable"
+**Spec reference** — docs/contracts/configurable-datatable.md §1 "Configurable datatable"
 **Schema context** — none queried directly: every field this component shows arrives through
 the Apex contract below. Column JSON shape: {fieldApiName, label, type}.
 **Test scenarios**
@@ -435,7 +435,7 @@ architect appends a dated **APPROVED** design section, and the brief goes out:
 **Objective** — On shipping address change, set Address_Verification_Status__c = 'Pending'
 and enqueue AddressVerificationQueueable: one bulk POST to the validation API via the Named
 Credential, write back status + standardized address fields.
-**Spec reference** — docs/tech-spec.md §7.3 + the approved 2026-06-11 design review
+**Spec reference** — docs/contracts/address-verification.md §1 + the approved 2026-06-11 design review
 **Schema context** — Account standard Shipping* address fields. Address_Verification_Status__c:
 Picklist (Pending/Verified/Failed), deployed. Named Credential AddressValidationAPI deployed —
 endpoint callout:AddressValidationAPI/v1/verify (External Credential holds the key).
@@ -500,7 +500,7 @@ then authors the test scenarios with you and embeds everything in the brief:
 **Objective** — Distribute newly created Leads owned by the Sales queue evenly across the
 queue's active members: an invocable Apex action assigns owners round-robin; a record-triggered
 flow on Lead create filters and calls it.
-**Spec reference** — docs/tech-spec.md §3.6 "Lead routing"
+**Spec reference** — docs/contracts/lead-routing.md §1 "Lead routing"
 **Schema context** — Lead.OwnerId (polymorphic: queue or user). Queue Sales_Queue — resolve via
 [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'Sales_Queue']; members via
 GroupMember.UserOrGroupId (users only, skip nested groups). Round_Robin__c custom setting

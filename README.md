@@ -39,7 +39,7 @@ The design follows a few principles:
 | `reviewing-apex` | Governor limits, trigger design, security, architecture, async, error handling, testing |
 | `reviewing-lwc` | Component architecture, data sourcing, directives, async/events, performance, Jest |
 | `reviewing-flow` | Entry-condition discipline, loop/collection/Transform optimization, fault handling and Custom Error, async paths, recursion, hardcoded IDs, complexity, flow tests, naming |
-| `sf-plan` | Plan a feature → a verified, completeness-checked design contract at `docs/tech-spec.md`: grills decisions, makes the declarative-vs-code calls, verifies schema against the org |
+| `sf-plan` | Plan a feature → a verified, completeness-checked design contract (shared `docs/CONTEXT.md` + one `docs/contracts/<slug>.md` per user story): grills decisions, makes the declarative-vs-code calls, verifies schema against the org |
 | `sf-build` | Build & review against that contract: dispatches the config skills and the `salesforce-developer` agent per work item, then runs the `reviewing-*` battery as a gate — deploys stay human-gated |
 
 The apex/lwc/flow quality skills also bundle optional **domain reference packs** (B2B Commerce
@@ -71,8 +71,10 @@ For a *planned* feature — not an ad-hoc fix — two skills form a deliberate p
 - **`/sf-plan`** explores your code and org, then grills you to shared understanding (one prose
   question at a time, with recommended choices) — settling the overall solution shape before the
   per-capability declarative-vs-code calls — verifies the schema, and writes a completeness-checked
-  design contract to `docs/tech-spec.md`. Run it again when requirements change and it **revises the
-  existing spec in place**, grilling the change against the prior decisions instead of overwriting.
+  design contract: a shared `docs/CONTEXT.md` (objective, user-story index, work-item dispatch table)
+  plus one `docs/contracts/<slug>.md` per user story. Run it again when requirements change and it
+  **revises the existing spec in place**, grilling the change against the prior decisions instead of
+  overwriting.
 - **`/sf-build`** builds and reviews against that contract: it dispatches the config skills and the
   `salesforce-developer` agent per work item, then runs the `reviewing-*` battery as a gate.
   Deploys stay human-gated.
@@ -97,10 +99,11 @@ recommendation for each. This is where the human input it can't deduce comes in:
 - *"What happens to the losing Account — hard delete, or deactivate and link it to the survivor for audit?"*
 - *"Which child objects are in scope — Contacts, Opportunities, Cases, plus any custom children? And who may run a merge (it needs Delete on Account)?"*
 
-Once you've agreed, it writes `docs/tech-spec.md` — the LWC console, its Apex controller and the
-reparenting service (with the async path), the conflict-resolution rules, a permission set, and
-given/when/then scenarios for the bulk and conflict cases. Because the design carries async/bulk
-governor risk, the spec marks **Architect review: recommended** — the same gate that, in another
+Once you've agreed, it writes `docs/CONTEXT.md` (the objective, user-story index, and work-item
+dispatch table) and a `docs/contracts/<slug>.md` per story — the LWC console, its Apex controller
+and the reparenting service (with the async path), the conflict-resolution rules, a permission set,
+and given/when/then scenarios for the bulk and conflict cases. Because the design carries async/bulk
+governor risk, `docs/CONTEXT.md` marks **Architect review: recommended** — the same gate that, in another
 feature, caught a callout-per-record design before any Apex existed. You review the spec, then
 `/sf-build` builds and reviews against it.
 

@@ -18,7 +18,7 @@ baseline routes to them and adds only the cross-cutting deployment and git guard
 Follow these rules unless the user explicitly overrides them.
 
 > **Two entry paths.** For a planned feature, start with `/sf-plan` (it writes a design contract
-> to `docs/tech-spec.md`) and build it with `/sf-build`. The routing below governs everything else
+> to `docs/CONTEXT.md` + per-story `docs/contracts/<slug>.md`) and build it with `/sf-build`. The routing below governs everything else
 > — ad-hoc edits, fixes, reviews, audits, config, and ops.
 
 ---
