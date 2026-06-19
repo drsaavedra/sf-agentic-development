@@ -1,11 +1,11 @@
 ---
 name: reviewing-flow
-description: "Use when reviewing or auditing Salesforce Flows after generation, or when the task is explicitly a code review. Covers loop and collection optimization (Get Records in loop, Collection Filter/Sort, Transform, early exit), entry-condition discipline, Send Email limits, fault handling and Custom Error, DML-in-loop prevention, hardcoded ID elimination, recursion guards, async paths, complexity limits, flow tests, and naming conventions. Detailed rules live in references/ — read the file(s) matching the artifact's domains. If the Flow invokes Apex actions, also load reviewing-apex. TRIGGER when: reviewing or auditing Flows, after generating any *.flow-meta.xml file, or when the task is an explicit Flow review. DO NOT TRIGGER as the authoring skill — for creating or editing Flows use generating-flow, then chain this skill as the review pass."
+description: "Use when reviewing or auditing Salesforce Flows — a review pass over existing or freshly built Flows, run as a discrete step at the end of a build or on demand, not chained onto every edit. Covers loop and collection optimization (Get Records in loop, Collection Filter/Sort, Transform, early exit), entry-condition discipline, Send Email limits, fault handling and Custom Error, DML-in-loop prevention, hardcoded ID elimination, recursion guards, async paths, complexity limits, flow tests, and naming conventions. Detailed rules live in references/ — read the file(s) matching the artifact's domains. If the Flow invokes Apex actions, also load reviewing-apex. TRIGGER when: the task is to review or audit Flows, or to review a completed build before deploy. DO NOT TRIGGER as the authoring skill, and do not auto-fire after each generated file — for creating or editing Flows use generating-flow."
 ---
 
 # Salesforce Flow Quality
 
-Invoke after generating any `flow-meta.xml` file and when reviewing Flows. These are the patterns that work in a developer sandbox but fail in production with real data volumes, non-admin profiles, or after deployment to a different org.
+Invoke when reviewing or auditing Flows — as the end-of-build quality pass or on demand. These are the patterns that work in a developer sandbox but fail in production with real data volumes, non-admin profiles, or after deployment to a different org.
 
 **Cross-domain:** If this Flow calls an Apex action (`@InvocableMethod`), also load `reviewing-apex` to apply Apex bulk safety, security, and testing rules to that action class.
 

@@ -4,7 +4,7 @@ A developer productivity toolkit for **Claude Code**, **GitHub Copilot**, and **
 
 The **skills** are standalone Salesforce code reviewers encoding hard-won quality rules — bulk safety, security, architecture, anti-patterns. Point one at an existing codebase for a quality audit or performance sweep, or let it slot in automatically as a review pass over freshly generated code.
 
-The **agents** add on-demand specialisation: the `salesforce-developer` agent builds automation (Apex, LWC, Flows) in an isolated, parallelizable context, and the `architect` agent gives an independent technical review when you want one. Agents are deliberately thin — the domain knowledge lives in the shared skills; project-specific constraints (e.g. additive-only) are passed in the work brief, not hardcoded.
+The **agents** add on-demand specialisation: the `salesforce-developer` agent builds automation (Apex, LWC, Flows) in an isolated, parallelizable context, the `code-reviewer` agent runs the end-of-build code-quality review, and the `architect` agent gives an independent spec/scope review when you want one. Agents are deliberately thin — the domain knowledge lives in the shared skills; project-specific constraints (e.g. additive-only) are passed in the work brief, not hardcoded.
 
 ---
 
@@ -17,7 +17,6 @@ The **agents** add on-demand specialisation: the `salesforce-developer` agent bu
 | `reviewing-apex` | Governor limits, trigger design, security, architecture, async, error handling, testing |
 | `reviewing-lwc` | Component architecture, data sourcing, directives, async/events, performance, Jest |
 | `reviewing-flow` | Entry-condition discipline, loop/collection/Transform optimization, fault handling and Custom Error, async paths, recursion, hardcoded IDs, complexity, flow tests, naming |
-| `deploying-sf-metadata` | Deployment safety rules, `package.xml` / git-delta (sgd) generation, validate → quick-deploy, CI/CD patterns, and SFDMU data deployments |
 
 The apex/lwc/flow quality skills also bundle an optional **B2B Commerce** reference pack —
 see [Domain Specific skills](#domain-specific-skills).
@@ -30,13 +29,14 @@ pipeline end to end; see [Planning and building a feature](#planning-and-buildin
 | Agent | Role |
 |---|---|
 | `salesforce-developer` | Receives a brief from the main agent; builds all automation — Apex (via TDD), LWC, Flows — in an isolated, parallelizable context; quality rules and project constraints come from the skills and brief; produces a build summary |
-| `architect` | On-demand independent review — pre-implementation, post-implementation, or both; flags project-specific constraint violations (e.g. additive-only) only when the spec/brief/ADRs impose them; produces a gap-analysis report |
+| `code-reviewer` | On-demand end-of-build **code-quality** review — runs the matching `reviewing-*` skills plus the analyzer over the delivered Apex/LWC/Flows and reports defects by severity; reviews only, never builds |
+| `architect` | On-demand independent **spec/scope** review — pre-implementation, post-implementation, or both; flags project-specific constraint violations (e.g. additive-only) only when the spec/brief/ADRs impose them; produces a gap-analysis report |
 
 See [docs/ORCHESTRATION.md](docs/ORCHESTRATION.md) for the full workflow: the work-brief template, when to parallelize developer instances, and the review/fix loop.
 
 ### Baselines
 
-`CLAUDE.md`, `AGENTS.md`, and `.github/copilot-instructions.md` are rendered from `templates/baseline.md` — one source of truth for **skill routing** across all three assistants. The baseline does one job: route to the right `generating-*` / `reviewing-*` skill and chain them. Everything else — safety rules, quality gates, domain knowledge (including the B2B Commerce packs) — lives in the skills themselves.
+`CLAUDE.md`, `AGENTS.md`, and `.github/copilot-instructions.md` are rendered from `templates/baseline.md` — one source of truth for **skill routing** across all three assistants. The baseline does one job: let each `generating-*` / config skill self-trigger, and route review to the right `reviewing-*` skill as an end-of-build pass. Everything else — safety rules, quality gates, domain knowledge (including the B2B Commerce packs) — lives in the skills themselves.
 
 ---
 
@@ -53,11 +53,10 @@ inherited org as to a line you just wrote. No generation step required.
 | **Anti-pattern / performance sweep** — surface what's making automations slow and inefficient | `/reviewing-apex` can you scan the codebase and find anti-patterns that exist that make the automations slow and not efficient |
 | **LWC review** — component performance, wire/async patterns, Jest gaps | `/reviewing-lwc` audit the components under `force-app/**/lwc/` for performance, wire/async issues, and Jest gaps |
 | **Flow review** — loop/collection efficiency, fault paths, recursion | `/reviewing-flow` scan my flows for Get-Records-in-loop, missing fault paths, and recursion |
-| **Deployment / package.xml** — manifest and git-delta generation, validate/quick-deploy, CI/CD | `/deploying-sf-metadata` generate a package.xml from current commit HEAD to [commit hash or reference branch] |
 
-The skills *also* fire automatically as a review pass whenever a `generating-*` skill writes code —
-the authoring → review chain under [Skill Routing](#skill-routing) below — but standalone use needs
-no generation step.
+These review skills run as a **discrete pass** — on an explicit review request, or as the
+end-of-build gate (the `code-reviewer` agent) once a feature is built; see
+[Skill Routing](#skill-routing) below. They are not chained onto every generated file.
 
 ### Domain Specific skills
 
@@ -139,8 +138,8 @@ install the Salesforce base skills (`generating-apex`, `generating-lwc-component
 npx skills add forcedotcom/sf-skills
 ```
 
-Nothing else to configure: the baseline is skill routing only, and the `salesforce-developer` and
-`architect` agents ask for your spec/architecture paths when you dispatch them.
+Nothing else to configure: the baseline is skill routing only, and the `salesforce-developer`,
+`code-reviewer`, and `architect` agents ask for the paths they need when you dispatch them.
 
 <details>
 <summary><strong>Manual setup (no installer)</strong></summary>
@@ -173,18 +172,24 @@ Nothing else to configure: the baseline is skill routing only, and the `salesfor
 
 ## Skill Routing
 
-**Authoring chains into review:** whenever a `generating-*` skill writes code, the matching `reviewing-*` skill runs as a review pass over the result. The arrow rows below are that chain; cross-domain work (LWC + Apex controller, Flow + invocable Apex) loads both skills. Each skill also self-triggers from its `description` frontmatter on the relevant file types as a fallback.
+**Authoring self-triggers; review is a separate end-of-build pass.** Each `generating-*` and config skill activates from its own `description` on the relevant files — no routing rule needed. Review is **not** chained onto every edit: run the matching `reviewing-*` skill as a discrete pass at the end of a build (typically via the `code-reviewer` agent), on an explicit review request, or as a quality gate. Cross-domain work loads both skills, in the order shown.
 
-| Context | Skills — invoke in order |
+**Authoring**
+
+- Apex, LWC, Flows, and config metadata — the matching `generating-*` skill fires on its own trigger.
+- **TDD for Apex** — `generating-apex-test` (failing tests first) → `generating-apex` (minimum to pass).
+- Deployment / package.xml / validate / quick-deploy / CI-CD → `deploying-metadata`.
+
+**Review** — end-of-build pass, or on demand:
+
+| Artifact under review | Skill(s) |
 |---|---|
-| Apex classes / triggers / services | `generating-apex` → `reviewing-apex` |
-| Apex test classes | `generating-apex-test` → `reviewing-apex` |
-| LWC components | `generating-lwc-components` → `reviewing-lwc` |
-| Flows | `generating-flow` → `reviewing-flow` |
-| Review-only (no authoring) | `reviewing-apex` / `reviewing-lwc` / `reviewing-flow` |
-| LWC + Apex controller | `reviewing-lwc` · `reviewing-apex` |
-| Flow + Apex invocable | `reviewing-flow` · `reviewing-apex` |
-| Deployment / package.xml / CI-CD | `deploying-sf-metadata` · `deploying-metadata` |
+| Apex — classes / triggers / services / tests | `reviewing-apex` |
+| Apex exposing `@AuraEnabled` to LWC | `reviewing-apex` · `reviewing-lwc` |
+| LWC components | `reviewing-lwc` |
+| LWC backed by an Apex controller | `reviewing-lwc` · `reviewing-apex` |
+| Flows | `reviewing-flow` |
+| Flow calling an Apex invocable | `reviewing-flow` · `reviewing-apex` |
 
 B2B Commerce storefront rules ride inside the `reviewing-*` skills via their optional `references/commerce-b2b.md` pack — no separate routing step. See [Domain Specific skills](#domain-specific-skills).
 
@@ -194,7 +199,7 @@ Skills auto-activate once the relevant files (`.cls`, `.trigger`, `lwc/**`, `*.f
 
 > *"Proceed — and follow the skill routing in `CLAUDE.md`."* (or `AGENTS.md` / `.github/copilot-instructions.md`)
 
-This re-anchors the authoring→review **ordering** and **cross-domain pairing** that a per-file trigger can't. The `salesforce-developer` and `architect` agents carry the routing in their own files, so dispatched briefs need no reminder.
+This re-anchors the **cross-domain pairings** and the **end-of-build review** that a per-file trigger can't. The `salesforce-developer`, `code-reviewer`, and `architect` agents carry the routing in their own files, so dispatched briefs need no reminder.
 
 ---
 
@@ -212,17 +217,20 @@ sequenceDiagram
     participant U as User
     participant M as Main agent
     participant D as salesforce-developer
+    participant R as code-reviewer
     participant A as architect
     U->>M: Feature request
     M->>M: Plan config + author test scenarios (inline)
     M->>D: Work brief
     D->>D: TDD - tests, code, validate loop
     D-->>M: Build summary
-    M->>A: Build review (optional)
+    M->>R: End-of-build code review (optional)
+    R-->>M: Code review report - APPROVED or CHANGES REQUESTED
+    M->>A: Spec/scope review (optional)
     A-->>M: Review report - APPROVED or BLOCKED
-    M->>D: Fix brief from Recommended Actions (if BLOCKED)
+    M->>D: Fix brief from Recommended Actions (if a gate fails)
     D-->>M: Updated build summary
-    A-->>M: Re-review, new dated report section
+    R-->>M: Re-review, new dated report section
 ```
 
 > **What the gates actually catch:** asked to add Account address verification via a vendor API, the

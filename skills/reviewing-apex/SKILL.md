@@ -1,11 +1,11 @@
 ---
 name: reviewing-apex
-description: "Use when reviewing or auditing Apex code after generation, or when the task is explicitly a code review. Covers governor limits, trigger design, security, architecture, async patterns, error handling, and test quality. Detailed rules live in references/ — read the file(s) matching the artifact's domains. If the Apex includes @AuraEnabled methods, also load reviewing-lwc. TRIGGER when: reviewing or auditing Apex, immediately after generating any .cls or .trigger file (force-app/**/classes/*.cls, force-app/**/triggers/*.trigger), or when the task is an explicit Apex code review. DO NOT TRIGGER as the authoring skill — for writing or refactoring Apex use generating-apex or generating-apex-test, then chain this skill as the review pass."
+description: "Use when reviewing or auditing Apex code — a review pass over existing or freshly built Apex, run as a discrete step at the end of a build or on demand, not chained onto every edit. Covers governor limits, trigger design, security, architecture, async patterns, error handling, and test quality. Detailed rules live in references/ — read the file(s) matching the artifact's domains. If the Apex includes @AuraEnabled methods, also load reviewing-lwc. TRIGGER when: the task is to review or audit Apex (classes, triggers, services, or test classes), or to review a completed build before deploy. DO NOT TRIGGER as the authoring skill, and do not auto-fire after each generated file — for writing or refactoring Apex use generating-apex or generating-apex-test."
 ---
 
 # Salesforce Apex Quality
 
-Invoke after generating any `.cls` or `.trigger` file and when reviewing Apex. These are the patterns that compile and pass a single-record test but fail at scale, under a non-admin profile, or after deployment. When in doubt, prefer the strict form even for "just a quick" request.
+Invoke when reviewing or auditing Apex — as the end-of-build quality pass or on demand. These are the patterns that compile and pass a single-record test but fail at scale, under a non-admin profile, or after deployment. When in doubt, prefer the strict form even for "just a quick" request.
 
 **Cross-domain:** If this class exposes `@AuraEnabled` methods (`references/aura-enabled.md`), also load `reviewing-lwc`. This skill covers the Apex side of that contract; `reviewing-lwc` covers the LWC side.
 

@@ -66,7 +66,6 @@ test('discovery includes each skill SKILL.md body', () => {
     'skills/reviewing-apex/SKILL.md',
     'skills/reviewing-flow/SKILL.md',
     'skills/reviewing-lwc/SKILL.md',
-    'skills/deploying-sf-metadata/SKILL.md',
     'skills/sf-plan/SKILL.md',
     'skills/sf-build/SKILL.md',
   ]) {

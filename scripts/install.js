@@ -20,7 +20,7 @@ const target = process.cwd();
 const isTTY = Boolean(process.stdin.isTTY && process.stdout.isTTY);
 
 // Gitignore strategy: we ignore ONLY the specific skill and agent paths this run
-// installs (e.g. `.claude/skills/deploying-sf-metadata/`), never the whole assistant
+// installs (e.g. `.claude/skills/reviewing-apex/`), never the whole assistant
 // directory. That keeps the user's own files under `.claude/` (or `.github/`, `.agents/`)
 // tracked, and never touches what they already ignore — see gitignoreEntriesFor /
 // updateGitignore. The baseline file (CLAUDE.md / AGENTS.md / copilot-instructions.md) is
@@ -489,8 +489,8 @@ async function main() {
     console.log(
       '\nAgent notes: the installed baseline (' +
         assistant.baseline +
-        ') is skill routing only. The salesforce-developer and architect agents ask for your\n' +
-        'spec/architecture document paths at dispatch time — nothing to fill in up front.'
+        ') is skill routing only. The salesforce-developer, code-reviewer, and architect agents\n' +
+        'ask for the paths they need at dispatch time — nothing to fill in up front.'
     );
   } finally {
     ui.close();

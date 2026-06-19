@@ -1,11 +1,11 @@
 ---
 name: reviewing-lwc
-description: "Use when reviewing or auditing Lightning Web Components after generation, or when the task is explicitly a code review. Covers component architecture, LDS/Apex/GraphQL data sourcing, template directives, async/event patterns, performance, and Jest testing. Detailed rules live in references/ — read the file(s) matching the artifact's domains. If the component has an Apex controller, also load reviewing-apex. TRIGGER when: reviewing or auditing LWC, after generating files under lwc/**/*.js, .html, .css, .js-meta.xml (or aura/**), or when the task is an explicit LWC review. DO NOT TRIGGER as the authoring skill — for creating or editing LWC use generating-lwc-components, then chain this skill as the review pass."
+description: "Use when reviewing or auditing Lightning Web Components — a review pass over existing or freshly built components, run as a discrete step at the end of a build or on demand, not chained onto every edit. Covers component architecture, LDS/Apex/GraphQL data sourcing, template directives, async/event patterns, performance, and Jest testing. Detailed rules live in references/ — read the file(s) matching the artifact's domains. If the component has an Apex controller, also load reviewing-apex. TRIGGER when: the task is to review or audit LWC, or to review a completed build before deploy. DO NOT TRIGGER as the authoring skill, and do not auto-fire after each generated file — for creating or editing LWC use generating-lwc-components."
 ---
 
 # Salesforce LWC Quality
 
-Invoke after generating any `lwc/**` or `aura/**` file and when reviewing LWC components. These are the patterns that work in a developer sandbox but fail in Lightning Web Security, Experience Cloud/LWR, or at scale.
+Invoke when reviewing or auditing LWC components — as the end-of-build quality pass or on demand. These are the patterns that work in a developer sandbox but fail in Lightning Web Security, Experience Cloud/LWR, or at scale.
 
 **Cross-domain:** If this component has `@AuraEnabled` Apex methods backing it, also load `reviewing-apex`. That skill covers the Apex side of the contract (its `references/aura-enabled.md` covers `@AuraEnabled` rules); this skill covers the LWC consumer side.
 

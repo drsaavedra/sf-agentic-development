@@ -29,8 +29,8 @@ const lf = (s) => s.replace(/\r\n/g, '\n');
 
 const template = fs.readFileSync(templatePath, 'utf8');
 
-// The four review/deploy skills authored IN this repo — they must exist as skills/<name>/SKILL.md.
-const AUTHORED_SKILLS = ['reviewing-apex', 'reviewing-lwc', 'reviewing-flow', 'deploying-sf-metadata'];
+// The review skills authored IN this repo — they must exist as skills/<name>/SKILL.md.
+const AUTHORED_SKILLS = ['reviewing-apex', 'reviewing-lwc', 'reviewing-flow'];
 
 // Skills pulled from forcedotcom/sf-skills. Mirrors the routing table in templates/baseline.md —
 // keep in sync if the table changes. Used to prove the template references no typo'd skill name.

@@ -27,7 +27,7 @@ const commerceFile = commerce.files[0]; // 'commerce-b2b.md'
 const commerceMarker = '<!-- ' + commerce.marker + ' -->'; // '<!-- domain:commerce -->'
 
 // Skills that genuinely carry the commerce pack: a references/<file> AND a marked SKILL.md
-// row. Verified against the repo before relying on it (deploying-sf-metadata does NOT).
+// row. Verified against the repo before relying on it (sf-plan / sf-build do NOT).
 const CARRIER_SKILLS = ['reviewing-apex', 'reviewing-lwc', 'reviewing-flow'];
 
 // Copy a real skill dir into a fresh temp dir and hand both back. The caller owns

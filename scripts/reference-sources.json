@@ -55,17 +55,6 @@
       ],
       "_note": "Quick Reference summary of the reviewing-lwc packs; grounded against the same canonical pages."
     },
-    "skills/deploying-sf-metadata/SKILL.md": {
-      "basis": "salesforce-docs",
-      "lastValidated": "2026-06-18",
-      "sources": [
-        {
-          "url": "https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_project_commands_unified.htm",
-          "anchors": ["sf project deploy validate", "sf project deploy quick", "sf project deploy start", "test-level"]
-        }
-      ],
-      "_note": "Deployment commands grounded against the Salesforce CLI Command Reference. sfdx-git-delta (sgd) and SFDMU are community-maintained tools, not Salesforce docs — verify those against their own project docs."
-    },
     "skills/sf-build/SKILL.md": {
       "basis": "expertise",
       "_note": "Build-orchestration process skill — dispatch and review-gate sequencing. No platform-fact claims to ground."
