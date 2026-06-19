@@ -83,7 +83,7 @@ path reference forces the agent to rediscover context it can't see from your con
 | Field | What goes in it |
 |---|---|
 | Objective | The unit of work in plain language — what exists when this brief is done |
-| Spec reference | Path to the Technical Specification plus the sections that apply to this task |
+| Spec reference | Path to the design contract that applies to this task — for the `/sf-plan` pipeline, the story's `docs/contracts/<slug>.md` (with the work item `§N` within it); for other projects, the spec/HLD path plus sections |
 | Schema context | The data model the code touches, written out in the brief. The developer runs isolated — don't make it rediscover the schema. Gather it verified, not guessed: `sf sobject describe` and read-only queries against the org (the developer agent's "Org introspection & schema truth" rule) |
 | Test scenarios | The TDD requirements. The developer writes these as failing tests first, so they must be concrete enough to assert on |
 | Constraints | Project-specific rules from the spec or your conversation. Constraints live in the brief, never hardcoded in the agent |
@@ -133,31 +133,46 @@ Once dispatching, parallel or sequential:
 
 ## Checkpoint commits (opt-in)
 
-The git safety rule (never commit without an explicit request — see **Deployment & git safety** in
+The git safety rule (never commit without an explicit grant — see **Deployment & git safety** in
 the baseline, `CLAUDE.md` / `AGENTS.md` / `.github/copilot-instructions.md`) means a long
 multi-brief run normally accumulates everything in the working tree — if work item four goes
-sideways, there is no stable point to roll back to.
-**Checkpoint mode** trades a single explicit grant for rollback safety, the same shape as the
-TDD validate-loop exception (confirm once, then iterate automatically):
+sideways, there is no stable point to roll back to, and a handover has no commit to point at.
+**Checkpoint mode** trades a single explicit grant for rollback safety and a referenceable history,
+the same shape as the TDD validate-loop exception (confirm once, then iterate automatically):
 
-1. **Grant** — you enable it in the prompt for one task: *"checkpoint as you go"*, *"enable
-   checkpoint commits"*, or any equally explicit wording — exact phrases aren't required, and
-   you can narrow the grant (e.g. *"only checkpoint completed work items, not every validate"*).
-   What never activates it: plan approval alone, or the agent inferring it because the run is
-   long — the agent never turns checkpoint mode on by itself. The grant expires when the task
-   completes; the next task needs a fresh one.
-2. **Branch** — the main agent creates `checkpoint/<task-slug>` from the current HEAD and
-   commits only there; your original branch is never committed to. If the working tree is dirty
-   at grant time, the agent asks once whether to record a `checkpoint: baseline (pre-task
-   state)` commit first.
-3. **Stable points** — commits happen only at: a green validate, a completed work item (the
-   commit includes its build summary), or immediately before a risky/hard-to-undo step. Messages
-   follow `checkpoint: <work item> — <state>`. Only the main agent commits — developer and
-   architect agents never run git — and parallel dispatches checkpoint only at merge points, so
-   a commit never captures another instance's partial work.
-4. **Wrap-up** — at task end the agent reports the branch name and the checkpoint list. Rolling
-   back to a checkpoint, merging or squashing the branch into your branch, pushing, and deleting
-   the branch all remain explicit requests from you.
+1. **Grant** — enable it one of two explicit ways: (a) **at planning time**, by answering
+   `sf-plan`'s checkpoint question, which records `Checkpoint commits: enabled` in `docs/CONTEXT.md`
+   — `/sf-build` reads that flag and honors it with a one-time announcement; or (b) **in the prompt**
+   for one task: *"checkpoint as you go"*, *"enable checkpoint commits"*, or any equally explicit
+   wording (you can narrow it, e.g. *"only checkpoint completed work items, not every validate"*).
+   What never activates it: plan approval alone (approving the plan ≠ answering the checkpoint
+   question), or the agent inferring it because the run is long — the agent never turns checkpoint
+   mode on by itself. The grant is scoped to the task / the build of that spec; a new task or a spec
+   revision needs a fresh grant.
+2. **Branch** — depends on what the commit is for:
+   - **Durable review-gated milestones** (see *Stable points*) land on the **current working
+     branch** — they record work that passed review and are referenced by hash in handover, so they
+     belong in real history, not a throwaway branch.
+   - **Throwaway rollback checkpoints** (green validate, pre-risky-step) may instead go on a
+     dedicated `checkpoint/<task-slug>` branch created from HEAD, leaving your working branch clean.
+
+   If the working tree is dirty at grant time, the agent asks once whether to record a
+   `checkpoint: baseline (pre-task state)` commit first.
+3. **Stable points** — commits happen only at: **a review gate passed clean** (the `reviewing-*`
+   battery is clean for a work item or dependent chain, or the `architect` returned APPROVED), a
+   green validate, a completed work item (the commit includes its build summary), or immediately
+   before a risky/hard-to-undo step. Messages follow `checkpoint: <work item> — <state>` (e.g.
+   `checkpoint: account-rollups §1 open-case rollup — review passed`). Only the main agent commits —
+   developer, code-reviewer, and architect agents never run git — and parallel dispatches checkpoint
+   only at merge points, so a commit never captures another instance's partial work.
+4. **Record the hash for handover** — after a review-gated milestone commit, capture the short hash
+   (`git rev-parse --short HEAD`) and record it in the story's `docs/contracts/<slug>.md` **Build
+   log** and the **Commit** column of that row in the `docs/CONTEXT.md` dispatch table. The hash
+   isn't known until after the commit, so these doc edits ride along in the **next** milestone
+   commit, and a final **wrap-up commit** flushes the last row's notes — never `--amend`.
+5. **Wrap-up** — at task end the agent reports the branch and the checkpoint list (work item → short
+   hash). Rolling back to a checkpoint, merging or squashing into your branch, pushing, and deleting
+   any `checkpoint/<task-slug>` branch all remain explicit requests from you.
 
 The full rule lives in the baseline's **Deployment & git safety** section.
 
@@ -220,7 +235,7 @@ trigger; briefing Apex for that burns a developer instance on config work.
 
 **Objective** — Maintain Account.Open_Case_Count__c as the count of the account's open Cases,
 updated on case insert, update (status change or reparent), delete, undelete.
-**Spec reference** — docs/tech-spec.md §4.2 "Account rollups"
+**Spec reference** — docs/contracts/account-rollups.md §1 "Open-case rollup"
 **Schema context** — Case.AccountId (lookup — no Roll-Up Summary possible on it, and flows
 can't trigger on undelete: hence Apex). Account.Open_Case_Count__c: Number(8,0), already
 deployed. Open = IsClosed = false.
@@ -306,7 +321,7 @@ integration contracts are fixed before anyone builds:
 
 **Objective** — Apex controller that loads a Datatable_Config__mdt record by developer name,
 builds one dynamic SOQL query from it, and returns the columns and rows for the datatable LWC.
-**Spec reference** — docs/tech-spec.md §6.1 "Configurable datatable"
+**Spec reference** — docs/contracts/configurable-datatable.md §1 "Configurable datatable"
 **Schema context** — Datatable_Config__mdt: Object_API_Name__c (Text), Columns__c (LongTextArea,
 JSON array of {fieldApiName, label, type}), Filter__c (Text, optional WHERE clause),
 Order_By__c (Text), Row_Limit__c (Number). Records Account_Table / Contact_Table /
@@ -334,7 +349,7 @@ half of a parallel dispatch is a first-class work item, not a footnote:
 
 **Objective** — Generic LWC that renders a lightning-datatable for any object, driven entirely
 by the Datatable_Config__mdt record named in its public config-name property.
-**Spec reference** — docs/tech-spec.md §6.1 "Configurable datatable"
+**Spec reference** — docs/contracts/configurable-datatable.md §1 "Configurable datatable"
 **Schema context** — none queried directly: every field this component shows arrives through
 the Apex contract below. Column JSON shape: {fieldApiName, label, type}.
 **Test scenarios**
@@ -435,7 +450,7 @@ architect appends a dated **APPROVED** design section, and the brief goes out:
 **Objective** — On shipping address change, set Address_Verification_Status__c = 'Pending'
 and enqueue AddressVerificationQueueable: one bulk POST to the validation API via the Named
 Credential, write back status + standardized address fields.
-**Spec reference** — docs/tech-spec.md §7.3 + the approved 2026-06-11 design review
+**Spec reference** — docs/contracts/address-verification.md §1 + the approved 2026-06-11 design review
 **Schema context** — Account standard Shipping* address fields. Address_Verification_Status__c:
 Picklist (Pending/Verified/Failed), deployed. Named Credential AddressValidationAPI deployed —
 endpoint callout:AddressValidationAPI/v1/verify (External Credential holds the key).
@@ -500,7 +515,7 @@ then authors the test scenarios with you and embeds everything in the brief:
 **Objective** — Distribute newly created Leads owned by the Sales queue evenly across the
 queue's active members: an invocable Apex action assigns owners round-robin; a record-triggered
 flow on Lead create filters and calls it.
-**Spec reference** — docs/tech-spec.md §3.6 "Lead routing"
+**Spec reference** — docs/contracts/lead-routing.md §1 "Lead routing"
 **Schema context** — Lead.OwnerId (polymorphic: queue or user). Queue Sales_Queue — resolve via
 [SELECT Id FROM Group WHERE Type = 'Queue' AND DeveloperName = 'Sales_Queue']; members via
 GroupMember.UserOrGroupId (users only, skip nested groups). Round_Robin__c custom setting

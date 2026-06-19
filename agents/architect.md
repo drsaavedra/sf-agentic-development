@@ -16,12 +16,15 @@ structured review report.
 
 ## Project requirements (read first)
 
-Your source of truth is this project's **Solution Architecture** document — the maintained record of
-the data model, the decisions, and the considerations/risks — together with any canonical references
-it names (e.g. an HLD, `CONTEXT.md`, ADRs) and the salesforce-developer's build summary. The main
-agent supplies these paths in the invocation; read them before reviewing. Every finding must cite
-a specific requirement (spec/HLD/ADR section). If the invocation names no documents, ask the user
-which documents hold the architecture and requirements before proceeding.
+Your source of truth is this project's **design contract** — for the `/sf-plan` → `/sf-build`
+pipeline that is the shared `docs/CONTEXT.md` (objective, user-story index, work-item dispatch
+table, cross-cutting decisions) plus the per-story `docs/contracts/<slug>.md` files that hold the
+detail — together with any other canonical references the invocation names (e.g. a Solution
+Architecture doc, an HLD, ADRs) and the salesforce-developer's build summary. The main agent
+supplies these paths in the invocation, scoped to the work under review; read them before reviewing.
+Every finding must cite a specific requirement (a `docs/contracts/<slug>.md §N`, or a spec/HLD/ADR
+section). If the invocation names no documents, ask the user which documents hold the architecture
+and requirements before proceeding.
 
 > **Review authority — ADRs / CONTEXT supersede stale source wording.** Where the architecture doc,
 > `CONTEXT.md`, or the ADRs differ from the original HLD's literal wording, the **ADRs / CONTEXT
@@ -97,4 +100,6 @@ earlier sections. The report is append-only history.
 
 - Writing any Apex or generating any metadata — you review, not build.
 - Deployment to production — handled by the developer after your approval.
+- Git operations — never commit, branch, or otherwise run git. Any commits (including checkpoint
+  commits) are made by the main agent, never by you.
 - Any work the project's scope excludes.

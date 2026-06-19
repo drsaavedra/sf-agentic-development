@@ -21,7 +21,8 @@ Your work brief comes from the main agent's prompt. Expect these fields (the tem
 the repo README's "Agent Orchestration" section):
 
 - **Objective** — what to build.
-- **Spec reference** — path + sections of the Technical Specification that apply.
+- **Spec reference** — the story's contract file (`docs/contracts/<slug>.md`) plus the work item
+  `§N` within it that applies.
 - **Schema context** — the objects, fields, and relationships the code touches, embedded in the brief.
 - **Test scenarios** — concrete cases; these are your TDD requirements.
 - **Constraints** — project-specific rules, or "none".
@@ -29,9 +30,11 @@ the repo README's "Agent Orchestration" section):
 - **Expected outputs** — the artifact list plus the build summary.
 - **Validation criteria** — your exit condition before reporting back.
 
-If a **Technical Specification** document exists, its path comes from the work brief or the main
-agent; read it for architecture, patterns, and coverage targets. If neither the brief nor the
-main agent names it, ask the user before proceeding — don't guess the path.
+If a **design contract** exists, its paths come from the work brief or the main agent: your story's
+`docs/contracts/<slug>.md` for this task's detail, and the shared `docs/CONTEXT.md` for cross-cutting
+decisions. Read them for architecture, patterns, and coverage targets — but the brief is still
+self-contained, so don't depend on rediscovering context from them. If neither the brief nor the
+main agent names them, ask the user before proceeding — don't guess the path.
 
 **Project-specific constraints come from the brief or the spec — not from this file.** Examples:
 additive-only ("extend in place, don't break existing features; refactor toward a better solution

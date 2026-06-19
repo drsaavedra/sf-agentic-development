@@ -10,14 +10,15 @@ A two-skill pipeline for planned feature work:
 
 1. **`sf-plan`** — a Salesforce-native planning/brainstorming skill that interrogates the
    requirement, makes the declarative-vs-code decisions, verifies the schema, and writes a
-   completeness-checked design contract to `docs/tech-spec.md`.
+   completeness-checked design contract: a shared `docs/CONTEXT.md` (objective, user-story index,
+   work-item dispatch table) plus one `docs/contracts/<slug>.md` per user story.
 2. **`sf-build`** — an orchestrator that builds and reviews *against that spec* (dispatches
    `salesforce-developer` and `architect`, then runs the `reviewing-*` battery).
 
 `sf-plan` replaces reliance on the CLI agent's native **plan mode**. `sf-build` is
 model-invocable but gated by a tight TRIGGER / DO NOT TRIGGER description so it doesn't fire
-before the spec is reviewed. The two are joined by a file on disk (`docs/tech-spec.md`), not by
-conversation context.
+before the spec is reviewed. The two are joined by files on disk (`docs/CONTEXT.md` and the
+per-story `docs/contracts/*.md`), not by conversation context.
 
 ---
 
@@ -38,12 +39,13 @@ orchestrated build, for two reasons:
    chosen, `/sf-build` wakes with no memory of the plan it is supposed to execute.
 
 Both are symptoms of the same root causes: a *hard gate* plus *ephemeral context*. A planning
-skill fixes both — it runs in normal mode (context preserved) and **persists the plan to a file**
-(`docs/tech-spec.md`) instead of relying on the conversation. That persistence also feeds
-infrastructure we already have: `salesforce-developer` reads a **Technical Specification**; the
-**Agent → Spec Doc Map** reserves an input path for it; and the work briefs in
-[`docs/ORCHESTRATION.md`](ORCHESTRATION.md) reference spec sections as `docs/tech-spec.md §N`. So
-the plan's output is the input the agents were already built to consume.
+skill fixes both — it runs in normal mode (context preserved) and **persists the plan to files**
+(`docs/CONTEXT.md` plus the per-story `docs/contracts/*.md`) instead of relying on the conversation.
+That persistence also feeds infrastructure we already have: `salesforce-developer` reads a **design
+contract**; the **Agent → Spec Doc Map** reserves an input path for it; and the work briefs in
+[`docs/ORCHESTRATION.md`](ORCHESTRATION.md) reference the story contract as
+`docs/contracts/<slug>.md §N`. So the plan's output is the input the agents were already built to
+consume.
 
 ### A generic brainstormer is the wrong shape
 
@@ -80,32 +82,44 @@ contract.
 ## The resulting pipeline
 
 ```
-/sf-plan  →  docs/tech-spec.md  →  [spec reviewed]  →  [user signals "build it"]  →  dev agent ─┐
- (soft gate,    (the design          (dev/architect      (soft gate: description                → architect ─┤→ review battery
-  context kept,  contract)            review first)        TRIGGER rules + body                              │
-  no plan mode)                                            instruction)             reads spec ──────────────┘
+/sf-plan  →  docs/CONTEXT.md       →  [spec reviewed]  →  [user signals "build it"]  →  dev agent ─┐
+ (soft gate,    (+ docs/contracts/    (dev/architect      (soft gate: description                  → architect ─┤→ review battery
+  context kept,   <slug>.md per        review first)        TRIGGER rules + body                                │
+  no plan mode)   user story)                               instruction)             reads contract ────────────┘
 ```
 
-**Output contract.** `docs/tech-spec.md` is written with numbered sections and a **work-item
-table** so each row maps to a work brief (`docs/ORCHESTRATION.md` template fields: Objective,
-Spec reference `§N`, Schema context, Test scenarios, Constraints, Dependencies, Expected outputs,
-Validation criteria). The table tags each item **config vs code**:
+**Output contract.** The plan is written in **two tiers**:
+
+- `docs/CONTEXT.md` — the shared master: objective, a **user-story index**, and a **work-item
+  dispatch table** (columns `# | Story | Work item | Metadata type | Config or code | Depends on |
+  Commit`), plus the `Architect review` and `Checkpoint commits` flags and cross-cutting decisions.
+  That table *is* the `/sf-build` dispatch list and dependency graph; its `Commit` column is filled
+  by `/sf-build` with each work item's review-gated commit hash when checkpoint commits are enabled
+  (the per-story detail lands in that contract's Build log), giving a handover an at-a-glance map of
+  what passed and where.
+- `docs/contracts/<slug>.md` — one file per user story, holding that story's work-item detail
+  (Schema context, Test scenarios, Constraints, Expected outputs, Validation criteria) so each
+  maps to a work brief (`docs/ORCHESTRATION.md` template fields: Objective, Spec reference
+  `docs/contracts/<slug>.md §N`, Schema context, Test scenarios, Constraints, Dependencies,
+  Expected outputs, Validation criteria).
+
+The dispatch table tags each item **config vs code**:
 
 - **config rows** → main agent runs the `generating-*` config skills,
-- **code rows** → `/sf-build` cuts a work brief and dispatches `salesforce-developer`.
-
-That table *is* the `/sf-build` dispatch list.
+- **code rows** → `/sf-build` cuts a work brief from the row's contract file and dispatches
+  `salesforce-developer`.
 
 ### Spec review and hand-off
 
 The spec review is a **manual step between `/sf-plan` and `/sf-build`**, owned by the human — not
 automated inside either skill. The flow at the end of `/sf-plan`:
 
-1. `sf-plan` announces: *"Plan generated at `docs/tech-spec.md`."*
+1. `sf-plan` announces: *"Plan generated at `docs/CONTEXT.md`."*
 2. It prints a **high-level summary to the CLI** — objective, the config-vs-code work-item list,
    key design decisions, and risks — so the user can review without opening the file.
-3. If the summary leaves the user doubtful, that is the cue to open `docs/tech-spec.md` for the
-   full detail, and to have the developer/architect review the spec.
+3. If the summary leaves the user doubtful, that is the cue to open `docs/CONTEXT.md` (and the
+   relevant `docs/contracts/<slug>.md`) for the full detail, and to have the developer/architect
+   review the spec.
 4. Only then does the build proceed — the user signals to build (by typing `/sf-build` or asking
    in prose). `sf-plan` never chains into a build itself, and `sf-build`'s `DO NOT TRIGGER` rules
    keep it from auto-firing straight out of planning, so the review checkpoint holds.
@@ -134,7 +148,8 @@ because the build agent had no checkable signal to act on.
 
 This is not just a plan-mode replacement. README roadmap item #1 (the keystone) is *"Design
 contract + completeness gate — refuses to build an incomplete design."* `sf-plan`'s completeness
-self-review **is** that gate, and `docs/tech-spec.md` is the design contract. `/sf-build` then
+self-review **is** that gate, and `docs/CONTEXT.md` + the per-story `docs/contracts/*.md` are the
+design contract. `/sf-build` then
 builds against a contract already checked for completeness — which is what makes the autonomous
 direction safe to pursue.
 
@@ -144,7 +159,8 @@ direction safe to pursue.
 
 - Planning skill: **`sf-plan`** (pairs naturally with `/sf-build`).
 - Build skill: **`sf-build`**.
-- Spec output path: **`docs/tech-spec.md`**.
+- Spec output paths: **`docs/CONTEXT.md`** (shared index + work-item dispatch table) and
+  **`docs/contracts/<slug>.md`** (one per user story, holding the detail).
 - Questioning follows the **grill-me pattern**: explore the code/org first to build a candidate
   solution map, then confirm it one decision at a time **in prose** (not the picker tool), offering
   the deduced choices with a recommended answer, until shared understanding.
