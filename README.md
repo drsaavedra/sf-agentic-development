@@ -167,9 +167,10 @@ instruction files and skill/agent directories if you want them.
 
 ### After the installer
 
-Only needed if you declined the installer's offer (or it couldn't detect an existing install) —
-install the Salesforce base skills (`generating-apex`, `generating-lwc-components`,
-`deploying-metadata`, `querying-soql`, and more):
+The installer does not install these for you — it only detects them and prints a reminder if
+they're missing, leaving the install scope (project vs. user) your choice. Install the Salesforce
+base skills (`generating-apex`, `generating-lwc-components`, `deploying-metadata`, `querying-soql`,
+and more) yourself:
 
 ```bash
 npx skills add forcedotcom/sf-skills
