@@ -7,7 +7,7 @@ description: "Use when reviewing or auditing Lightning Web Components — a revi
 
 Invoke when reviewing or auditing LWC components — as the end-of-build quality pass or on demand. These are the patterns that work in a developer sandbox but fail in Lightning Web Security, Experience Cloud/LWR, or at scale.
 
-**Cross-domain:** If this component has `@AuraEnabled` Apex methods backing it, also load `reviewing-apex`. That skill covers the Apex side of the contract (its `references/aura-enabled.md` covers `@AuraEnabled` rules); this skill covers the LWC consumer side.
+**Cross-domain:** an `@AuraEnabled` Apex controller pairs with `reviewing-apex` — see Cross-Skill Integration below.
 
 This skill complements `generating-lwc-components` (which covers how to produce a component) by specifying the quality bar it must meet.
 
@@ -70,3 +70,14 @@ Load a reference file when either applies:
 | B2B Commerce storefront LWC — Storefront APIs, checkout adapters, product/search/quick-order, storefront caching & performance | `references/commerce-b2b.md` | <!-- domain:commerce -->
 
 A component usually spans several domains — read every file that applies before delivering the review.
+
+## Cross-Skill Integration
+
+This skill owns the LWC side of a review. Delegate the rest:
+
+| Need | Delegate to |
+|---|---|
+| Component is backed by an `@AuraEnabled` Apex controller | `reviewing-apex` — load alongside; this skill reviews the consumer, `reviewing-apex` reviews the Apex contract |
+| Author or edit the component under review | `generating-lwc-components` |
+| Audit the component for SLDS compliance | `validating-slds` |
+| Static analysis (ESLint, RetireJS) over the reviewed code | `running-code-analyzer` |

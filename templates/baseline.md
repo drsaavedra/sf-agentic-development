@@ -83,18 +83,17 @@ is the primary path, not the only one.
 ## Review Routing
 
 Review is a **discrete pass at the end of a build**, not a step chained onto every edit. Run the
-skill matching the artifact under review — when a `code-reviewer` agent is dispatched, on an
-explicit review/audit request, or as the quality gate once a feature is built. When an artifact
-spans two domains, load both, in the order shown.
+skill matching each artifact under review — when a `code-reviewer` agent is dispatched, on an
+explicit review/audit request, or as the quality gate once a feature is built. A changeset that
+spans domains loads each matching skill: an Apex class and an LWC fire both rows below on their own.
+Each `reviewing-*` skill names its cross-domain partner under its own **Cross-Skill Integration**
+(e.g. an LWC with an `@AuraEnabled` Apex controller pulls in `reviewing-apex` alongside).
 
-| Artifact under review | Skill(s) |
+| Artifact under review | Skill |
 |---|---|
 | Apex — classes, triggers, services, or test classes | {{skill:reviewing-apex}} |
-| Apex exposing `@AuraEnabled` methods to LWC | {{skill:reviewing-apex}} · {{skill:reviewing-lwc}} |
 | Lightning Web Components | {{skill:reviewing-lwc}} |
-| LWC backed by an Apex controller | {{skill:reviewing-lwc}} · {{skill:reviewing-apex}} |
 | Flows | {{skill:reviewing-flow}} |
-| Flow calling an Apex invocable action | {{skill:reviewing-flow}} · {{skill:reviewing-apex}} |
 
 For the deep code-quality gate after a build, dispatch the `code-reviewer` agent — it runs the
 table above plus {{skill:running-code-analyzer}} over the delivered artifacts and reports defects
