@@ -54,7 +54,7 @@ end to end; see [Planning and building a feature](#planning-and-building-a-featu
 |---|---|
 | `salesforce-developer` | Receives a brief from the main agent; builds all automation — Apex (via TDD), LWC, Flows — in an isolated, parallelizable context; quality rules and project constraints come from the skills and brief; produces a build summary |
 | `code-reviewer` | On-demand end-of-build **code-quality** review — runs the matching `reviewing-*` skills plus the analyzer over the delivered Apex/LWC/Flows and reports defects by severity; reviews only, never builds |
-| `architect` | On-demand independent **spec/scope** review — pre-implementation, post-implementation, or both; flags project-specific constraint violations (e.g. additive-only) only when the spec/brief/ADRs impose them; produces a gap-analysis report |
+| `architect` | On-demand independent **solution-design** review — a pre-code design gate plus a dependency-scoped whole-build inspection against the design contract (completeness, scope, design conformance), reading the code-reviewer's report for code quality rather than re-running it; flags project-specific constraint violations (e.g. additive-only) only when the spec/brief/ADRs impose them; produces a gap-analysis report |
 
 See [docs/ORCHESTRATION.md](docs/ORCHESTRATION.md) for the full workflow: the work-brief template, when to parallelize developer instances, and the review/fix loop.
 
@@ -272,7 +272,7 @@ sequenceDiagram
     D-->>M: Build summary
     M->>R: End-of-build code review (optional)
     R-->>M: Code review report - APPROVED or CHANGES REQUESTED
-    M->>A: Spec/scope review (optional)
+    M->>A: Design review / whole-build inspection (optional)
     A-->>M: Review report - APPROVED or BLOCKED
     M->>D: Fix brief from Recommended Actions (if a gate fails)
     D-->>M: Updated build summary

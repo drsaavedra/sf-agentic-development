@@ -27,7 +27,7 @@ sequenceDiagram
     D-->>M: Build summary
     M->>R: End-of-build code review (optional)
     R-->>M: Code review report - APPROVED or CHANGES REQUESTED
-    M->>A: Spec/scope review (optional)
+    M->>A: Design review / whole-build inspection (optional)
     A-->>M: Review report - APPROVED or BLOCKED
     M->>D: Fix brief from Recommended Actions (if a gate fails)
     D-->>M: Updated build summary
@@ -51,9 +51,12 @@ sequenceDiagram
 6. **Invoke a review gate when you want one** — two complementary, on-demand gates, never mandatory:
    - **`code-reviewer`** — the end-of-build **code-quality** pass: runs the matching `reviewing-*`
      skills plus the analyzer over the delivered artifacts and reports defects by severity.
-   - **`architect`** — the **spec/scope** gate: design review before coding, build review after, or
-     both; validates completeness and scope against the design contract.
-   Dispatch either, both, or neither — code quality and spec completeness are orthogonal checks.
+   - **`architect`** — the **solution-design** gate: a design review before code, and a whole-build
+     design-conformance inspection once a sprint's work is built and has passed the code-reviewer
+     gate — scoped to the dependency cluster of what changed. Validates completeness, scope, and
+     design conformance against the design contract; reads the code-reviewer's report for code
+     quality rather than re-running those skills.
+   Dispatch either, both, or neither — code quality and solution design are orthogonal checks.
 7. **Fix loop** — a failing review (**CHANGES REQUESTED** from `code-reviewer`, or **BLOCKED** from
    `architect`) goes back to `salesforce-developer` as a new brief built from the report's
    Recommended Actions; the same gate re-reviews after the fix and appends a new dated section to
@@ -260,8 +263,9 @@ until green, and appends to `docs/dev-build-summary.md`:
 > Scenarios: bulk insert, close/reopen, reparent, delete/undelete, orphan case.
 > Tests: 6/6 pass · coverage 94%.
 
-**The review** — you invoke `architect` for a build review. It reads the spec and the build
-summary, runs the code analyzer, and appends to `docs/sa-review-report.md`:
+**The review** — you invoke `architect` for a whole-build inspection. It reads the spec, the build
+summary, and the code-reviewer's report, and judges design conformance — appending to
+`docs/sa-review-report.md`:
 
 > ## Review — Open-case rollup (2026-06-12)
 > ### Review Status: BLOCKED
@@ -385,8 +389,9 @@ enough to be worth the dispatch). Each brief's **Dependencies** field carries th
 outputs from the build summaries: the LWC public API, its bundle path, and the config record
 names.
 
-**The review** — a build review across the suite. The architect reads the spec and the build
-summaries, runs the analyzer, and appends to `docs/sa-review-report.md`:
+**The review** — a whole-build inspection across the suite. The architect reads the spec, the build
+summaries, and the code-reviewer's report, and judges design conformance — appending to
+`docs/sa-review-report.md`:
 
 > ## Review — Configurable datatable suite (2026-06-11)
 > ### Review Status: BLOCKED
@@ -469,9 +474,10 @@ existing TriggerHandler base class
 **Validation criteria** — all scenarios green via validate deploy, ≥85% coverage, analyzer clean
 ```
 
-**Step 3 — build review (gate 2).** The developer builds via TDD and logs the build summary
+**Step 3 — whole-build inspection (gate 2).** The developer builds via TDD and logs the build summary
 (*"AddressVerificationQueueable — bulk verify with chaining + 3-attempt retry. Tests: 6/6 ·
-coverage 91%"*). The architect re-reads spec + summary, runs the analyzer, and appends:
+coverage 91%"*). The architect re-reads spec + summary + the code-reviewer's report, judges design
+conformance, and appends:
 
 > ## Review — Account address verification (build) (2026-06-12)
 > ### Review Status: APPROVED WITH MINOR ISSUES
@@ -566,7 +572,7 @@ The build summary entry:
 > condition and delegates — no logic in the flow beyond the action call and its fault path.
 > Tests: 7/7 Apex + flow test pass · coverage 95%.
 
-An architect build review is optional as always. The teaching point: **a Flow brief is a
+An architect whole-build inspection is optional as always. The teaching point: **a Flow brief is a
 developer dispatch like any other** — same brief template, same quality gates, just a different
 skill chain — and a Flow that calls Apex is a dependent chain even though the two artifacts are
 different types: one instance, sequenced, contract inside the brief.

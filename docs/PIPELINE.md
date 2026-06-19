@@ -13,7 +13,8 @@ A two-skill pipeline for planned feature work:
    completeness-checked design contract: a shared `docs/CONTEXT.md` (objective, user-story index,
    work-item dispatch table) plus one `docs/contracts/<slug>.md` per user story.
 2. **`sf-build`** — an orchestrator that builds and reviews *against that spec* (dispatches
-   `salesforce-developer` and `architect`, then runs the `reviewing-*` battery).
+   `salesforce-developer`, runs the `reviewing-*` battery as the `code-reviewer` gate, and dispatches
+   `architect` for the solution-design gate).
 
 `sf-plan` replaces reliance on the CLI agent's native **plan mode**. `sf-build` is
 model-invocable but gated by a tight TRIGGER / DO NOT TRIGGER description so it doesn't fire
@@ -130,10 +131,13 @@ There are two distinct architect touchpoints, and only the first is a free human
 
 - **Spec review** (pre-build) — a manual step the human may run between `/sf-plan` and `/sf-build`,
   as above.
-- **Build review** (inside `/sf-build`) — *not* a judgment call the build agent makes. `sf-plan`
-  records an **`Architect review: recommended | not needed`** flag in the spec, set from concrete
-  complexity signals: a new or changed data model, cross-object automation, callouts / async
-  (governor-limit risk), or a multi-domain / many-item build.
+- **Whole-build inspection** (inside `/sf-build`) — *not* a judgment call the build agent makes. Once
+  the sprint's work items pass the code-reviewer battery, the architect inspects the assembled build
+  against the design contract for **design conformance** — scoped to the dependency cluster of what
+  changed, and reading the code-reviewer's report rather than re-running it. `sf-plan` records an
+  **`Architect review: recommended | not needed`** flag in the spec, set from concrete complexity
+  signals: a new or changed data model, cross-object automation, callouts / async (governor-limit
+  risk), or a multi-domain / many-item build.
 
 `/sf-build` then invokes the `architect` agent only when one of three checkable conditions holds —
 the spec flag is `recommended`, the user asked for a review, or the review battery can't reach clean

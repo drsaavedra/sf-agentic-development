@@ -65,15 +65,22 @@ frontmatter flag, so it holds across every assistant.
    checkpoint commits are active**, a clean battery for the work item (or dependent chain) is a
    stable point: commit the produced/modified artifacts plus the build summary on the current branch
    and record the hash (see *Rules*).
-5. **Architect build review — only when triggered, never by your own judgment.** Invoke the
-   `architect` agent only if one of these holds; otherwise skip it and say so in the final report:
+5. **Architect whole-build inspection (end of sprint) — only when triggered, never by your own
+   judgment.** Once the sprint's work items are built and have passed the step-4 code-reviewer
+   battery, invoke the `architect` agent only if one of these holds; otherwise skip it and say so in
+   the final report:
    - the **spec flags** `Architect review: recommended`,
    - the **user asked** for an architect or design review (now or during planning),
    - the **review gate (step 4) can't reach clean** after a fix round — escalate to the architect
      to adjudicate.
-   A **BLOCKED** report re-briefs `salesforce-developer` with its Recommended Actions; re-review
-   afterward. **When checkpoint commits are active**, an **APPROVED** architect review is a stable
-   point: commit and record the hash like step 4.
+   The architect judges **design conformance against the design contract, not code quality** (that
+   was step 4) — it reads the code-reviewer's report rather than re-running the `reviewing-*`/analyzer
+   skills. Scope the inspection to the **dependency cluster of what changed**: the changed story plus
+   the stories it depends on or that depend on it (per the `Depends on` column), so the whole package
+   is verified to still work together; skip stories that already passed and have no dependency to the
+   changed work. A **BLOCKED** report re-briefs `salesforce-developer` with its Recommended Actions;
+   re-review afterward. **When checkpoint commits are active**, an **APPROVED** architect review is a
+   stable point: commit and record the hash like step 4.
 
 ## Rules
 
