@@ -1,6 +1,8 @@
 # sf-agentic-development
 
-A developer productivity toolkit for AI tools that can utilize skills and custom agents.
+Salesforce skills and agents for AI agents, with the platform's rules built in. Point them at any
+Apex, LWC, or Flow to catch what the platform punishes, or run the plan→build pipeline to ship a new
+feature the way Salesforce expects.
 
 ## Why this exists
 
@@ -40,8 +42,8 @@ The design follows a few principles:
 | `sf-plan` | Plan a feature → a verified, completeness-checked design contract at `docs/tech-spec.md`: grills decisions, makes the declarative-vs-code calls, verifies schema against the org |
 | `sf-build` | Build & review against that contract: dispatches the config skills and the `salesforce-developer` agent per work item, then runs the `reviewing-*` battery as a gate — deploys stay human-gated |
 
-The apex/lwc/flow quality skills also bundle an optional **B2B Commerce** reference pack —
-see [Domain Specific skills](#domain-specific-skills).
+The apex/lwc/flow quality skills also bundle optional **domain reference packs** (B2B Commerce
+today) — see [domain-specific reference packs](#domain-specific-reference-packs).
 
 `sf-plan` and `sf-build` are the two workflow skills — together they drive the plan→build pipeline
 end to end; see [Planning and building a feature](#planning-and-building-a-feature).
@@ -59,37 +61,6 @@ See [docs/ORCHESTRATION.md](docs/ORCHESTRATION.md) for the full workflow: the wo
 ### Agent Instruction File
 
 `CLAUDE.md` at your project root is the instruction file Claude Code reads on every session. It does one job: let each `generating-*` / config skill self-trigger, and route review to the right `reviewing-*` skill as an end-of-build pass. Everything else — safety rules, quality gates, domain knowledge (including the B2B Commerce packs) — lives in the skills themselves. (Copilot and Codex get equivalent instruction files — see [Setup](#setup).)
-
----
-
-## Using the review skills
-
-Invoke a `reviewing-*` skill **by name** and point it at code you already have. Each is a complete
-Salesforce reviewer — the same governor-limit, security, and architecture rules apply to an
-inherited org as to a line you just wrote. No generation step required.
-
-| Use it for | Example prompt |
-|---|---|
-| **Ad-hoc code review** — one class, a PR diff, a file you're about to change | `/reviewing-apex` review `OrderService.cls` for bulk safety and security |
-| **Codebase quality audit** — assess the overall health of an existing or inherited org; great for onboarding or scoping tech debt | `/reviewing-apex` can you scan the codebase and assess the quality of the existing codebase |
-| **Anti-pattern / performance sweep** — surface what's making automations slow and inefficient | `/reviewing-apex` can you scan the codebase and find anti-patterns that exist that make the automations slow and not efficient |
-| **LWC review** — component performance, wire/async patterns, Jest gaps | `/reviewing-lwc` audit the components under `force-app/**/lwc/` for performance, wire/async issues, and Jest gaps |
-| **Flow review** — loop/collection efficiency, fault paths, recursion | `/reviewing-flow` scan my flows for Get-Records-in-loop, missing fault paths, and recursion |
-
-These review skills run as a **discrete pass** — on an explicit review request, or as the
-end-of-build gate (the `code-reviewer` agent) once a feature is built; see
-[Skill Routing](#skill-routing) below. They are not chained onto every generated file.
-
-### Domain Specific skills
-
-There is no separate skill per domain. The Commerce Domain rules are folded into the three
-`reviewing-*` skills as optional `references/commerce-b2b.md` — Apex backend rules under
-`reviewing-apex`, storefront LWC under `reviewing-lwc`, Commerce-object automation under
-`reviewing-flow` — and ride each skill's own trigger when the artifact is a Commerce storefront
-artifact, no manual invoke.
-
-Include the pack via the installer's prompt, or keep/delete `references/commerce-b2b.md` manually.
-Declining it strips only those files; the base review rules are untouched.
 
 ---
 
@@ -142,6 +113,42 @@ vetted, not guessed.
 
 Full detail — the grilling pattern, the spec / work-item contract, why it replaces plan mode, and
 how it feeds the agents — is in **[docs/PIPELINE.md](docs/PIPELINE.md)**.
+
+---
+
+## Using the review skills
+
+Invoke a `reviewing-*` skill **by name** and point it at code you already have. Each is a complete
+Salesforce reviewer — the same governor-limit, security, and architecture rules apply to an
+inherited org as to a line you just wrote. No generation step required.
+
+| Use it for | Example prompt |
+|---|---|
+| **Ad-hoc code review** — one class, a PR diff, a file you're about to change | `/reviewing-apex` review `OrderService.cls` for bulk safety and security |
+| **Codebase quality audit** — assess the overall health of an existing or inherited org; great for onboarding or scoping tech debt | `/reviewing-apex` can you scan the codebase and assess the quality of the existing codebase |
+| **Anti-pattern / performance sweep** — surface what's making automations slow and inefficient | `/reviewing-apex` can you scan the codebase and find anti-patterns that exist that make the automations slow and not efficient |
+| **LWC review** — component performance, wire/async patterns, Jest gaps | `/reviewing-lwc` audit the components under `force-app/**/lwc/` for performance, wire/async issues, and Jest gaps |
+| **Flow review** — loop/collection efficiency, fault paths, recursion | `/reviewing-flow` scan my flows for Get-Records-in-loop, missing fault paths, and recursion |
+
+These review skills run as a **discrete pass** — on an explicit review request, or as the
+end-of-build gate (the `code-reviewer` agent) once a feature is built; see
+[Skill Routing](#skill-routing) below. They are not chained onto every generated file.
+
+### Domain-specific reference packs
+
+Some Salesforce work carries domain rules on top of the platform basics that a generic Apex, LWC, or
+Flow review wouldn't know to check. Rather than ship a separate skill per domain, the three
+`reviewing-*` skills carry that knowledge as **optional reference packs**: `references/<domain>.md`
+files that load only when the artifact under review belongs to that domain. There's no extra skill
+to invoke and no routing step; each pack rides its host skill's own trigger.
+
+| Domain | Reference pack | Carried by |
+|---|---|---|
+| B2B Commerce (storefront) | `references/commerce-b2b.md` | `reviewing-apex` (backend), `reviewing-lwc` (storefront LWC), `reviewing-flow` (Commerce-object automation) |
+
+B2B Commerce is the first such pack, and the only one today; more land here as their rules are vetted
+and stabilized. Include a pack via the installer's prompt, or keep/delete its `references/*.md` files
+manually — declining one strips only those files and leaves the base review rules untouched.
 
 ---
 
@@ -226,7 +233,7 @@ Nothing else to configure: the instruction file is skill routing only, and the `
 | LWC components | `reviewing-lwc` |
 | Flows | `reviewing-flow` |
 
-B2B Commerce storefront rules ride inside the `reviewing-*` skills via their optional `references/commerce-b2b.md` pack — no separate routing step. See [Domain Specific skills](#domain-specific-skills).
+Domain rules (B2B Commerce today) ride inside the `reviewing-*` skills via optional `references/*.md` packs — no separate routing step. See [domain-specific reference packs](#domain-specific-reference-packs).
 
 ### Making sure routing is followed
 
