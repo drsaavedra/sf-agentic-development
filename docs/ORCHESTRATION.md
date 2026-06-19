@@ -133,31 +133,46 @@ Once dispatching, parallel or sequential:
 
 ## Checkpoint commits (opt-in)
 
-The git safety rule (never commit without an explicit request — see **Deployment & git safety** in
+The git safety rule (never commit without an explicit grant — see **Deployment & git safety** in
 the baseline, `CLAUDE.md` / `AGENTS.md` / `.github/copilot-instructions.md`) means a long
 multi-brief run normally accumulates everything in the working tree — if work item four goes
-sideways, there is no stable point to roll back to.
-**Checkpoint mode** trades a single explicit grant for rollback safety, the same shape as the
-TDD validate-loop exception (confirm once, then iterate automatically):
+sideways, there is no stable point to roll back to, and a handover has no commit to point at.
+**Checkpoint mode** trades a single explicit grant for rollback safety and a referenceable history,
+the same shape as the TDD validate-loop exception (confirm once, then iterate automatically):
 
-1. **Grant** — you enable it in the prompt for one task: *"checkpoint as you go"*, *"enable
-   checkpoint commits"*, or any equally explicit wording — exact phrases aren't required, and
-   you can narrow the grant (e.g. *"only checkpoint completed work items, not every validate"*).
-   What never activates it: plan approval alone, or the agent inferring it because the run is
-   long — the agent never turns checkpoint mode on by itself. The grant expires when the task
-   completes; the next task needs a fresh one.
-2. **Branch** — the main agent creates `checkpoint/<task-slug>` from the current HEAD and
-   commits only there; your original branch is never committed to. If the working tree is dirty
-   at grant time, the agent asks once whether to record a `checkpoint: baseline (pre-task
-   state)` commit first.
-3. **Stable points** — commits happen only at: a green validate, a completed work item (the
-   commit includes its build summary), or immediately before a risky/hard-to-undo step. Messages
-   follow `checkpoint: <work item> — <state>`. Only the main agent commits — developer and
-   architect agents never run git — and parallel dispatches checkpoint only at merge points, so
-   a commit never captures another instance's partial work.
-4. **Wrap-up** — at task end the agent reports the branch name and the checkpoint list. Rolling
-   back to a checkpoint, merging or squashing the branch into your branch, pushing, and deleting
-   the branch all remain explicit requests from you.
+1. **Grant** — enable it one of two explicit ways: (a) **at planning time**, by answering
+   `sf-plan`'s checkpoint question, which records `Checkpoint commits: enabled` in `docs/CONTEXT.md`
+   — `/sf-build` reads that flag and honors it with a one-time announcement; or (b) **in the prompt**
+   for one task: *"checkpoint as you go"*, *"enable checkpoint commits"*, or any equally explicit
+   wording (you can narrow it, e.g. *"only checkpoint completed work items, not every validate"*).
+   What never activates it: plan approval alone (approving the plan ≠ answering the checkpoint
+   question), or the agent inferring it because the run is long — the agent never turns checkpoint
+   mode on by itself. The grant is scoped to the task / the build of that spec; a new task or a spec
+   revision needs a fresh grant.
+2. **Branch** — depends on what the commit is for:
+   - **Durable review-gated milestones** (see *Stable points*) land on the **current working
+     branch** — they record work that passed review and are referenced by hash in handover, so they
+     belong in real history, not a throwaway branch.
+   - **Throwaway rollback checkpoints** (green validate, pre-risky-step) may instead go on a
+     dedicated `checkpoint/<task-slug>` branch created from HEAD, leaving your working branch clean.
+
+   If the working tree is dirty at grant time, the agent asks once whether to record a
+   `checkpoint: baseline (pre-task state)` commit first.
+3. **Stable points** — commits happen only at: **a review gate passed clean** (the `reviewing-*`
+   battery is clean for a work item or dependent chain, or the `architect` returned APPROVED), a
+   green validate, a completed work item (the commit includes its build summary), or immediately
+   before a risky/hard-to-undo step. Messages follow `checkpoint: <work item> — <state>` (e.g.
+   `checkpoint: account-rollups §1 open-case rollup — review passed`). Only the main agent commits —
+   developer, code-reviewer, and architect agents never run git — and parallel dispatches checkpoint
+   only at merge points, so a commit never captures another instance's partial work.
+4. **Record the hash for handover** — after a review-gated milestone commit, capture the short hash
+   (`git rev-parse --short HEAD`) and record it in the story's `docs/contracts/<slug>.md` **Build
+   log** and the **Commit** column of that row in the `docs/CONTEXT.md` dispatch table. The hash
+   isn't known until after the commit, so these doc edits ride along in the **next** milestone
+   commit, and a final **wrap-up commit** flushes the last row's notes — never `--amend`.
+5. **Wrap-up** — at task end the agent reports the branch and the checkpoint list (work item → short
+   hash). Rolling back to a checkpoint, merging or squashing into your branch, pushing, and deleting
+   any `checkpoint/<task-slug>` branch all remain explicit requests from you.
 
 The full rule lives in the baseline's **Deployment & git safety** section.
 

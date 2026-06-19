@@ -20,9 +20,13 @@ frontmatter flag, so it holds across every assistant.
 
 - `docs/CONTEXT.md` exists and contains the work-item dispatch table. If it is missing or has no
   table, **stop** and tell the user to run `/sf-plan` first.
-- Read `docs/CONTEXT.md` — the dispatch table, dependency order, and `Architect review` flag — in
-  full before dispatching anything. Read each story's `docs/contracts/<slug>.md` for detail as you
-  reach its rows; you don't need every contract loaded up front.
+- Read `docs/CONTEXT.md` — the dispatch table, dependency order, `Architect review` flag, and
+  `Checkpoint commits` flag — in full before dispatching anything. Read each story's
+  `docs/contracts/<slug>.md` for detail as you reach its rows; you don't need every contract loaded
+  up front.
+- If `docs/CONTEXT.md` reads `Checkpoint commits: enabled` (or the user grants it in the prompt),
+  **announce once** — *"Checkpoint commits enabled — committing on the current branch at each passed
+  review gate."* — then follow the checkpoint rule below. Otherwise commit nothing.
 
 ## Orchestration (in order)
 
@@ -57,7 +61,10 @@ frontmatter flag, so it holds across every assistant.
    - `reviewing-apex` for `.cls` / `.trigger`,
    - `reviewing-lwc` for `lwc/**`,
    - `reviewing-flow` for `*.flow-meta.xml`.
-   Feed any findings back to `salesforce-developer` as a fix brief and re-review until clean.
+   Feed any findings back to `salesforce-developer` as a fix brief and re-review until clean. **When
+   checkpoint commits are active**, a clean battery for the work item (or dependent chain) is a
+   stable point: commit the produced/modified artifacts plus the build summary on the current branch
+   and record the hash (see *Rules*).
 5. **Architect build review — only when triggered, never by your own judgment.** Invoke the
    `architect` agent only if one of these holds; otherwise skip it and say so in the final report:
    - the **spec flags** `Architect review: recommended`,
@@ -65,15 +72,25 @@ frontmatter flag, so it holds across every assistant.
    - the **review gate (step 4) can't reach clean** after a fix round — escalate to the architect
      to adjudicate.
    A **BLOCKED** report re-briefs `salesforce-developer` with its Recommended Actions; re-review
-   afterward.
+   afterward. **When checkpoint commits are active**, an **APPROVED** architect review is a stable
+   point: commit and record the hash like step 4.
 
 ## Rules
 
 - **Deploys stay human-gated.** Validate is allowed — display the full command and confirm the
   first validate of a TDD loop (later iterations re-run automatically). **Never deploy** without
   explicit user approval.
-- **Never run git** (commit, push, branch, or any variant) unless the user explicitly asked in the
-  current request.
-- Track progress through **build summaries**, not raw diffs. Subagents never run git.
+- **Git is gated by an explicit grant.** Commit nothing unless checkpoint commits are granted — the
+  spec's `Checkpoint commits: enabled` flag, or an explicit in-prompt grant. *When granted*, the
+  passed-review-gate stable points above commit the work item's artifacts + build summary on the
+  **current working branch** (message `checkpoint: <story-slug> §N <work item> — review passed`),
+  then record the short hash (`git rev-parse --short HEAD`) in the story's `docs/contracts/<slug>.md`
+  **Build log** and the **Commit** column of its `docs/CONTEXT.md` row. The hash lands only after the
+  commit, so those doc edits ride along in the **next** milestone commit and a final **wrap-up
+  commit** flushes the last — never `--amend`. Only the main agent commits; **subagents never run
+  git**. Push, branch-merge/squash, and any other git stay explicit user requests. Full rule:
+  `docs/ORCHESTRATION.md` **Checkpoint commits**.
+- Track progress through **build summaries**, not raw diffs.
 - **Report at the end:** what was built, modified, or skipped as already-current (config + code),
-  the review-gate results, and any BLOCKED items still open.
+  the review-gate results, any BLOCKED items still open, and — if checkpoint commits ran — the
+  checkpoint list (work item → short hash).

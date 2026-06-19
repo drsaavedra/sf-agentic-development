@@ -100,4 +100,6 @@ earlier sections. The report is append-only history.
 
 - Writing any Apex or generating any metadata — you review, not build.
 - Deployment to production — handled by the developer after your approval.
+- Git operations — never commit, branch, or otherwise run git. Any commits (including checkpoint
+  commits) are made by the main agent, never by you.
 - Any work the project's scope excludes.

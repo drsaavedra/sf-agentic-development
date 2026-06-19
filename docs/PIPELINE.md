@@ -91,9 +91,12 @@ contract.
 **Output contract.** The plan is written in **two tiers**:
 
 - `docs/CONTEXT.md` — the shared master: objective, a **user-story index**, and a **work-item
-  dispatch table** (columns `# | Story | Work item | Metadata type | Config or code | Depends on`),
-  plus the `Architect review` flag and cross-cutting decisions. That table *is* the `/sf-build`
-  dispatch list and dependency graph.
+  dispatch table** (columns `# | Story | Work item | Metadata type | Config or code | Depends on |
+  Commit`), plus the `Architect review` and `Checkpoint commits` flags and cross-cutting decisions.
+  That table *is* the `/sf-build` dispatch list and dependency graph; its `Commit` column is filled
+  by `/sf-build` with each work item's review-gated commit hash when checkpoint commits are enabled
+  (the per-story detail lands in that contract's Build log), giving a handover an at-a-glance map of
+  what passed and where.
 - `docs/contracts/<slug>.md` — one file per user story, holding that story's work-item detail
   (Schema context, Test scenarios, Constraints, Expected outputs, Validation criteria) so each
   maps to a work brief (`docs/ORCHESTRATION.md` template fields: Objective, Spec reference

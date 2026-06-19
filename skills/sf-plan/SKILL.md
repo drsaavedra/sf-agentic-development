@@ -81,6 +81,11 @@ metadata) here. End by handing off to `/sf-build`.
    - announce: *"Plan generated at `docs/CONTEXT.md`."*
    - print a **high-level summary to the CLI**: objective, the config-vs-code work-item list, key
      design decisions, and risks — enough to review without opening the file.
+   - **ask once whether to enable checkpoint commits** for the build — *"Should `/sf-build`
+     checkpoint-commit each work item as it passes review (on the current branch), so progress is
+     captured and referenceable in a handover? Recommended for long or multi-item builds."* — and
+     record the answer as the `Checkpoint commits: enabled | disabled` line in `docs/CONTEXT.md`
+     (default *disabled* if declined).
    - tell the user: review the summary; open `docs/CONTEXT.md` (and the relevant
      `docs/contracts/<slug>.md`) for full detail if doubtful; have the developer/architect review
      the spec (a manual step); then run `/sf-build` to build.
@@ -104,18 +109,25 @@ contract files. It holds:
 - **Work-item dispatch table** — every work item across all stories. This is the `/sf-build`
   dispatch list and the global dependency graph:
 
-  | # | Story | Work item | Metadata type | Config or code | Depends on |
-  |---|---|---|---|---|---|
+  | # | Story | Work item | Metadata type | Config or code | Depends on | Commit |
+  |---|---|---|---|---|---|---|
 
   - **Config rows** → built with the matching `generating-*` config skill.
   - **Code rows** → built by `salesforce-developer` (Apex via TDD; LWC/Flow via the validate loop).
   - `Story` links to the `docs/contracts/<slug>.md` that holds the row's full detail; `Depends on`
     orders the build — a row builds only after the rows it lists, config or code.
+  - `Commit` — leave empty (`—`); `/sf-build` fills the short commit hash here when the row passes
+    review, but only if checkpoint commits are enabled (below).
 - **`Architect review: recommended | not needed`** — one line with a one-line reason, so `/sf-build`
   knows whether to invoke the `architect` agent without having to judge it itself. Recommend it when
   the design shows concrete complexity signals — a new or changed data model, cross-object
   automation, callouts / async (governor-limit risk), or a multi-domain or many-item build;
   otherwise mark it *not needed*.
+- **`Checkpoint commits: enabled | disabled`** — one line recording the user's answer to the
+  handoff checkpoint question (Phase 8). On `enabled`, `/sf-build` commits each work item on the
+  current branch as it passes review and fills the `Commit` column / contract Build log; on
+  `disabled` (the default) it commits nothing. This is the recorded grant — see
+  [`docs/ORCHESTRATION.md`](../../docs/ORCHESTRATION.md) **Checkpoint commits**.
 - **Decisions & assumptions (cross-cutting)** — material decisions that span stories, each with its
   reason; any decision the user deferred, resolved with the recommended option and marked
   **assumption**; and — in Revise mode — for any reversal of a prior decision, a short rationale
@@ -134,6 +146,9 @@ opening any other story**. Use the same kebab-case `<slug>` as the index entry. 
   (project-specific rules), **Expected outputs** (artifacts to produce), **Validation criteria**
   (exit conditions). Write each complete enough that `/sf-build` rediscovers nothing.
 - **Decisions & assumptions (story-specific)** — decisions local to this story, each with its reason.
+- **Build log** — leave a stub heading; `/sf-build` fills it (only when checkpoint commits are
+  enabled), one line per work item: `§N <work item> — <short hash> · review passed · <date>`. This
+  is the per-story handover record; the dispatch table's `Commit` column is its index.
 
 A work brief's **Spec reference** is the story's `docs/contracts/<slug>.md` (with optional in-file
 `§N` for a work item within it). These fields align with the work-brief template in
