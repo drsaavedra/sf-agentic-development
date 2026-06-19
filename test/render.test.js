@@ -29,8 +29,8 @@ const lf = (s) => s.replace(/\r\n/g, '\n');
 
 const template = fs.readFileSync(templatePath, 'utf8');
 
-// The four review/deploy skills authored IN this repo — they must exist as skills/<name>/SKILL.md.
-const AUTHORED_SKILLS = ['reviewing-apex', 'reviewing-lwc', 'reviewing-flow', 'deploying-sf-metadata'];
+// The review skills authored IN this repo — they must exist as skills/<name>/SKILL.md.
+const AUTHORED_SKILLS = ['reviewing-apex', 'reviewing-lwc', 'reviewing-flow'];
 
 // Skills pulled from forcedotcom/sf-skills. Mirrors the routing table in templates/baseline.md —
 // keep in sync if the table changes. Used to prove the template references no typo'd skill name.
@@ -43,6 +43,8 @@ const SF_SKILLS_ALLOWLIST = [
   'debugging-apex-logs',
   'generating-custom-object',
   'generating-custom-field',
+  'generating-custom-tab',
+  'generating-custom-application',
   'generating-permission-set',
   'generating-flexipage',
   'generating-validation-rule',
@@ -53,6 +55,8 @@ const SF_SKILLS_ALLOWLIST = [
   'building-sf-integrations',
   'running-code-analyzer',
   'generating-lightning-app',
+  'applying-slds',
+  'validating-slds',
 ];
 
 // --- drift: committed renders must match a fresh re-render --------------------------------------

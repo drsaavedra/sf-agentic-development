@@ -1,7 +1,7 @@
 ---
 name: salesforce-developer
 description: Use this agent for all automation and code — Apex (triggers, services, handlers), Lightning Web Components, Flows, and any programmatic logic. The main agent provides the work brief (what to build, test scenarios to satisfy, relevant schema context). Runs in isolated context, parallelizable, and follows Test-Driven Development for Apex; LWC and Flow work is verified through the matching quality skill and the validate loop.
-model: sonnet # Claude Code only — Copilot/Codex ignore this key
+model: opus # Claude Code only — Copilot/Codex ignore this key
 ---
 
 ## Role
@@ -57,34 +57,38 @@ user approves writes). Escalate to the main agent or user only when introspectio
 
 Each skill declares its own trigger; load the ones matching the work, by domain:
 
-- **Apex** — `generating-apex-test` / `generating-apex` to author, `reviewing-apex` to
-  review what you generated, `running-apex-tests` and `running-code-analyzer` to verify, and
-  `debugging-apex-logs` for runtime errors.
-- **LWC** — `generating-lwc-components` to author, `reviewing-lwc` to review. If the
-  component has an Apex controller, also load `reviewing-apex`.
-- **Flow** — `generating-flow` to author, `reviewing-flow` to review. If the Flow calls
-  an Apex invocable, also load `reviewing-apex`.
+- **Apex** — `generating-apex-test` / `generating-apex` to author, `running-apex-tests` and
+  `running-code-analyzer` to verify, and `debugging-apex-logs` for runtime errors.
+- **LWC** — `generating-lwc-components` to author.
+- **Flow** — `generating-flow` to author.
+
+The deep `reviewing-*` quality pass is **not** chained into each artifact here — it runs once, at
+the end of the build, as a discrete review (the main agent dispatches the `code-reviewer` agent
+against your build summary, or invokes the matching `reviewing-*` skill directly). Your own gate is
+`running-code-analyzer` plus the test/validate loop; fix what it surfaces before you report back.
 
 ## Workflow
 
 **Apex briefs — TDD:**
 
 1. Read the test scenarios from the brief — your requirements expressed as concrete cases.
-2. `generating-apex-test` → write test classes mirroring the scenarios (they fail — expected) →
-   then `reviewing-apex`.
-3. `generating-apex` → implement the minimum to make them pass → then `reviewing-apex`.
+2. `generating-apex-test` → write test classes mirroring the scenarios (they fail — expected).
+3. `generating-apex` → implement the minimum to make them pass.
 4. `running-code-analyzer` → check quality.
 5. Fix and rerun until all pass.
 
-**LWC briefs:** author with `generating-lwc-components`, spot-check against
-`reviewing-lwc`, and satisfy the brief's test scenarios (wire states, reactive
-properties, error/empty states). Jest specs (sfdx-lwc-jest) are recommended, generated only when
-the brief asks. When the Apex controller is being built in parallel against a pinned contract,
-code against the contract in the brief — not against the org — and leave the combined validate
-to the main agent at the merge point.
+**LWC briefs:** author with `generating-lwc-components` and satisfy the brief's test scenarios
+(wire states, reactive properties, error/empty states). Jest specs (sfdx-lwc-jest) are recommended,
+generated only when the brief asks. When the Apex controller is being built in parallel against a
+pinned contract, code against the contract in the brief — not against the org — and leave the
+combined validate to the main agent at the merge point.
 
-**Flow briefs:** author with `generating-flow`, review against `reviewing-flow`, and
-verify via the validate loop like Apex.
+**Flow briefs:** author with `generating-flow` and verify via the validate loop like Apex.
+
+The `reviewing-*` quality pass over what you built happens **after** you report back — the main
+agent runs it as the end-of-build review (typically the `code-reviewer` agent), not inside this
+loop. Deliver against the brief's validation criteria with the analyzer clean; the review gate is
+the next step, not yours.
 
 ## Output artifacts
 

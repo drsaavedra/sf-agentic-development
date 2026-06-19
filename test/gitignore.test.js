@@ -30,8 +30,8 @@ const baselineFiles = assistants.map((a) => a.baseline);
 // --- gitignoreEntriesFor: scoping ------------------------------------------------------
 
 test('ignores only the specific installed skill path, not the whole assistant dir', () => {
-  const entries = gitignoreEntriesFor(claude, ['deploying-sf-metadata'], []);
-  assert.deepEqual(entries, ['.claude/skills/deploying-sf-metadata/']);
+  const entries = gitignoreEntriesFor(claude, ['reviewing-apex'], []);
+  assert.deepEqual(entries, ['.claude/skills/reviewing-apex/']);
   // crucially NOT the broad directory
   assert.ok(!entries.includes('.claude/'));
   assert.ok(!entries.includes('.claude/skills/'));
@@ -81,10 +81,10 @@ test('installing nothing yields no entries', () => {
 // --- planGitignore: additive, idempotent, coverage-aware -------------------------------
 
 test('creates the block with a header when .gitignore is empty', () => {
-  const entries = gitignoreEntriesFor(claude, ['deploying-sf-metadata'], []);
+  const entries = gitignoreEntriesFor(claude, ['reviewing-apex'], []);
   const { content, added } = planGitignore('', entries);
   assert.deepEqual(added, entries);
-  assert.equal(content, GITIGNORE_HEADER + '\n.claude/skills/deploying-sf-metadata/\n');
+  assert.equal(content, GITIGNORE_HEADER + '\n.claude/skills/reviewing-apex/\n');
 });
 
 test('appends to an existing .gitignore without modifying prior lines', () => {
@@ -119,7 +119,7 @@ test('respects a broad dir the user already ignores (ancestor coverage)', () => 
   // user already ignores the whole .claude/ — we must not re-add anything beneath it
   const { added, content } = planGitignore(
     '.claude/\n',
-    gitignoreEntriesFor(claude, ['deploying-sf-metadata'], ['architect'])
+    gitignoreEntriesFor(claude, ['reviewing-apex'], ['architect'])
   );
   assert.deepEqual(added, []);
   assert.equal(content, '.claude/\n');
@@ -146,10 +146,10 @@ test('never duplicates within a single batch', () => {
 test('updateGitignore writes the scoped entries to a real .gitignore', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'sfad-gi-'));
   try {
-    const entries = gitignoreEntriesFor(claude, ['deploying-sf-metadata'], ['salesforce-developer']);
+    const entries = gitignoreEntriesFor(claude, ['reviewing-apex'], ['salesforce-developer']);
     updateGitignore(entries, dir);
     const gi = fs.readFileSync(path.join(dir, '.gitignore'), 'utf8');
-    assert.ok(gi.includes('.claude/skills/deploying-sf-metadata/'));
+    assert.ok(gi.includes('.claude/skills/reviewing-apex/'));
     assert.ok(gi.includes('.claude/agents/salesforce-developer.md'));
     assert.ok(!/^\.claude\/\s*$/m.test(gi), 'must not ignore the whole .claude/ dir');
     for (const b of baselineFiles) {

@@ -52,7 +52,6 @@ Create a todo per step.
   - `generating-apex` / `generating-apex-test` → `reviewing-apex`
   - `generating-lwc-components` → `reviewing-lwc`
   - `generating-flow` → `reviewing-flow`
-  - `deploying-metadata` → `deploying-sf-metadata`
 
   Flag each matching `reviewing-*` / authored pack whose upstream pair changed.
 - [ ] **4. Re-ground the flagged packs.** Run the `regrounding-references` skill on them: confirm the

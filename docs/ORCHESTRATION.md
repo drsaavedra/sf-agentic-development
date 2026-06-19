@@ -4,7 +4,7 @@
 > this is the full working guide — the lifecycle steps, the work-brief template, dispatch rules,
 > checkpoint commits, prompting guidance, and four worked examples.
 
-How the main agent and the two repo agents work together on a feature. The pattern is adapted
+How the main agent and the three repo agents work together on a feature. The pattern is adapted
 from [Agentic Project Management (APM)](https://github.com/sdi2200262/agentic-project-management):
 self-contained task briefs, progress tracked through summaries rather than raw code, and
 dependency-aware dispatch. Three APM mechanisms were deliberately **not** adopted — the file-based
@@ -18,17 +18,20 @@ sequenceDiagram
     participant U as User
     participant M as Main agent
     participant D as salesforce-developer
+    participant R as code-reviewer
     participant A as architect
     U->>M: Feature request
     M->>M: Plan config + author test scenarios (inline)
     M->>D: Work brief
     D->>D: TDD - tests, code, validate loop
     D-->>M: Build summary
-    M->>A: Build review (optional)
+    M->>R: End-of-build code review (optional)
+    R-->>M: Code review report - APPROVED or CHANGES REQUESTED
+    M->>A: Spec/scope review (optional)
     A-->>M: Review report - APPROVED or BLOCKED
-    M->>D: Fix brief from Recommended Actions (if BLOCKED)
+    M->>D: Fix brief from Recommended Actions (if a gate fails)
     D-->>M: Updated build summary
-    A-->>M: Re-review, new dated report section
+    R-->>M: Re-review, new dated report section
 ```
 
 ## The lifecycle
@@ -39,16 +42,22 @@ sequenceDiagram
 2. **Compose a work brief** — one brief per unit of dev work, using the template below.
 3. **Dispatch `salesforce-developer`** — one instance, or several in parallel (dispatch rules below).
 4. **Developer builds** — Apex via TDD (tests first, minimum implementation, validate-deploy
-   loop until green); LWC and Flow briefs through the matching quality pass and validate — then
-   writes the **build summary** (default `docs/dev-build-summary.md`).
+   loop until green); LWC and Flow briefs author and validate against their scenarios — then
+   writes the **build summary** (default `docs/dev-build-summary.md`). The `reviewing-*` quality
+   pass is **not** chained into this loop; it runs once, after the build, as a discrete gate (step 6).
 5. **Main agent reads the build summary, not the raw code** — the summary is the integration
    point: it tells the main agent what exists, which scenarios passed, and what the next brief can
    depend on.
-6. **Invoke `architect` when you want a gate** — design review before coding, build review after,
-   or both. On-demand, never mandatory.
-7. **Fix loop** — a **BLOCKED** review goes back to `salesforce-developer` as a new brief built
-   from the report's Recommended Actions; the architect re-reviews after the fix and appends a new
-   dated section to the report (the report is append-only history).
+6. **Invoke a review gate when you want one** — two complementary, on-demand gates, never mandatory:
+   - **`code-reviewer`** — the end-of-build **code-quality** pass: runs the matching `reviewing-*`
+     skills plus the analyzer over the delivered artifacts and reports defects by severity.
+   - **`architect`** — the **spec/scope** gate: design review before coding, build review after, or
+     both; validates completeness and scope against the design contract.
+   Dispatch either, both, or neither — code quality and spec completeness are orthogonal checks.
+7. **Fix loop** — a failing review (**CHANGES REQUESTED** from `code-reviewer`, or **BLOCKED** from
+   `architect`) goes back to `salesforce-developer` as a new brief built from the report's
+   Recommended Actions; the same gate re-reviews after the fix and appends a new dated section to
+   its report (the reports are append-only history).
 8. **You gate the irreversible steps** — validates and deploys are confirmed per the deployment
    skill's safety rules, and you can review any brief or report before the next agent acts on it.
 
@@ -105,8 +114,8 @@ everything that follows. That tension is the decision map:
 - **Dispatch to `salesforce-developer`** — work heavy enough to crowd the main conversation:
   independent or contract-pinned items that build in parallel, a multi-artifact chain with a
   long TDD/validate loop, or a build you want to keep planning around while it runs.
-- **Architect gates are orthogonal** — on-demand at any size; review cost scales with the
-  artifact, not the dispatch shape.
+- **Review gates are orthogonal** — both `code-reviewer` and `architect` are on-demand at any
+  size; review cost scales with the artifact, not the dispatch shape.
 
 Once dispatching, parallel or sequential:
 
@@ -124,9 +133,10 @@ Once dispatching, parallel or sequential:
 
 ## Checkpoint commits (opt-in)
 
-The git safety rule (never commit without an explicit request — see the `deploying-sf-metadata`
-skill) means a long multi-brief run normally accumulates everything in the working tree — if
-work item four goes sideways, there is no stable point to roll back to.
+The git safety rule (never commit without an explicit request — see **Deployment & git safety** in
+the baseline, `CLAUDE.md` / `AGENTS.md` / `.github/copilot-instructions.md`) means a long
+multi-brief run normally accumulates everything in the working tree — if work item four goes
+sideways, there is no stable point to roll back to.
 **Checkpoint mode** trades a single explicit grant for rollback safety, the same shape as the
 TDD validate-loop exception (confirm once, then iterate automatically):
 
@@ -149,7 +159,7 @@ TDD validate-loop exception (confirm once, then iterate automatically):
    back to a checkpoint, merging or squashing the branch into your branch, pushing, and deleting
    the branch all remain explicit requests from you.
 
-The full rule lives in the `deploying-sf-metadata` skill's Security and Deployment Safety section.
+The full rule lives in the baseline's **Deployment & git safety** section.
 
 ## Prompting a pattern
 
@@ -527,11 +537,12 @@ analyzer clean; reviewing-flow pass on the flow; flow test asserting a queue-own
 created lead ends user-owned
 ```
 
-**The build — one instance, two artifact types, two skill chains.** The developer runs the
-Apex chain first (`generating-apex-test` → `generating-apex` → `reviewing-apex`,
-validate loop until the invocable's scenarios are green), then the Flow chain
-(`generating-flow` → `reviewing-flow` — the routing table's "Flow + Apex invocable"
-pair loads both quality skills). Because the flow only fires on create and reassigns the lead
+**The build — one instance, two artifact types.** The developer runs the Apex work first
+(`generating-apex-test` → `generating-apex`, validate loop until the invocable's scenarios are
+green), then the Flow work (`generating-flow`, validate). The `reviewing-*` quality pass over both
+artifacts is the end-of-build gate (the `code-reviewer` agent, whose "Flow + Apex invocable" row
+loads both `reviewing-flow` and `reviewing-apex`), not a step inside the dev loop. Because the flow
+only fires on create and reassigns the lead
 to a user, the entry condition is also the recursion guard — a re-fired update never re-enters.
 The build summary entry:
 

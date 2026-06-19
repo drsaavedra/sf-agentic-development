@@ -12,9 +12,10 @@
 # Salesforce Project — GitHub Copilot Baseline
 
 Routing rules for GitHub Copilot working on Salesforce — Apex, LWC, Experience Cloud, B2B
-Commerce, metadata, and Salesforce CLI projects. This file does one job: fire the right skill at
-the right time. Each skill carries its own safety rules, quality gates, and domain knowledge, so
-this baseline only routes to them. Follow these rules unless the user explicitly overrides them.
+Commerce, metadata, and Salesforce CLI projects. Its main job is to fire the right skill at the
+right time. Each skill carries its own safety rules, quality gates, and domain knowledge, so this
+baseline routes to them and adds only the cross-cutting deployment and git guardrails below.
+Follow these rules unless the user explicitly overrides them.
 
 > **Two entry paths.** For a planned feature, start with `/sf-plan` (it writes a design contract
 > to `docs/tech-spec.md`) and build it with `/sf-build`. The routing below governs everything else
@@ -22,60 +23,83 @@ this baseline only routes to them. Follow these rules unless the user explicitly
 
 ---
 
-## Skill Routing
+## Authoring & Config Routing
 
-Use the appropriate skill **before** generating any artifact. Use the skill that best matches
-the active context.
+Match the active context to its skill and invoke it before building. This table is the fast routing
+index; each skill also self-triggers from its own `description` on the relevant files, so the table
+is the primary path, not the only one.
 
-> `generating-*` skills are for authoring — new files and edits including bug fixes.
-> `reviewing-*` skills are for review.
-
-**Always chain authoring → review.** Whenever a `generating-*` skill authors or edits code, chain
-the matching `reviewing-*` skill as a review pass over what you just produced — generation is not
-done until the review skill has run. The pairs:
-- `/skill generating-apex` / `/skill generating-apex-test` → `/skill reviewing-apex`
-- `/skill generating-lwc-components` → `/skill reviewing-lwc`
-- `/skill generating-flow` → `/skill reviewing-flow`
-
-For a review-only task (no authoring), invoke the `reviewing-*` skill on its own.
-
-| Context | Skill(s) — invoke in order |
+| Context | Skill |
 |---|---|
-| Writing, editing, refactoring, or fixing Apex classes, triggers, services | `/skill generating-apex` → then chain `/skill reviewing-apex` |
-| Writing or editing Apex test classes | `/skill generating-apex-test` → then chain `/skill reviewing-apex` |
-| Reviewing Apex classes, triggers, services, or test classes (review-only) | `/skill reviewing-apex` |
-| Reviewing Apex that includes `@AuraEnabled` methods | `/skill reviewing-apex` · `/skill reviewing-lwc` |
-| Running Apex tests / coverage | `/skill running-apex-tests` |
-| Debugging Apex logs | `/skill debugging-apex-logs` |
-| Creating / editing LWC components | `/skill generating-lwc-components` → then chain `/skill reviewing-lwc` |
-| Reviewing LWC components (review-only) | `/skill reviewing-lwc` |
-| Reviewing LWC component backed by an Apex controller | `/skill reviewing-lwc` · `/skill reviewing-apex` |
-| Creating or editing Flows | `/skill generating-flow` → then chain `/skill reviewing-flow` |
-| Reviewing Flows (review-only) | `/skill reviewing-flow` |
-| Reviewing Flow that calls an Apex invocable action | `/skill reviewing-flow` · `/skill reviewing-apex` |
-| Creating custom objects | `/skill generating-custom-object` |
-| Creating custom fields | `/skill generating-custom-field` |
-| Creating permission sets | `/skill generating-permission-set` |
-| Creating Lightning pages (FlexiPages) | `/skill generating-flexipage` |
-| Creating validation rules | `/skill generating-validation-rule` |
-| Creating list views | `/skill generating-list-view` |
-| Deploying metadata, generating a `package.xml` / manifest, building a git delta (sgd) from a commit or range, deploying reference data (SFDMU), CI/CD | `/skill deploying-sf-metadata` · `/skill deploying-metadata` |
-| Querying org data (SOQL) | `/skill querying-soql` |
-| Handling org data (import/export) | `/skill handling-sf-data` |
-| Named Credentials / External Services / callouts | `/skill building-sf-integrations` |
-| Running code analysis (PMD/CodeAnalyzer) | `/skill running-code-analyzer` |
-| Building a complete Lightning app | `/skill generating-lightning-app` |
+| Apex — write/edit/refactor a class, trigger, service, selector, batch/queueable/schedulable, invocable, `@AuraEnabled` controller, or `@RestResource` endpoint | `/skill generating-apex` |
+| Apex **test** classes — TestDataFactory, bulk (251+), coverage, test-fix loops | `/skill generating-apex-test` |
+| Lightning Web Components — create/edit a bundle, wire service, Jest specs | `/skill generating-lwc-components` |
+| Styling UI to SLDS — blueprints, styling hooks, utility classes, icons; modals, forms, data tables, theming, dark mode | `/skill applying-slds` |
+| Flows — screen, record-triggered (before/after-save), scheduled, autolaunched; "when a record is created/updated", automation | `/skill generating-flow` |
+| Custom objects | `/skill generating-custom-object` |
+| Custom fields — formula, roll-up summary, lookup, master-detail, picklist | `/skill generating-custom-field` |
+| Custom tabs — object tabs, web tabs, Visualforce/Lightning component & page tabs; navigation for a custom object | `/skill generating-custom-tab` |
+| Custom applications — tab-based apps, App Launcher navigation, branding, action overrides | `/skill generating-custom-application` |
+| Permission sets — object/field permissions, FLS, tab visibility | `/skill generating-permission-set` |
+| Lightning pages (FlexiPages) — record/app/home pages | `/skill generating-flexipage` |
+| Validation rules | `/skill generating-validation-rule` |
+| List views | `/skill generating-list-view` |
+| A complete multi-component Lightning app from a description | `/skill generating-lightning-app` |
+| Run Apex tests / check coverage / fix failing tests | `/skill running-apex-tests` |
+| Analyze debug logs, governor limits, stack traces | `/skill debugging-apex-logs` |
+| Write or optimize SOQL/SOSL queries | `/skill querying-soql` |
+| Bulk data import/export, seed or clean org records, test data | `/skill handling-sf-data` |
+| Named Credentials, External Services, REST/SOAP callouts, Platform Events, CDC | `/skill building-sf-integrations` |
+| Static analysis / code scan (PMD, ESLint, Flow, SFGE, RetireJS) | `/skill running-code-analyzer` |
+| Deploy metadata, generate a `package.xml` / manifest, validate / quick-deploy, or CI/CD | `/skill deploying-metadata` |
 
-**Test-Driven Development (skill sequencing)**
-- New Apex classes or logic changes: author or extend the test class first
-  (`/skill generating-apex-test`), then implement the minimum to make it pass
-  (`/skill generating-apex`). The red/green validate mechanics live in those skills.
-- LWC: after generating a component, spot-check it against `/skill reviewing-lwc`. A Jest spec
-  (sfdx-lwc-jest) is recommended, not required — generate one when the user asks.
-- Exceptions: metadata-only changes, trivial non-logic edits, and user-declared prototypes or
-  spikes.
+> **TDD for Apex** — author or extend the test class first (`/skill generating-apex-test`), then
+> implement the minimum to make it pass (`/skill generating-apex`). Exceptions: metadata-only
+> changes, trivial non-logic edits, and user-declared prototypes or spikes.
+>
+> **LWC ↔ SLDS bridge.** When building or restyling LWC UI, pair `/skill generating-lwc-components`
+> with `/skill applying-slds` (SLDS blueprints, styling hooks, utility classes, icons) — the LWC
+> skill covers SLDS conceptually but its own cross-skill delegation does **not** route to it. To
+> audit an existing component for SLDS compliance (scorecard / production-readiness check), use
+> `/skill validating-slds`.
 
-The authored skills in this repo — `/skill reviewing-apex`, `/skill reviewing-lwc`,
-`/skill reviewing-flow`, and `/skill deploying-sf-metadata` — install into `.github/skills/` at
-setup (see the README). All other skills above come from `forcedotcom/sf-skills`
+## Review Routing
+
+Review is a **discrete pass at the end of a build**, not a step chained onto every edit. Run the
+skill matching each artifact under review — when a `code-reviewer` agent is dispatched, on an
+explicit review/audit request, or as the quality gate once a feature is built. A changeset that
+spans domains loads each matching skill: an Apex class and an LWC fire both rows below on their own.
+Each `reviewing-*` skill names its cross-domain partner under its own **Cross-Skill Integration**
+(e.g. an LWC with an `@AuraEnabled` Apex controller pulls in `reviewing-apex` alongside).
+
+| Artifact under review | Skill |
+|---|---|
+| Apex — classes, triggers, services, or test classes | `/skill reviewing-apex` |
+| Lightning Web Components | `/skill reviewing-lwc` |
+| Flows | `/skill reviewing-flow` |
+
+For the deep code-quality gate after a build, dispatch the `code-reviewer` agent — it runs the
+table above plus `/skill running-code-analyzer` over the delivered artifacts and reports defects
+by severity. The `architect` agent is the separate governance gate (spec/scope completeness).
+
+The authored skills in this repo — `/skill reviewing-apex`, `/skill reviewing-lwc`, and
+`/skill reviewing-flow` — install into `.github/skills/` at setup (see the README). All other
+skills referenced above come from `forcedotcom/sf-skills`
 (install: `npx skills add forcedotcom/sf-skills`).
+
+## Deployment & git safety
+
+These guardrails are not optional and hold for every task, including work done by dispatched agents:
+
+- **Never run `git commit`, `git push`, or any variant** (amend, force-push, rebase, tag push)
+  unless the user explicitly asks for it in the current message — do not infer it from context or
+  plan approval. The one exception is **checkpoint mode**: an explicit per-task grant (e.g.
+  *"checkpoint as you go"*) under which the main agent commits at stable points on a dedicated
+  `checkpoint/<task-slug>` branch. Plan approval alone is not a grant, and the grant expires when
+  the task completes.
+- **Never deploy to a Salesforce org without explicit user approval.** Confirm the target org alias
+  and manifest path first, and if the deploy includes destructive members, show the affected
+  components and get explicit confirmation. You may run `sf project deploy validate` freely to
+  support test-driven development — only the actual deploy needs approval.
+- **No secrets.** Never put org credentials, session IDs, access tokens, or real customer data in
+  code, tests, logs, or generated files.

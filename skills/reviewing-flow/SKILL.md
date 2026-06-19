@@ -1,13 +1,13 @@
 ---
 name: reviewing-flow
-description: "Use when reviewing or auditing Salesforce Flows after generation, or when the task is explicitly a code review. Covers loop and collection optimization (Get Records in loop, Collection Filter/Sort, Transform, early exit), entry-condition discipline, Send Email limits, fault handling and Custom Error, DML-in-loop prevention, hardcoded ID elimination, recursion guards, async paths, complexity limits, flow tests, and naming conventions. Detailed rules live in references/ — read the file(s) matching the artifact's domains. If the Flow invokes Apex actions, also load reviewing-apex. TRIGGER when: reviewing or auditing Flows, after generating any *.flow-meta.xml file, or when the task is an explicit Flow review. DO NOT TRIGGER as the authoring skill — for creating or editing Flows use generating-flow, then chain this skill as the review pass."
+description: "Use when reviewing or auditing Salesforce Flows — a review pass over existing or freshly built Flows, run as a discrete step at the end of a build or on demand, not chained onto every edit. Covers loop and collection optimization (Get Records in loop, Collection Filter/Sort, Transform, early exit), entry-condition discipline, Send Email limits, fault handling and Custom Error, DML-in-loop prevention, hardcoded ID elimination, recursion guards, async paths, complexity limits, flow tests, and naming conventions. Detailed rules live in references/ — read the file(s) matching the artifact's domains. If the Flow invokes Apex actions, also load reviewing-apex. TRIGGER when: the task is to review or audit Flows, or to review a completed build before deploy. DO NOT TRIGGER as the authoring skill, and do not auto-fire after each generated file — for creating or editing Flows use generating-flow."
 ---
 
 # Salesforce Flow Quality
 
-Invoke after generating any `flow-meta.xml` file and when reviewing Flows. These are the patterns that work in a developer sandbox but fail in production with real data volumes, non-admin profiles, or after deployment to a different org.
+Invoke when reviewing or auditing Flows — as the end-of-build quality pass or on demand. These are the patterns that work in a developer sandbox but fail in production with real data volumes, non-admin profiles, or after deployment to a different org.
 
-**Cross-domain:** If this Flow calls an Apex action (`@InvocableMethod`), also load `reviewing-apex` to apply Apex bulk safety, security, and testing rules to that action class.
+**Cross-domain:** an `@InvocableMethod` Apex action pairs with `reviewing-apex`, an embedded LWC screen component with `reviewing-lwc` — see Cross-Skill Integration below.
 
 This skill complements `generating-flow` (which covers how to build a Flow) by specifying the quality bar it must meet.
 
@@ -56,3 +56,14 @@ Load a reference file when either applies:
 | B2B Commerce automation — buyer entitlement / effective-account / catalog / pricebook context, Commerce-object record-triggered flows, checkout-owned state | `references/commerce-b2b.md` | <!-- domain:commerce -->
 
 A flow usually spans several domains — read every file that applies before delivering the review.
+
+## Cross-Skill Integration
+
+This skill owns the Flow side of a review. Delegate the rest:
+
+| Need | Delegate to |
+|---|---|
+| Flow invokes an `@InvocableMethod` Apex action | `reviewing-apex` — load alongside to apply bulk safety, security, and testing rules to the action class |
+| Screen Flow embeds a custom LWC screen component, or an LWC launches this Flow | `reviewing-lwc` — load alongside to review the component side of the integration |
+| Author or edit the Flow under review | `generating-flow` |
+| Static analysis (Flow scanner, SFGE) over the reviewed Flow | `running-code-analyzer` |
