@@ -43,6 +43,8 @@ const SF_SKILLS_ALLOWLIST = [
   'debugging-apex-logs',
   'generating-custom-object',
   'generating-custom-field',
+  'generating-custom-tab',
+  'generating-custom-application',
   'generating-permission-set',
   'generating-flexipage',
   'generating-validation-rule',
@@ -53,6 +55,8 @@ const SF_SKILLS_ALLOWLIST = [
   'building-sf-integrations',
   'running-code-analyzer',
   'generating-lightning-app',
+  'applying-slds',
+  'validating-slds',
 ];
 
 // --- drift: committed renders must match a fresh re-render --------------------------------------

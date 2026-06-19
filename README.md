@@ -172,15 +172,17 @@ Nothing else to configure: the baseline is skill routing only, and the `salesfor
 
 ## Skill Routing
 
-**Authoring self-triggers; review is a separate end-of-build pass.** Each `generating-*` and config skill activates from its own `description` on the relevant files — no routing rule needed. Review is **not** chained onto every edit: run the matching `reviewing-*` skill as a discrete pass at the end of a build (typically via the `code-reviewer` agent), on an explicit review request, or as a quality gate. Cross-domain work loads both skills, in the order shown.
+The baseline carries two explicit context→skill routing tables — **Authoring & Config Routing** and **Review Routing** — so the main agent routes from a compact index in `CLAUDE.md` instead of relying on each skill's `description` being loaded. Each skill also self-triggers from its own `description` as a fallback. The full tables live in the baseline; the summary below is representative.
 
-**Authoring**
+**Authoring & Config** — match the context to its skill and invoke it before building:
 
-- Apex, LWC, Flows, and config metadata — the matching `generating-*` skill fires on its own trigger.
+- Apex / Apex tests → `generating-apex` / `generating-apex-test`; LWC → `generating-lwc-components`; Flows → `generating-flow`.
+- SLDS styling → `applying-slds` (pair it with `generating-lwc-components`, which doesn't delegate to it); SLDS compliance audit → `validating-slds`.
+- Declarative metadata → `generating-custom-object` / `-custom-field` / `-custom-tab` / `-custom-application` / `-permission-set` / `-flexipage` / `-validation-rule` / `-list-view`.
+- Ops → `running-apex-tests`, `debugging-apex-logs`, `querying-soql`, `handling-sf-data`, `building-sf-integrations`, `running-code-analyzer`, `deploying-metadata`.
 - **TDD for Apex** — `generating-apex-test` (failing tests first) → `generating-apex` (minimum to pass).
-- Deployment / package.xml / validate / quick-deploy / CI-CD → `deploying-metadata`.
 
-**Review** — end-of-build pass, or on demand:
+**Review** — a separate end-of-build pass (not chained onto every edit): run the matching `reviewing-*` skill at the end of a build (typically via the `code-reviewer` agent), on an explicit review request, or as a quality gate. Cross-domain work loads both skills, in the order shown:
 
 | Artifact under review | Skill(s) |
 |---|---|

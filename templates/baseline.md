@@ -40,25 +40,47 @@ Follow these rules unless the user explicitly overrides them.
 
 ---
 
-## Skill Routing
+## Authoring & Config Routing
 
-Every authoring and config skill self-triggers from its own `description` on the relevant files —
-{{ASSISTANT_NAME}} loads `generating-apex`, `generating-lwc-components`, `generating-flow`,
-`generating-custom-object`, and the rest without a routing rule here. This baseline adds only what
-a single skill's description can't carry on its own: the **review pass**, the cross-domain
-pairings, and a couple of sequencing rules.
+Match the active context to its skill and invoke it before building. This table is the fast routing
+index; each skill also self-triggers from its own `description` on the relevant files, so the table
+is the primary path, not the only one.
 
-### Authoring
+| Context | Skill |
+|---|---|
+| Apex — write/edit/refactor a class, trigger, service, selector, batch/queueable/schedulable, invocable, `@AuraEnabled` controller, or `@RestResource` endpoint | {{skill:generating-apex}} |
+| Apex **test** classes — TestDataFactory, bulk (251+), coverage, test-fix loops | {{skill:generating-apex-test}} |
+| Lightning Web Components — create/edit a bundle, wire service, Jest specs | {{skill:generating-lwc-components}} |
+| Styling UI to SLDS — blueprints, styling hooks, utility classes, icons; modals, forms, data tables, theming, dark mode | {{skill:applying-slds}} |
+| Flows — screen, record-triggered (before/after-save), scheduled, autolaunched; "when a record is created/updated", automation | {{skill:generating-flow}} |
+| Custom objects | {{skill:generating-custom-object}} |
+| Custom fields — formula, roll-up summary, lookup, master-detail, picklist | {{skill:generating-custom-field}} |
+| Custom tabs — object tabs, web tabs, Visualforce/Lightning component & page tabs; navigation for a custom object | {{skill:generating-custom-tab}} |
+| Custom applications — tab-based apps, App Launcher navigation, branding, action overrides | {{skill:generating-custom-application}} |
+| Permission sets — object/field permissions, FLS, tab visibility | {{skill:generating-permission-set}} |
+| Lightning pages (FlexiPages) — record/app/home pages | {{skill:generating-flexipage}} |
+| Validation rules | {{skill:generating-validation-rule}} |
+| List views | {{skill:generating-list-view}} |
+| A complete multi-component Lightning app from a description | {{skill:generating-lightning-app}} |
+| Run Apex tests / check coverage / fix failing tests | {{skill:running-apex-tests}} |
+| Analyze debug logs, governor limits, stack traces | {{skill:debugging-apex-logs}} |
+| Write or optimize SOQL/SOSL queries | {{skill:querying-soql}} |
+| Bulk data import/export, seed or clean org records, test data | {{skill:handling-sf-data}} |
+| Named Credentials, External Services, REST/SOAP callouts, Platform Events, CDC | {{skill:building-sf-integrations}} |
+| Static analysis / code scan (PMD, ESLint, Flow, SFGE, RetireJS) | {{skill:running-code-analyzer}} |
+| Deploy metadata, generate a `package.xml` / manifest, validate / quick-deploy, or CI/CD | {{skill:deploying-metadata}} |
 
-- Apex, LWC, Flows, and config metadata (objects, fields, permission sets, FlexiPages, validation
-  rules, list views): the matching `generating-*` skill activates on its own trigger — let it.
-- **TDD for Apex** — author or extend the test class first ({{skill:generating-apex-test}}), then
-  implement the minimum to make it pass ({{skill:generating-apex}}). Exceptions: metadata-only
-  changes, trivial non-logic edits, and user-declared prototypes or spikes.
-- **Deploying** metadata, generating a `package.xml` / manifest, validate / quick-deploy, or CI/CD
-  → {{skill:deploying-metadata}}.
+> **TDD for Apex** — author or extend the test class first ({{skill:generating-apex-test}}), then
+> implement the minimum to make it pass ({{skill:generating-apex}}). Exceptions: metadata-only
+> changes, trivial non-logic edits, and user-declared prototypes or spikes.
+>
+> **LWC ↔ SLDS bridge.** When building or restyling LWC UI, pair {{skill:generating-lwc-components}}
+> with {{skill:applying-slds}} (SLDS blueprints, styling hooks, utility classes, icons) — the LWC
+> skill covers SLDS conceptually but its own cross-skill delegation does **not** route to it. To
+> audit an existing component for SLDS compliance (scorecard / production-readiness check), use
+> {{skill:validating-slds}}.
 
-### Review
+## Review Routing
 
 Review is a **discrete pass at the end of a build**, not a step chained onto every edit. Run the
 skill matching the artifact under review — when a `code-reviewer` agent is dispatched, on an
