@@ -4,12 +4,27 @@ Salesforce skills and agents for AI agents, with the platform's rules built in. 
 Apex, LWC, or Flow to catch what the platform punishes, or run the plan→build pipeline to ship a new
 feature the way Salesforce expects.
 
+## Contents
+
+- [Why this exists](#why-this-exists)
+- [What's Inside](#whats-inside)
+- [Planning and building a feature](#planning-and-building-a-feature)
+- [Using the review skills](#using-the-review-skills)
+- [Setup](#setup)
+- [Skill Routing](#skill-routing)
+- [Agent Orchestration](#agent-orchestration)
+- [Roadmap](#roadmap)
+- [Recommended companion skills](#recommended-companion-skills)
+- [Maintaining](#maintaining)
+- [License](#license)
+
 ## Why this exists
 
 Generating Apex, LWC, and Flows is the easy part. Salesforce even ships
 **[skills](https://github.com/forcedotcom/sf-skills)** for it. The hard part is everything around
 it. Salesforce isn't traditional software development; it's metadata-driven, multitenant, and bound
-by hard platform limits a generator won't enforce for you.
+by hard platform limits a generator can only enforce on code it writes itself — not on the Apex Class you
+inherited or the Lightning Web Component someone built last year.
 
 This repo covers the hard part: **`reviewing-*` skills** that hold any code to the platform's rules (governor limits, bulk safety,
 FLS, trigger design), no matter who or what wrote it, plus **`sf-plan` / `sf-build`**, a plan→build
