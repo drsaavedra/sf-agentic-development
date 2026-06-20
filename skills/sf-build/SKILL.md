@@ -25,8 +25,12 @@ frontmatter flag, so it holds across every assistant.
   `docs/contracts/<slug>.md` for detail as you reach its rows; you don't need every contract loaded
   up front.
 - If `docs/CONTEXT.md` reads `Checkpoint commits: enabled` (or the user grants it in the prompt),
-  **announce once** — *"Checkpoint commits enabled — committing on the current branch at each passed
-  review gate."* — then follow the checkpoint rule below. Otherwise commit nothing.
+  first **confirm the project is a git repo** (`git rev-parse --is-inside-work-tree`) — checkpoint
+  commits need one. If it is, **announce once** — *"Checkpoint commits enabled — committing on the
+  current branch at each passed review gate."* — then follow the checkpoint rule below. If there is
+  **no repo**, don't let a raw git error surface mid-build: offer to initialize one (`git init`), and
+  if the user declines, **build without checkpoints** (commit nothing) and say so once. Otherwise
+  (checkpoints not granted) commit nothing.
 
 ## Orchestration (in order)
 
@@ -88,7 +92,10 @@ frontmatter flag, so it holds across every assistant.
   first validate of a TDD loop (later iterations re-run automatically). **Never deploy** without
   explicit user approval.
 - **Git is gated by an explicit grant.** Commit nothing unless checkpoint commits are granted — the
-  spec's `Checkpoint commits: enabled` flag, or an explicit in-prompt grant. *When granted*, the
+  spec's `Checkpoint commits: enabled` flag, or an explicit in-prompt grant. *When granted*, first
+  verify a git repo exists (`git rev-parse --is-inside-work-tree`); if none, offer `git init` or
+  build without checkpoints (per Preconditions) — never run a commit against a non-existent repo.
+  *When granted and a repo exists*, the
   passed-review-gate stable points above commit the work item's artifacts + build summary on the
   **current working branch** (message `checkpoint: <story-slug> §N <work item> — review passed`),
   then record the short hash (`git rev-parse --short HEAD`) in the story's `docs/contracts/<slug>.md`
