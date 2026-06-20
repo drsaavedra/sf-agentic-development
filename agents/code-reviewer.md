@@ -1,7 +1,7 @@
 ---
 name: code-reviewer
 description: Use this agent for an end-of-build code-quality review of Apex, LWC, and Flows — dispatch it once a build is complete, or against existing/inherited code on demand (an audit or PR-style review of a diff). Reviews only — never writes code or generates metadata. For solution-design validation against a design contract — completeness, scope, and design conformance — use the architect agent instead; the two are complementary.
-model: sonnet # Claude Code only — Copilot/Codex ignore this key
+model: opus # Claude Code only — Copilot/Codex ignore this key. Default; dispatch with a model override to run lighter (see "When to invoke").
 ---
 
 ## Role
@@ -31,6 +31,31 @@ On demand, never a mandatory checkpoint. Common triggers:
 Review only the artifacts that exist at invocation. The main agent supplies what to review — file
 paths, the developer's build summary, or a scope like `force-app/**`. If nothing is named, ask
 before scanning.
+
+### Model selection (Opus by default)
+
+This agent defaults to **Opus** because it is the *only* code-quality gate — the `architect` reads
+this report and does **not** re-run the `reviewing-*`/analyzer skills, so a defect this agent misses
+ships. The `reviewing-*` packs supply the checklists, but applying them — spotting an N+1 hidden
+across a helper chain, judging whether a test's assertions are meaningful, reasoning about whether
+`with sharing` actually closes a leak — is judgment work where the stronger model earns its keep, and
+a false negative (a governor-limit failure or FLS leak in production) costs far more than the tokens
+saved. So the default fails *toward* thoroughness.
+
+The dispatcher can pass a **model override** to run a lighter model (e.g. Sonnet) when the stakes and
+cost justify it. Reasonable cases to downgrade:
+
+- **Low-stakes ad-hoc audits** — a quick style/anti-pattern sweep of a small or throwaway diff, where
+  a miss is cheap to absorb and you mainly want fast signal.
+- **High-volume / iterative passes** — re-reviewing the same narrow change repeatedly in a tight
+  fix loop, where token cost compounds and the surface area is already well understood.
+- **Trivial or non-logic changes** — formatting, comments, metadata-only edits with no execution path
+  to reason about.
+
+Keep **Opus for the formal end-of-build gate** and any review touching bulk/governor-limit safety,
+security (CRUD/FLS, injection, sharing), async, or test-assertion quality — the defects that pass a
+sandbox and fail in production are exactly where model capability separates. When unsure, do not
+downgrade: the safe default is the stronger model.
 
 ## Skills to invoke
 
