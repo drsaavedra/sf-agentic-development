@@ -1,7 +1,7 @@
 ---
 name: sf-plan
 description: "Salesforce design and planning — produces a verified, completeness-checked design contract BEFORE any build: a shared docs/CONTEXT.md (objective, user-story index, work-item dispatch table) plus one docs/contracts/<slug>.md per user story. Use at the start of a feature, before creating custom objects/fields, Apex, LWC, or Flows. Asks clarifying questions, makes the declarative-vs-code decisions, verifies the schema against the org, and writes or revises the spec the /sf-build pipeline consumes. TRIGGER when: starting a new Salesforce feature or change, or revising an existing design when requirements change before a build. DO NOT TRIGGER when: a spec already exists and the task is to build (use /sf-build), or for a trivial one-line fix."
-allowed-tools: Read, Grep, Glob, Bash
+allowed-tools: Read, Grep, Glob, Bash, AskUserQuestion
 ---
 
 # Salesforce Planning (sf-plan)
@@ -15,13 +15,19 @@ metadata) here. End by handing off to `/sf-build`.
 
 - **Grill toward shared understanding — explore first, then offer choices.** Read the relevant
   code and schema *before* asking, so you can deduce the likely solution and the real decision
-  points rather than fish with open-ended questions. Ask **one question at a time, in prose**
-  (never the multiple-choice picker tool); when you have enough context to deduce the options,
-  present them as concrete choices with your **recommended answer and the reason**. Walk down each
-  branch of the decision tree, resolving dependencies one-by-one, until you and the user share the
-  same picture of the solution. **Grill only what changes a work item, its schema, or a
-  config-vs-code call** — don't ask preferences the spec doesn't depend on. Never ask what the code
-  or org can tell you — investigate instead.
+  points rather than fish with open-ended questions. Ask **one decision at a time** via the
+  **`AskUserQuestion` picker** — precede each with a **brief prose framing** line that states why the
+  fork matters (just enough to orient, not a wall of text), then offer the deduced choices in the
+  picker: **2–4 options**, the **recommended one first with `(Recommended)` appended to its label**,
+  and each option's `description` carrying the tradeoff/reason from the matching decision pack.
+  Collapse a pack with more rows than will fit to the 2–4 that actually fit this feature, and lean on
+  the auto-provided **"Other"** for anything outside that set. Use **`multiSelect: true`** when the
+  decision is naturally multi-valued (e.g. which fields need FLS, which child relationships to
+  reparent). Walk down each branch of the decision tree, resolving dependencies one-by-one across
+  subsequent picker calls as branches open and close, until you and the user share the same picture
+  of the solution. **Grill only what changes a work item, its schema, or a config-vs-code call** —
+  don't ask preferences the spec doesn't depend on. Never ask what the code or org can tell you —
+  investigate instead.
 - **Verify, never guess.** Confirm every object, field, and relationship API name against the repo
   (`force-app/**`) first, then the org — the org wins on divergence. Use read-only sf CLI freely:
   `sf sobject list`, `sf sobject describe --sobject <Name>`, `sf data query --query "..."`. Never
@@ -45,12 +51,15 @@ metadata) here. End by handing off to `/sf-build`.
    map** — what likely needs to change and the open decision points — *before* you ask anything.
    The map is what you grill against; it also surfaces what to reuse instead of duplicate.
 2. **Grill the map into shared understanding** — confirm the candidate solution one decision at a
-   time, in prose, offering the deduced choices and your recommendation for each. Resolve the
-   decision tree branch by branch — including purpose and success criteria — until nothing material
-   is ambiguous. Don't re-ask what you already confirmed from the code or org.
+   time, each as a **brief framing line + `AskUserQuestion` picker** (recommended option first,
+   tradeoffs in the option descriptions). Resolve the decision tree branch by branch — including
+   purpose and success criteria — until nothing material is ambiguous. Don't re-ask what you already
+   confirmed from the code or org.
 3. **Solution shape (only when there's a real architectural fork)** — when the requirement admits
-   genuinely different *whole-solution* architectures, present 2–3 shapes with their cross-cutting
-   Salesforce tradeoffs and recommend one, using the same grill discipline (options + reason). These
+   genuinely different *whole-solution* architectures, present 2–3 shapes as a **single-select
+   `AskUserQuestion` picker** (recommended shape first with `(Recommended)`, each shape's
+   cross-cutting Salesforce tradeoff in its `description`); use the picker's optional **`preview`**
+   field to sketch a shape side-by-side when a visual helps. These
    are architecture-level forks that span work items — e.g. extend a standard object vs introduce a
    new custom-object model; declarative orchestration (record-triggered Flow + invocable Apex) vs an
    Apex-trigger-owned domain; configure an existing feature/managed package vs build custom;
