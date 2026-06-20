@@ -44,6 +44,23 @@ Rule of thumb: app config that ships with the release → **CMT**; runtime org/u
 **hierarchy custom setting**; high-volume history → **Big Object** or tier off-platform via
 **External Objects**; everything users transact on → **custom object**.
 
+### Schema-aware CMT mappings (object/field references)
+
+When a CMT stores **object or field references** that admins configure — a field-mapping table, a
+per-object rule, a "copy this source field to that target field" config — model those references as
+**`MetadataRelationship`** fields, not text:
+
+- an **object** reference → `MetadataRelationship` with `referenceTo` **`EntityDefinition`**;
+- a **field** reference → `MetadataRelationship` with `referenceTo` **`FieldDefinition`**, and set
+  **`metadataRelationshipControllingField`** to the object field on the same CMT so the field picker
+  is scoped to the chosen object.
+
+Admins then pick objects and fields from the **live schema**, so **no API names are hardcoded as
+text** — text-stored API names rot silently on a rename and skip schema validation, while a
+`MetadataRelationship` is validated against the schema and travels package/upgrade-safe like any
+other CMT field. Add a validation rule for cross-field invariants (e.g. source field ≠ target
+field). Available since Spring '17.
+
 ## Design for large data volumes from the start (Well-Architected)
 
 You have **large data volumes** at roughly tens of thousands of users, tens of millions of records,

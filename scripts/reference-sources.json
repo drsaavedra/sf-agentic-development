@@ -375,7 +375,7 @@
     },
     "skills/sf-plan/references/data-model-decision.md": {
       "basis": "salesforce-docs",
-      "lastValidated": "2026-06-17",
+      "lastValidated": "2026-06-20",
       "sources": [
         {
           "url": "https://help.salesforce.com/s/articleView?id=platform.relationships_considerations.htm&type=5",
@@ -384,6 +384,14 @@
         {
           "url": "https://architect.salesforce.com/well-architected/trusted/reliable",
           "anchors": ["large data volume", "ownership skew", "data tier", "aggregation"]
+        },
+        {
+          "url": "https://help.salesforce.com/s/articleView?id=platform.custommetadatatypes_relationships.htm&type=5",
+          "anchors": ["Entity Definition", "Field Definition", "Metadata Relationship"]
+        },
+        {
+          "url": "https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/customfield.htm",
+          "anchors": ["MetadataRelationship", "metadataRelationshipControllingField", "referenceTo"]
         }
       ]
     },
