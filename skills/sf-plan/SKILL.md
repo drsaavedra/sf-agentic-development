@@ -87,14 +87,20 @@ metadata) here. End by handing off to `/sf-build`.
      ("you decide") is resolved by you with the recommended option and recorded as an explicit
      assumption, which counts as resolved.
 8. **Hand off** — do this exactly:
+   - **Settle checkpoint mode first — before the summary.** Detect whether the project folder is a
+     git repo (`git rev-parse --is-inside-work-tree`):
+     - **Git repo present** → **ask once whether to enable checkpoint commits** for the build, via
+       the `AskUserQuestion` picker (Enabled / Disabled, recommended *Enabled* for long or multi-item
+       builds): *"Should `/sf-build` checkpoint-commit each work item as it passes review (on the
+       current branch), so progress is captured and referenceable in a handover?"*
+     - **No git repo** → offer to initialize one via the picker (*Initialize git* / *Skip*). If the
+       user accepts, run `git init` in the project folder, then ask the checkpoint question above. If
+       the user declines, skip checkpoint entirely — it needs a repo — and move on.
+     - Record the outcome as the `Checkpoint commits: enabled | disabled` line in `docs/CONTEXT.md`
+       (default *disabled* when declined, or when there's no repo and the user skipped init).
    - announce: *"Plan generated at `docs/CONTEXT.md`."*
    - print a **high-level summary to the CLI**: objective, the config-vs-code work-item list, key
      design decisions, and risks — enough to review without opening the file.
-   - **ask once whether to enable checkpoint commits** for the build — *"Should `/sf-build`
-     checkpoint-commit each work item as it passes review (on the current branch), so progress is
-     captured and referenceable in a handover? Recommended for long or multi-item builds."* — and
-     record the answer as the `Checkpoint commits: enabled | disabled` line in `docs/CONTEXT.md`
-     (default *disabled* if declined).
    - tell the user: review the summary; open `docs/CONTEXT.md` (and the relevant
      `docs/contracts/<slug>.md`) for full detail if doubtful; have the developer/architect review
      the spec (a manual step); then run `/sf-build` to build.
