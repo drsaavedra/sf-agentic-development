@@ -40,6 +40,7 @@ Scan every artifact against this checklist.
 | LWC: raw error in UI | Normalize via `reduceErrors`-style util; shared error component |
 | LWC: custom form validation UI | `reportValidity()` / `setCustomValidity()` on base components |
 | LWC: stale UI after DML | `refreshApex` (wired Apex) / `notifyRecordUpdateAvailable` (LDS) / RefreshView API (cross-component) |
+| LWC: object arg into an untyped Apex `Object` / `Map<String,Object>` param | Match the Apex inbound type — send primitives / `Map<String,String>`; untyped `Object` params fail JSON deserialization and the arg arrives `null` |
 | LWC: bare `Event` / object in `detail` | `CustomEvent` with primitive payload; copy objects; pass record Id only |
 | LWC: `window.location` navigation | `NavigationMixin` from `lightning/navigation` |
 | LWC: LMS subscription leak | `unsubscribe(this._subscription)` in `disconnectedCallback` |
