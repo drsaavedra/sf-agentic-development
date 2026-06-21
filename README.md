@@ -266,7 +266,7 @@ This re-anchors the **cross-domain pairings** and the **end-of-build review** th
 
 ## Agent Orchestration
 
-How the main agent and the two repo agents work together on a feature. The pattern is adapted
+How the main agent and the three repo agents work together on a feature. The pattern is adapted
 from [Agentic Project Management (APM)](https://github.com/sdi2200262/agentic-project-management):
 self-contained task briefs, progress tracked through summaries rather than raw code, and
 dependency-aware dispatch.
