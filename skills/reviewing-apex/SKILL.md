@@ -36,6 +36,7 @@ Scan every artifact against this checklist.
 | Mixed automation on same object | One automation strategy per object |
 | No CRUD/FLS | `WITH USER_MODE` + `AccessLevel.USER_MODE` (the default at API v67+; check the class API version) |
 | `WITH SECURITY_ENFORCED` | Removed at API v67+ — migrate to `WITH USER_MODE` |
+| Untyped `Object` / `Map<String,Object>` / `List<Object>` as an `@AuraEnabled` **inbound** param or wrapper field | Concrete types (`Map<String,String>`, typed DTO) — JS→Apex JSON can't deserialize `Object` (arg arrives `null`); assemble rich shapes server-side |
 | State-changing callout from LWC | Initiate from trigger / Platform Event, not a direct `@AuraEnabled` call |
 | State-changing `@HttpGet` / page-load action | CSRF — GET handlers stay read-only; mutate via POST |
 | SOQL injection | Bind variables / `Database.queryWithBinds`; allowlist dynamic names |
