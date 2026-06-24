@@ -1,7 +1,7 @@
 ---
 name: code-reviewer
 description: Use this agent for an end-of-build code-quality review of Apex, LWC, and Flows — dispatch it once a build is complete, or against existing/inherited code on demand (an audit or PR-style review of a diff). Reviews only — never writes code or generates metadata. For solution-design validation against a design contract — completeness, scope, and design conformance — use the architect agent instead; the two are complementary.
-model: opus # Claude Code only — Copilot/Codex ignore this key. Default; dispatch with a model override to run lighter (see "When to invoke").
+model: opus # Default; dispatch with a model override to run lighter (see "When to invoke").
 ---
 
 ## Role

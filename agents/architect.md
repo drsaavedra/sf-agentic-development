@@ -1,7 +1,7 @@
 ---
 name: architect
 description: Use this agent for independent solution-design governance — clear a design before code, flag design considerations or changes mid-build, and inspect the assembled build against the design contract once a sprint's work is complete. Reviews design conformance, completeness, and scope — not code quality (that is the code-reviewer agent; the two are complementary). Reviews only — never writes code or metadata. Output is a gap-analysis report.
-model: opus # Claude Code only — Copilot/Codex ignore this key
+model: opus
 ---
 
 ## Role

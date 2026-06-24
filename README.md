@@ -75,7 +75,7 @@ See [docs/ORCHESTRATION.md](docs/ORCHESTRATION.md) for the full workflow: the wo
 
 ### Agent Instruction File
 
-`CLAUDE.md` at your project root is the instruction file Claude Code reads on every session. It does one job: let each `generating-*` / config skill self-trigger, and route review to the right `reviewing-*` skill as an end-of-build pass. Everything else — safety rules, quality gates, domain knowledge (including the B2B Commerce packs) — lives in the skills themselves. (Copilot and Codex get equivalent instruction files — see [Setup](#setup).)
+`CLAUDE.md` at your project root is the instruction file Claude Code reads on every session. It does one job: let each `generating-*` / config skill self-trigger, and route review to the right `reviewing-*` skill as an end-of-build pass. Everything else — safety rules, quality gates, domain knowledge (including the B2B Commerce packs) — lives in the skills themselves.
 
 ---
 
@@ -180,8 +180,8 @@ From the **root of your Salesforce project** (requires Node 18+):
 npx github:drsaavedra/sf-agentic-development
 ```
 
-The installer sets up Claude Code by default, and can also write the **GitHub Copilot** and **Codex**
-instruction files and skill/agent directories if you want them.
+The installer sets up Claude Code: it copies the skills and agents you pick into `.claude/` and
+injects the routing into your project's `CLAUDE.md` as a managed block.
 
 ### After the installer
 
@@ -200,25 +200,15 @@ Nothing else to configure: the instruction file is skill routing only, and the `
 <details>
 <summary><strong>Manual setup (no installer)</strong></summary>
 
-1. Copy the skills into the assistant-specific directory of your project:
+1. Copy the skills into your project:
    ```bash
-   cp -r skills/* .claude/skills/    # Claude Code (Copilot also reads this)
-   cp -r skills/* .github/skills/    # GitHub Copilot
-   cp -r skills/* .agents/skills/    # Codex
+   cp -r skills/* .claude/skills/
    ```
 2. Copy the agents:
    ```bash
-   cp -r agents/* .claude/agents/    # Claude Code
-   cp -r agents/* .github/agents/    # GitHub Copilot
-   cp -r agents/* .agents/agents/    # Codex
+   cp -r agents/* .claude/agents/
    ```
-3. Copy the matching instruction file into your project root:
-
-   | Assistant | File to copy |
-   |---|---|
-   | Claude Code | `CLAUDE.md` |
-   | GitHub Copilot | `.github/copilot-instructions.md` |
-   | Codex | `AGENTS.md` |
+3. Copy `CLAUDE.md` into your project root (or merge its contents into an existing `CLAUDE.md`).
 
 4. Continue with [After the installer](#after-the-installer) above.
 
@@ -348,8 +338,8 @@ alongside the Salesforce skills.
 
 ## Maintaining
 
-Maintaining this repo — re-rendering baselines, re-grounding the reference packs, bumping the
-sf-skills pin, and the repository layout — is documented in **[docs/MAINTAINING.md](docs/MAINTAINING.md)**.
+Maintaining this repo — editing `CLAUDE.md` and the skills, re-grounding the reference packs,
+bumping the sf-skills pin, and the repository layout — is documented in **[docs/MAINTAINING.md](docs/MAINTAINING.md)**.
 
 ## License
 

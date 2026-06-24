@@ -8,7 +8,7 @@ How the main agent and the three repo agents work together on a feature. The pat
 from [Agentic Project Management (APM)](https://github.com/sdi2200262/agentic-project-management):
 self-contained task briefs, progress tracked through summaries rather than raw code, and
 dependency-aware dispatch. Three APM mechanisms were deliberately **not** adopted — the file-based
-message bus and handoff procedures (Claude Code / Copilot / Codex subagents pass context natively
+message bus and handoff procedures (Claude Code subagents pass context natively
 via prompt and result), and the separate Planner agent (the main agent plans inline because it
 already holds your conversation context). Only the ideas are borrowed — none of APM's files are
 copied or derived (APM is licensed MPL-2.0; this toolkit is MIT).
@@ -137,7 +137,7 @@ Once dispatching, parallel or sequential:
 ## Checkpoint commits (opt-in)
 
 The git safety rule (never commit without an explicit grant — see **Deployment & git safety** in
-the baseline, `CLAUDE.md` / `AGENTS.md` / `.github/copilot-instructions.md`) means a long
+`CLAUDE.md`) means a long
 multi-brief run normally accumulates everything in the working tree — if work item four goes
 sideways, there is no stable point to roll back to, and a handover has no commit to point at.
 **Checkpoint mode** trades a single explicit grant for rollback safety and a referenceable history,
@@ -177,7 +177,7 @@ the same shape as the TDD validate-loop exception (confirm once, then iterate au
    hash). Rolling back to a checkpoint, merging or squashing into your branch, pushing, and deleting
    any `checkpoint/<task-slug>` branch all remain explicit requests from you.
 
-The full rule lives in the baseline's **Deployment & git safety** section.
+The full rule lives in `CLAUDE.md`'s **Deployment & git safety** section.
 
 ## Prompting a pattern
 
