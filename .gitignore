@@ -23,6 +23,7 @@ node_modules/
 # The installed sf-skills tree under .claude/skills/ stays ignored; only the named
 # maintainer-only skills for THIS repo are committed (not under the shipped skills/
 # tree, so the installer never offers them). Add a line per maintainer skill.
+# `.agents/` is a local third-party install location (kept ignored so it can't be committed).
 .agents/
 .claude/*
 !.claude/settings.json

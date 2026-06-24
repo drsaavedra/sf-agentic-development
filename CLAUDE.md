@@ -1,10 +1,7 @@
 <!--
-  SALESFORCE PROJECT TEMPLATE — Claude Code baseline
-  Rendered from: templates/baseline.md — DO NOT EDIT DIRECTLY.
-  Re-render with: node scripts/render-baselines.js
-  Companion files (same routing content, assistant-specific syntax):
-    AGENTS.md                        (Codex)
-    .github/copilot-instructions.md  (GitHub Copilot)
+  SALESFORCE PROJECT — Claude Code instruction file.
+  This file is hand-maintained — edit it directly. It is the canonical source the installer
+  injects into a project's CLAUDE.md as a managed block.
   Canonical skills:  skills/*/SKILL.md   (installed into .claude/skills/ at setup)
   Canonical agents:  agents/*.md         (installed into .claude/agents/ at setup)
 -->

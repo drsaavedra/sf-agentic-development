@@ -1,7 +1,7 @@
 ---
 name: salesforce-developer
 description: Use this agent for all automation and code — Apex (triggers, services, handlers), Lightning Web Components, Flows, and any programmatic logic. The main agent provides the work brief (what to build, test scenarios to satisfy, relevant schema context). Runs in isolated context, parallelizable, and follows Test-Driven Development for Apex; LWC and Flow work is verified through the matching quality skill and the validate loop.
-model: opus # Claude Code only — Copilot/Codex ignore this key
+model: opus # Claude Code only
 ---
 
 ## Role

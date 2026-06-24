@@ -1,12 +1,11 @@
 {
   "name": "sf-agentic-development",
   "version": "0.1.0",
-  "description": "Installer for the sf-agentic-development Salesforce skills, agents, and baselines",
+  "description": "Installer for the sf-agentic-development Salesforce skills and agents",
   "bin": {
     "sf-agentic-development": "scripts/install.js"
   },
   "scripts": {
-    "render": "node scripts/render-baselines.js",
     "validate:refs": "node scripts/validate-references.js",
     "test": "node --test"
   },

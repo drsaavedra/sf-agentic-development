@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Interactive installer for the sf-agentic-development skills, agents, and baselines.
+// Interactive installer for the sf-agentic-development skills and agents.
 // Zero dependencies. Run from the root of your Salesforce project:
 //   npx github:drsaavedra/sf-agentic-development
 // or, from a local clone:  node <clone>/scripts/install.js
@@ -18,38 +18,22 @@ const pkgRoot = path.join(__dirname, '..');
 const target = process.cwd();
 const isTTY = Boolean(process.stdin.isTTY && process.stdout.isTTY);
 
-// The installer writes skills and agents into the project's assistant directory and injects
-// the baseline (CLAUDE.md / AGENTS.md / copilot-instructions.md) as a managed block alongside
-// the user's own instructions. It deliberately does NOT touch `.gitignore` — whether to track
-// or ignore the installed files is the user's call to make.
-const assistants = [
-  {
-    name: 'Claude Code',
-    skillsDir: '.claude/skills',
-    agentsDir: '.claude/agents',
-    baseline: 'CLAUDE.md',
-  },
-  {
-    name: 'GitHub Copilot',
-    skillsDir: '.github/skills',
-    agentsDir: '.github/agents',
-    baseline: path.join('.github', 'copilot-instructions.md'),
-  },
-  {
-    name: 'Codex',
-    skillsDir: '.agents/skills',
-    agentsDir: '.agents/agents',
-    baseline: 'AGENTS.md',
-  },
-];
+// The installer writes skills and agents into the project's .claude/ directory and injects
+// CLAUDE.md as a managed block alongside the user's own instructions. It deliberately does NOT
+// touch `.gitignore` — whether to track or ignore the installed files is the user's call to make.
+const assistant = {
+  name: 'Claude Code',
+  skillsDir: '.claude/skills',
+  agentsDir: '.claude/agents',
+  baseline: 'CLAUDE.md',
+};
 
-// The baseline is injected into the target file (CLAUDE.md / AGENTS.md /
-// .github/copilot-instructions.md) as a marker-delimited managed block, so it can
-// coexist with any project instructions the user already keeps there.
+// CLAUDE.md is injected into the project's CLAUDE.md as a marker-delimited managed block,
+// so it can coexist with any project instructions the user already keeps there.
 const BASELINE_BEGIN = '<!-- BEGIN sf-agentic-development (managed block — do not edit) -->';
 const BASELINE_END = '<!-- END sf-agentic-development (managed block) -->';
 
-// Write the rendered baseline as a managed block. Idempotent on re-runs:
+// Write CLAUDE.md as a managed block. Idempotent on re-runs:
 //   - file absent                  → create it from the block alone
 //   - file exists, markers present → replace only the content between them (in place)
 //   - file exists, no markers      → append the block, preserving the user's content
@@ -294,21 +278,17 @@ function lineUI() {
 // folders with a SKILL.md, in the project's or the user's skills directory.
 // ---------------------------------------------------------------------------
 
-function skillInstalled(skillName, assistant) {
+function skillInstalled(skillName) {
   const home = os.homedir();
   const dirs = [
     path.join(target, assistant.skillsDir),
-    path.join(target, '.claude', 'skills'),
     path.join(home, '.claude', 'skills'),
-    path.join(home, '.agents', 'skills'),
-    path.join(home, '.codex', 'skills'),
-    path.join(home, '.github', 'skills'),
   ];
   return dirs.some((d) => fs.existsSync(path.join(d, skillName, 'SKILL.md')));
 }
 
-function sfSkillsInstalled(assistant) {
-  return skillInstalled('generating-apex', assistant);
+function sfSkillsInstalled() {
+  return skillInstalled('generating-apex');
 }
 
 // ---------------------------------------------------------------------------
@@ -335,10 +315,6 @@ async function main() {
     console.log('sf-agentic-development installer');
     console.log('Installing into: ' + target + '\n');
 
-    const assistant =
-      assistants[await ui.pickOne('Which assistant do you use?', assistants.map((a) => a.name))];
-
-    console.log('');
     const skills = await ui.pickMany('Which skills do you want to install?', skillNames);
     if (skills.length === 0) console.log('No skills selected — skipping skills.');
 
@@ -377,24 +353,23 @@ async function main() {
       console.log('installed agent  ' + path.join(assistant.agentsDir, name + '.md'));
     }
 
-    // Inject the baseline (CLAUDE.md / AGENTS.md / .github/copilot-instructions.md) as a
-    // marker-delimited managed block. The baseline is skill routing only — safety,
-    // conventions, and Commerce rules live in the skills — so it slots in alongside any
-    // project instructions the user already keeps in that file, and updates in place on
-    // re-runs rather than clobbering it or prompting to overwrite.
+    // Inject CLAUDE.md as a marker-delimited managed block. CLAUDE.md is skill routing only —
+    // safety, conventions, and Commerce rules live in the skills — so it slots in alongside any
+    // project instructions the user already keeps in that file, and updates in place on re-runs
+    // rather than clobbering it or prompting to overwrite.
     const baselineDest = path.join(target, assistant.baseline);
     const rendered = fs.readFileSync(path.join(pkgRoot, assistant.baseline), 'utf8');
     const action = writeBaseline(baselineDest, rendered);
     console.log(
       action === 'unchanged'
-        ? 'baseline up to date ' + assistant.baseline + ' (managed block)'
-        : action + ' baseline ' + assistant.baseline + ' (managed block)'
+        ? assistant.baseline + ' up to date (managed block)'
+        : action + ' ' + assistant.baseline + ' (managed block)'
     );
 
     // Dependency — sf-skills is the toolkit's one required base. We don't install it for the
     // user (that would be a user-global change as a side effect of a project install, and the
     // scope is theirs to choose); detect it and, if absent, point them at the one command to run.
-    const needSfSkills = !sfSkillsInstalled(assistant);
+    const needSfSkills = !sfSkillsInstalled();
 
     console.log('\nDone.' + (needSfSkills ? ' Remaining steps:' : ''));
     if (needSfSkills) {
@@ -402,9 +377,9 @@ async function main() {
       console.log('       npx skills add forcedotcom/sf-skills');
     }
     console.log(
-      '\nAgent notes: the installed baseline (' +
+      '\nAgent notes: the installed ' +
         assistant.baseline +
-        ') is skill routing only. The salesforce-developer, code-reviewer, and architect agents\n' +
+        ' is skill routing only. The salesforce-developer, code-reviewer, and architect agents\n' +
         'ask for the paths they need at dispatch time — nothing to fill in up front.'
     );
   } finally {
@@ -423,7 +398,7 @@ if (require.main === module) {
 }
 
 module.exports = {
-  assistants,
+  assistant,
   writeBaseline,
   applyDomainPacks,
   DOMAIN_PACKS,

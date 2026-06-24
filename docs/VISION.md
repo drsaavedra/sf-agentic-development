@@ -2,7 +2,7 @@
 
 > Status: **direction-setting** (living document). Started 2026-06-14.
 > This describes where the toolkit is going, not everything it does today. Where this doc and the
-> current `README.md` / baseline `CLAUDE.md` disagree, the shipped behavior is what's installed —
+> current `README.md` / `CLAUDE.md` disagree, the shipped behavior is what's installed —
 > this is the target we are building toward.
 
 ---
@@ -20,7 +20,7 @@ design it cannot responsibly resolve.
 
 ## 2. The shift: the human moves up the stack
 
-Today the toolkit is a productivity tool with a human **at the wheel**. Priority 1 of the baseline
+Today the toolkit is a productivity tool with a human **at the wheel**. Priority 1 of `CLAUDE.md`
 gates every consequential action on explicit human confirmation — deploys, the first validate of a
 loop, every commit, checkpoint mode, even reading test results back. That is the correct design for
 a tool a person drives.
