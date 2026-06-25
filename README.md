@@ -59,7 +59,7 @@ org census), writing one `docs/<domain>.md` per in-scope domain that you review 
 
 | Skill | Stage | Covers |
 |---|---|---|
-| `sf-research` | Research | One prompt-driven skill that inventories the org's current state for the domains your prompt names, in dependency order (data-model → security → automation → ui → integration), writing a reviewable `docs/<domain>.md` per in-scope domain plus a lean `docs/CONTEXT.md` in feature mode. |
+| `sf-research` | Research | One prompt-driven skill that inventories the org's current state for the domains your prompt names, in dependency order (data-model → security → automation → ui → integration), writing a reviewable `docs/<domain>.md` per in-scope domain. It writes only those docs (never `docs/CONTEXT.md`) and can run on a schedule to keep them in sync. |
 | `sf-plan` | Plan | Turns the reviewed research docs into a verified, completeness-checked design contract (`docs/solution-design.md` + `docs/CONTEXT.md` + one `docs/contracts/<slug>.md` per user story), grilling decisions and making the declarative-vs-code calls. |
 | `sf-build` | Build *(optional)* | Optional orchestrated build-and-review against the contract that dispatches the config skills and the `salesforce-developer` agent per work item then runs the `reviewing-*` battery as a gate, with deploys staying human-gated. |
 
@@ -130,8 +130,7 @@ reparenting and the recursion/order risk.
 ```
 
 Review the `docs/*.md` `sf-research` writes (`docs/data-model.md`, `docs/automation.md`,
-`docs/security-model.md` here, plus the lean `docs/CONTEXT.md` capturing the objective), then hand the
-lot to `/sf-plan`:
+`docs/security-model.md` here), then hand the lot to `/sf-plan`, stating the objective in the prompt:
 
 ```text
 /sf-plan I want a console where a user picks two duplicate Accounts, chooses which one

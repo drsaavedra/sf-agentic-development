@@ -1,6 +1,6 @@
 ---
 name: sf-research
-description: "Salesforce state-of-the-world discovery — one prompt-driven skill that inventories the current org/repo across five domains (data model, automation, integration, UI, security & licensing) and writes a reviewable docs/<domain>.md per in-scope domain. The request names which domains to look at; only those run. Two modes: feature research (a feature/change to build → writes the in-scope docs + a lean docs/CONTEXT.md capturing the objective, for handoff to sf-plan) and standalone discovery (just persist the org's current state → writes the docs only, no CONTEXT.md). Surfaces the constraints that bite at planning time — master-detail on a populated object, order-of-execution conflicts, unsupported auth, the missing license — before sign-off, not mid-build. TRIGGER when: starting research/discovery before a design, or asked to inventory, map, audit, or persist an org's data model, automation, integrations, UI surfaces, sharing model, or license entitlements. DO NOT TRIGGER when: choosing an approach or designing (use sf-plan); building (generating-* / building-sf-integrations / applying-slds); or reviewing (reviewing-*)."
+description: "Salesforce state-of-the-world discovery — one prompt-driven skill that inventories the current org/repo across five domains (data model, automation, integration, UI, security & licensing) and writes a reviewable docs/<domain>.md per in-scope domain. The request names which domains to look at; only those run. Single-purpose: it researches and writes/refreshes the docs only — it never writes docs/CONTEXT.md (sf-plan owns that, taking the objective straight from its own prompt). Safe to run unattended on a schedule to keep the org docs in sync. Surfaces the constraints that bite at planning time — master-detail on a populated object, order-of-execution conflicts, unsupported auth, the missing license — before sign-off, not mid-build. TRIGGER when: starting research/discovery before a design, or asked to inventory, map, audit, refresh, or persist an org's data model, automation, integrations, UI surfaces, sharing model, or license entitlements. DO NOT TRIGGER when: choosing an approach or designing (use sf-plan); building (generating-* / building-sf-integrations / applying-slds); or reviewing (reviewing-*)."
 allowed-tools: Read, Grep, Glob, Bash, AskUserQuestion
 ---
 
@@ -15,19 +15,15 @@ One skill, five domains, prompt-driven: **the request names which domains to res
 run.** A feature touching data model, sharing, and automation researches those three and skips UI and
 integration — the prompt never named them.
 
-## Two modes
+**It only ever writes `docs/<domain>.md`.** It does **not** write `docs/CONTEXT.md` or any handoff
+file — planning gets its objective straight from the `/sf-plan` prompt, and `sf-plan` owns CONTEXT.md.
+Two ways it gets invoked, both producing the same output (just the domain docs):
 
-The prompt distinguishes them:
-
-- **Feature research** — the prompt describes a feature or change to build ("I want a console
-  where…"). Write the in-scope domain docs **plus a lean `docs/CONTEXT.md`** capturing the objective,
-  as a handoff to `/sf-plan`. (See *Lean CONTEXT.md* below.)
-- **Standalone discovery** — the prompt just asks to document/inventory/map/persist the org ("persist
-  my data-model and automation docs", "map the current sharing model") with no feature to build.
-  Write the in-scope domain docs **only — no CONTEXT.md.** sf-research stands alone here, like
-  `sf-plan` can.
-
-If it's genuinely unclear which mode applies, ask one `AskUserQuestion`; otherwise infer from intent.
+- **Before a design** — the prompt names a feature's domains; research those, scoped to the feature,
+  so a human can review the docs before `/sf-plan`.
+- **As a scheduled / unattended refresh** — run with no specific feature to **keep the org docs in
+  sync** (e.g. a weekend job). This is the org-survey/refresh use: update the existing `docs/*`
+  broadly across the in-scope domains. (See *Org-survey mode is opt-in* below.)
 
 ## Domain selection (prompt-driven)
 
@@ -98,8 +94,9 @@ These hold for every in-scope domain:
   standard-vs-custom, or design the sharing model — all of that is `sf-plan`. Surface the constraints
   that gate those decisions; don't make them.
 - **Org-survey mode is opt-in.** Only when the user explicitly asks to document the whole org/domain
-  (not a specific feature) do you drop the scope bound and inventory wholesale; the feature-scoped
-  default above holds otherwise.
+  (not a specific feature) — or when this is a scheduled/unattended refresh run to keep the docs in
+  sync — do you drop the scope bound and inventory wholesale, refreshing the existing `docs/*`; the
+  feature-scoped default above holds otherwise.
 
 ## Phases: Discover → Analyze → Document
 
@@ -119,9 +116,10 @@ before it.
    and the greenfield-vs-established verdict. Use `AskUserQuestion` **only** for intent the code/org
    can't reveal (expected growth rate, internal-vs-customer audience, whether a Flow is admin-owned).
 3. **Document.** Write each in-scope domain's `docs/<domain>.md` from its output contract below,
-   ending with the design-gating **Surprises & constraints**. In feature mode, also write the lean
-   `docs/CONTEXT.md`. Keep each doc **scoped to the feature** — a later feature appends its own
-   in-scope findings, so each doc is the union of what features have needed, not a complete org model.
+   ending with the design-gating **Surprises & constraints** — and nothing else (no `docs/CONTEXT.md`).
+   Keep each doc **scoped to the feature** by default — a later feature appends its own in-scope
+   findings, so each doc is the union of what features have needed; a scheduled refresh run instead
+   updates them broadly (org-survey mode).
 
 ## Per-domain output contracts
 
@@ -212,21 +210,6 @@ For **security** with no org, instead use:
 - **Compliance** — SLA/latency, PII, data residency, Shield, IP allowlisting.
 - **Surprises & constraints** — unsupported auth, missing spec, limit pressure, trigger-context
   callout constraint, middleware in the landscape.
-
-## Lean `docs/CONTEXT.md` (feature mode only — optional handoff)
-
-When the prompt describes a feature to build, write a lean `docs/CONTEXT.md` as a convenience for the
-`/sf-plan` handoff. Write **only** these fields:
-
-- **Objective** — the issue/feature being researched, in a few lines (from the prompt).
-- **Research scope** — which domains were researched and why; note any skipped domains.
-- **Doc pointers** — links to the in-scope domain docs written.
-- **Status** — `Research complete — ready for /sf-plan`, plus any `repo-only` / `LICENSING
-  UNCONFIRMED` caveats carried up so planning sees them.
-
-Do **not** write the user-story index, work-item dispatch table, or the architect/checkpoint flags —
-those are `sf-plan`'s. `sf-plan` will enrich this file (or write it whole if it's absent); the hard
-gate for planning is the **research docs**, not CONTEXT.md.
 
 ## Cross-Skill Integration
 

@@ -48,11 +48,11 @@ integration depends on the automation that drives it). Domain → doc, in that o
 | Existing LWC/Flow/page surfaces & reusable components, placement, internal-vs-Experience-Cloud, design/accessibility constraints | `docs/ui-design.md` |
 | External systems, the auth they support, existing Named/External Credentials, data format & limits, events | `docs/integration-patterns.md` |
 
-`sf-research` has **two modes**: *feature research* (the prompt describes a feature to build → writes
-the in-scope docs **+ a lean `docs/CONTEXT.md`** capturing the objective, as a handoff to `/sf-plan`)
-and *standalone discovery* (just persist the org's current state → the docs only, no CONTEXT.md).
-The research docs are `/sf-plan`'s required input — it stops and routes back here if one a feature
-needs is missing. `/sf-plan` then refines `docs/data-model.md` and `docs/automation.md` in place.
+`sf-research` only ever writes these `docs/<domain>.md` files — never `docs/CONTEXT.md` (that is
+`/sf-plan`'s, built from the objective you give `/sf-plan` directly). It can also run on a schedule to
+keep the org docs in sync. The research docs are `/sf-plan`'s required input — it stops and routes
+back here if one a feature needs is missing. `/sf-plan` then refines `docs/data-model.md` and
+`docs/automation.md` in place.
 
 ## Authoring & Config Routing
 

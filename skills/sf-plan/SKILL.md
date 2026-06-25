@@ -1,6 +1,6 @@
 ---
 name: sf-plan
-description: "Salesforce design and planning — turns the reviewed research docs (docs/data-model.md, docs/automation.md, docs/ui-design.md, docs/integration-patterns.md, docs/security-model.md, written by sf-research) into a verified, completeness-checked design contract before any build: docs/solution-design.md, docs/CONTEXT.md (objective, story index, work-item dispatch table, doc pointers — enriched from sf-research's lean CONTEXT.md if present, else written whole), and one docs/contracts/<slug>.md per story. Makes the solution-shape and declarative-vs-code calls from the decision packs; does not re-explore the org — research already did. TRIGGER when: planning a feature whose research docs exist, or revising a design before a build. DO NOT TRIGGER when: the feature's research docs don't exist yet (run /sf-research first), a spec already exists and the task is to build (use /sf-build), or a trivial one-line fix."
+description: "Salesforce design and planning — turns the reviewed research docs (docs/data-model.md, docs/automation.md, docs/ui-design.md, docs/integration-patterns.md, docs/security-model.md, written by sf-research) into a verified, completeness-checked design contract before any build: docs/solution-design.md, docs/CONTEXT.md (objective, story index, work-item dispatch table, doc pointers), and one docs/contracts/<slug>.md per story. Takes the objective from its own prompt and owns docs/CONTEXT.md; makes the solution-shape and declarative-vs-code calls from the decision packs; does not re-explore the org — research already did. TRIGGER when: planning a feature whose research docs exist, or revising a design before a build. DO NOT TRIGGER when: the feature's research docs don't exist yet (run /sf-research first), a spec already exists and the task is to build (use /sf-build), or a trivial one-line fix."
 allowed-tools: Read, Grep, Glob, Bash, AskUserQuestion
 ---
 
@@ -20,21 +20,18 @@ is an optional orchestrated mode for large multi-story builds.
 
 Planning **consumes** the research stage's output; it does not rediscover the org. Before the phases:
 
-1. **Read `docs/CONTEXT.md` if it exists.** `sf-research` writes a lean CONTEXT.md (Objective,
-   Research scope, Doc pointers, Status) as its handoff — take the **objective** and the **in-scope
-   domain set** from it. If there's no CONTEXT.md (research was done some other way, or the user came
-   straight here), take the objective from the `/sf-plan` prompt and **determine the feature's
-   domains** from the request — data model (almost always), automation (triggers / Flows / validation
-   rules / roll-ups / async), UI, integration (an external system), and security / sharing /
-   licensing.
+1. **Take the objective from the `/sf-plan` prompt** and **determine the feature's domains** from the
+   request — data model (almost always), automation (triggers / Flows / validation rules / roll-ups /
+   async), UI, integration (an external system), and security / sharing / licensing. (`sf-research`
+   does not hand off an objective; you state it to `/sf-plan` directly.)
 2. **Require the matching research doc for each in-scope domain** — `docs/data-model.md`,
    `docs/automation.md`, `docs/ui-design.md`, `docs/integration-patterns.md`,
    `docs/security-model.md`.
 3. **If a required research doc is missing, stop.** Name the gap and tell the user to run
    **`/sf-research`** (and review its doc) first — do **not** substitute your own exploration.
-   Planning on un-researched ground is the exact failure this split removed. A **missing CONTEXT.md
-   is not a blocker** — the hard gate is the research docs; given those and an objective (inline or
-   from a lean CONTEXT.md), planning proceeds.
+   Planning on un-researched ground is the exact failure this split removed. The research docs are the
+   hard gate; `docs/CONTEXT.md` is your output, not a prerequisite (a *prior* CONTEXT.md from an
+   earlier `/sf-plan` run triggers Revise mode — see Phase 1).
 4. **Honor the docs' caveats.** A doc flagged `repo-only` or `LICENSING UNCONFIRMED` is a known risk —
    carry it into the design, don't silently resolve it by introspecting yourself.
 
@@ -75,13 +72,11 @@ Proceed to the phases only once every needed research doc is present.
 ## Phases
 
 1. **Read the research docs and map the solution** — first check whether `docs/CONTEXT.md` (or a
-   context doc the user points to) already exists. A **lean `sf-research` handoff** (Objective +
-   Research scope + Doc pointers + Status, **no** work-item dispatch table) is the expected seed —
-   keep its Objective and Doc pointers and *enrich* it as you write the spec, not Revise mode. An
-   **already-structured spec** (a CONTEXT.md that already carries the dispatch table) means work in
-   **Revise mode** (below) — treat it as prior truth, not something to overwrite. Confirm the
-   prerequisite research docs are present (above). Then **read the research docs** the feature
-   touches — `docs/data-model.md`,
+   context doc the user points to) already exists. If an **already-structured spec** is present (a
+   `docs/CONTEXT.md` that carries the work-item dispatch table, from a prior `/sf-plan` run), work in
+   **Revise mode** (below) — treat it as prior truth, not something to overwrite. Otherwise you'll
+   write `docs/CONTEXT.md` fresh. Confirm the prerequisite research docs are present (above). Then
+   **read the research docs** the feature touches — `docs/data-model.md`,
    `docs/automation.md`, `docs/ui-design.md`, `docs/integration-patterns.md`,
    `docs/security-model.md` — plus the artifacts the prompt names, and from their current-state
    picture form a **candidate solution map**: what likely needs to change, what to reuse, and the
@@ -176,17 +171,14 @@ reasoning, not a restatement of the dispatch table. It holds:
 
 ### `docs/CONTEXT.md` — the shared master (every agent reads this)
 
-`sf-plan` **owns this file** and writes its full structure. If `sf-research` left a **lean
-CONTEXT.md** (Objective + Research scope + Doc pointers + Status), preserve its Objective and Doc
-pointers and fill in the rest **in place** — don't overwrite it. If it's **absent** (research done
-some other way, docs already updated, user came straight to `/sf-plan`), write the whole file from
-scratch. Both paths are first-class; `sf-research` is not required to have seeded it.
+`sf-plan` **owns this file** and writes its full structure from scratch (taking the objective from the
+`/sf-plan` prompt). `sf-research` never writes it. When a prior structured spec already exists, revise
+it in place rather than overwriting (Revise mode).
 
 Keep it an **index, not a detail dump** — no schema dumps, test scenarios, or design rationale here;
 those live in the contract files and `docs/solution-design.md`. It holds:
 
-- **Objective** — the problem and the intended outcome, in a few lines (preserved from the lean
-  CONTEXT.md if `sf-research` wrote one).
+- **Objective** — the problem and the intended outcome, in a few lines (from the `/sf-plan` prompt).
 - **User-story index** — one entry per story: its title, kebab-case slug, and a link to
   `docs/contracts/<slug>.md`, listed in build order.
 - **Work-item dispatch table** — every work item across all stories. This is the build dispatch list
@@ -251,9 +243,6 @@ When `docs/CONTEXT.md` (or a context doc the user names) is already present, tre
 truth** and build on it — never overwrite it blind. First classify what you're starting from, then
 proceed:
 
-- **A lean `sf-research` handoff** — Objective + Research scope + Doc pointers + Status and **no**
-  dispatch table or contract files → this is the expected fresh-plan seed, **not** a revision.
-  Preserve its Objective and Doc pointers and write the full three-tier spec around them (Phase 1).
 - **An already-structured spec** — a `docs/CONTEXT.md` with the work-item dispatch table (usually
   alongside `docs/solution-design.md` and `docs/contracts/*.md`), e.g. from a prior `/sf-plan`
   session → **revise it in place** via the rules below.
