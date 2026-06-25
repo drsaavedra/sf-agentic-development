@@ -452,6 +452,32 @@
           "anchors": ["Platform Event", "Change Data Capture", "Pub/Sub API"]
         }
       ]
+    },
+    "skills/sf-plan/references/security-decision.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-06-25",
+      "sources": [
+        {
+          "url": "https://help.salesforce.com/s/articleView?id=platform.managing_the_sharing_model.htm&type=5",
+          "anchors": ["organization-wide default", "role hierarchy", "sharing rules", "manual sharing", "Apex managed sharing"]
+        },
+        {
+          "url": "https://help.salesforce.com/s/articleView?id=platform.security_sharing_owd_about.htm&type=5",
+          "anchors": ["organization-wide default", "Private", "Controlled by Parent", "most restrictive"]
+        },
+        {
+          "url": "https://help.salesforce.com/s/articleView?id=platform.perm_sets_best_practices.htm&type=5",
+          "anchors": ["permission set", "profile", "recommended", "grant but not to deny"]
+        },
+        {
+          "url": "https://help.salesforce.com/s/articleView?id=platform.security_restriction_rule.htm&type=5",
+          "anchors": ["restriction rule", "scoped", "custom objects", "scoping rule"]
+        },
+        {
+          "url": "https://help.salesforce.com/s/articleView?id=platform.security_sharing_rules_guest.htm&type=5",
+          "anchors": ["guest user sharing rule", "Read Only", "criteria-based"]
+        }
+      ]
     }
   }
 }

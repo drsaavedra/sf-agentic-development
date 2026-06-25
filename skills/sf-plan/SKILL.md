@@ -92,10 +92,11 @@ Proceed to the phases only once every needed doc is present.
    real-time vs event-driven/async as the overall style. The chosen shape frames the triage and
    schema below. Skip this phase when one shape is obviously right — don't manufacture alternatives.
 4. **Declarative-vs-code triage (per capability)** — within the chosen shape, decide config or code
-   for each capability, working from the automation, UI, and integration decision packs (see
+   for each capability, working from the automation, UI, integration, and security decision packs (see
    *Decision references*). This is the per-piece tool choice (e.g. this rollup → roll-up summary
-   field; this UI → Screen Flow or LWC; this callout → External Service / Named Credential), not the
-   whole-solution fork above. Standard object before custom. Record each decision with its reason.
+   field; this UI → Screen Flow or LWC; this callout → External Service / Named Credential; this
+   record-access rule → sharing rule vs Apex managed sharing), not the whole-solution fork above.
+   Standard object before custom. Record each decision with its reason.
 5. **Schema design (from the data-model doc)** — pin the data model with the real API names **from
    `docs/data-model.md`** (already org-verified), applying the data-model decision pack (see *Decision
    references*) to any standard-vs-custom, relationship-type, config/data-storage, or large-data-volume
@@ -110,7 +111,7 @@ Proceed to the phases only once every needed doc is present.
    - every object/field/relationship API name is pinned from the research docs (not guessed); any
      research gap was sent back to the matching `researching-*` skill, not patched over,
    - every **code** item carries concrete given/when/then test scenarios,
-   - security is addressed (permission set / FLS / sharing model),
+   - security is addressed (permission set / FLS / sharing model — from the security decision pack),
    - the design is bulk-safe and scales as data grows (assume it will),
    - no placeholders, contradictions, or unresolved questions remain — a decision the user deferred
      ("you decide") is resolved by you with the recommended option and recorded as an explicit
@@ -274,6 +275,9 @@ them up front:
 - `references/integration-decision.md` — talking to an external system: Named Credential auth, the
   External Services / Flow callout / Apex ladder, pattern selection, Platform Events vs CDC, and
   Salesforce Connect for external data.
+- `references/security-decision.md` — the access model: org-wide default, the record-access ladder
+  (role hierarchy / sharing rules / manual / Apex managed sharing), restriction rules, permission
+  sets vs profiles, FLS, and Experience Cloud / guest access.
 
 These are curated decision criteria, kept current against official Salesforce documentation by the
 repo maintainer (re-validated each release). Decide from them; if a pack looks out of date or
