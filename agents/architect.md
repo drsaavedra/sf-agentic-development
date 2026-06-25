@@ -25,18 +25,20 @@ structured review report.
 ## Project requirements (read first)
 
 Your source of truth is this project's **design contract** — for the `/sf-plan` → `/sf-build`
-pipeline that is the shared `docs/CONTEXT.md` (objective, user-story index, work-item dispatch
-table, cross-cutting decisions) plus the per-story `docs/contracts/<slug>.md` files that hold the
-detail — together with any other canonical references the invocation names (e.g. a Solution
-Architecture doc, an HLD, ADRs) and the salesforce-developer's build summary. The main agent
+pipeline that is `docs/solution-design.md` (the design narrative: solution shape, declarative-vs-code
+triage, cross-cutting decisions, carried-forward research caveats), the lean `docs/CONTEXT.md`
+(objective, user-story index, work-item dispatch table), and the per-story `docs/contracts/<slug>.md`
+files that hold the detail — backed by the research docs (`docs/data-model.md`, `docs/automation.md`,
+…) for current-state context, together with any other canonical references the invocation names (e.g.
+a Solution Architecture doc, an HLD, ADRs) and the salesforce-developer's build summary. The main agent
 supplies these paths in the invocation, scoped to the work under review; read them before reviewing.
 Every finding must cite a specific requirement (a `docs/contracts/<slug>.md §N`, or a spec/HLD/ADR
 section). If the invocation names no documents, ask the user which documents hold the architecture
 and requirements before proceeding.
 
-> **Review authority — ADRs / CONTEXT supersede stale source wording.** Where the architecture doc,
-> `CONTEXT.md`, or the ADRs differ from the original HLD's literal wording, the **ADRs / CONTEXT
-> win** and those HLD lines are stale. Validate against the current truth, not the literal HLD. As
+> **Review authority — ADRs / solution-design supersede stale source wording.** Where the
+> architecture doc, `docs/solution-design.md` / `CONTEXT.md`, or the ADRs differ from the original
+> HLD's literal wording, the **ADRs / solution-design win** and those HLD lines are stale. Validate against the current truth, not the literal HLD. As
 > part of keeping the architecture doc current, maintain its data model and its
 > considerations/risks table as reviews are completed.
 

@@ -14,11 +14,32 @@ right time. Each skill carries its own safety rules, quality gates, and domain k
 baseline routes to them and adds only the cross-cutting deployment and git guardrails below.
 Follow these rules unless the user explicitly overrides them.
 
-> **Two entry paths.** For a planned feature, start with `/sf-plan` (it writes a design contract
-> to `docs/CONTEXT.md` + per-story `docs/contracts/<slug>.md`) and build it with `/sf-build`. The routing below governs everything else
-> — ad-hoc edits, fixes, reviews, audits, config, and ops.
+> **Three stages for a planned feature — Research → Plan → Build, each human-gated.**
+> **Research:** run the `researching-*` skills to write a state-of-the-world `docs/<domain>.md` per
+> domain the feature touches (reviewed before planning). **Plan:** `/sf-plan` turns those docs into a
+> design contract — `docs/solution-design.md` + a lean `docs/CONTEXT.md` + per-story
+> `docs/contracts/<slug>.md` (it stops and routes back to Research if a needed doc is missing).
+> **Build:** `/sf-build`. The routing below governs everything else — ad-hoc edits, fixes, reviews,
+> audits, config, and ops.
 
 ---
+
+## Research Routing
+
+Research is the **first stage of a planned feature** — discovery before design. Each `researching-*`
+skill inventories one domain's current state (scoped to the feature, not an org census) and writes
+`docs/<domain>.md` for a human to review before `/sf-plan`. Run only the ones the feature touches.
+
+| Discover (before planning) | Skill | Writes |
+|---|---|---|
+| Existing objects, fields, relationships, record types, volumes, config storage, org-wide settings | `researching-data-model` | `docs/data-model.md` |
+| Automation already firing on the target objects (Flows, triggers, validation rules, roll-ups, async) + the framework new automation plugs into | `researching-automation` | `docs/automation.md` |
+| External systems, the auth they support, existing Named/External Credentials, data format & limits, events | `researching-integration-patterns` | `docs/integration-patterns.md` |
+| Existing LWC/Flow/page surfaces & reusable components, placement, internal-vs-Experience-Cloud, design/accessibility constraints | `researching-ui` | `docs/ui-design.md` |
+| OWD, sharing rules, permission sets vs profiles, FLS, record-level access, and the user/feature **license** inventory | `researching-security-model` | `docs/security-model.md` |
+
+These docs are `/sf-plan`'s required input — it stops and routes back here if one a feature needs is
+missing. `/sf-plan` then refines `docs/data-model.md` and `docs/automation.md` in place.
 
 ## Authoring & Config Routing
 
@@ -81,9 +102,9 @@ by severity. The `architect` agent is the separate solution-design governance ga
 design before code and inspects the assembled build against the design contract (completeness, scope,
 design conformance), not code quality.
 
-The authored skills in this repo — `reviewing-apex`, `reviewing-lwc`, and
-`reviewing-flow` — install into `.claude/skills/` at setup (see the README). All other
-skills referenced above come from `forcedotcom/sf-skills`
+The authored skills in this repo — the five `researching-*` skills, `sf-plan`, `sf-build`, and
+`reviewing-apex` / `reviewing-lwc` / `reviewing-flow` — install into `.claude/skills/` at setup (see
+the README). All other skills referenced above come from `forcedotcom/sf-skills`
 (install: `npx skills add forcedotcom/sf-skills`).
 
 ## Deployment & git safety
