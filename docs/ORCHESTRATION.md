@@ -54,8 +54,9 @@ sequenceDiagram
    - **`architect`** — the **solution-design** gate: a design review before code, and a whole-build
      design-conformance inspection once a sprint's work is built and has passed the code-reviewer
      gate — scoped to the dependency cluster of what changed. Validates completeness, scope, and
-     design conformance against the design contract; reads the code-reviewer's report for code
-     quality rather than re-running those skills.
+     design conformance against the design contract (`docs/solution-design.md` + `docs/CONTEXT.md` +
+     the contracts); reads the code-reviewer's report for code quality rather than re-running those
+     skills.
    Dispatch either, both, or neither — code quality and solution design are orthogonal checks.
 7. **Fix loop** — a failing review (**CHANGES REQUESTED** from `code-reviewer`, or **BLOCKED** from
    `architect`) goes back to `salesforce-developer` as a new brief built from the report's
@@ -87,7 +88,7 @@ path reference forces the agent to rediscover context it can't see from your con
 |---|---|
 | Objective | The unit of work in plain language — what exists when this brief is done |
 | Spec reference | Path to the design contract that applies to this task — for the `/sf-plan` pipeline, the story's `docs/contracts/<slug>.md` (with the work item `§N` within it); for other projects, the spec/HLD path plus sections |
-| Schema context | The data model the code touches, written out in the brief. The developer runs isolated — don't make it rediscover the schema. Gather it verified, not guessed: `sf sobject describe` and read-only queries against the org (the developer agent's "Org introspection & schema truth" rule) |
+| Schema context | The data model the code touches, written out in the brief. The developer runs isolated — don't make it rediscover the schema. For the `/sf-plan` pipeline it's pinned in `docs/data-model.md` and the contract's *Schema context*; gather it verified, not guessed, confirming against the org (`sf sobject describe` and read-only queries — the developer agent's "Org introspection & schema truth" rule) |
 | Test scenarios | The TDD requirements. The developer writes these as failing tests first, so they must be concrete enough to assert on |
 | Constraints | Project-specific rules from the spec or your conversation. Constraints live in the brief, never hardcoded in the agent |
 | Dependencies | What earlier briefs produced that this one consumes — paths, signatures, and how to integrate |

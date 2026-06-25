@@ -31,7 +31,7 @@ the repo README's "Agent Orchestration" section):
 - **Validation criteria** — your exit condition before reporting back.
 
 If a **design contract** exists, its paths come from the work brief or the main agent: your story's
-`docs/contracts/<slug>.md` for this task's detail, and the shared `docs/CONTEXT.md` for cross-cutting
+`docs/contracts/<slug>.md` for this task's detail, and `docs/solution-design.md` for cross-cutting
 decisions. Read them for architecture, patterns, and coverage targets — but the brief is still
 self-contained, so don't depend on rediscovering context from them. If neither the brief nor the
 main agent names them, ask the user before proceeding — don't guess the path.

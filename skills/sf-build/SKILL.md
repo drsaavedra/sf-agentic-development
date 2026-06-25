@@ -24,6 +24,10 @@ frontmatter flag, so it holds across every assistant.
   `Checkpoint commits` flag — in full before dispatching anything. Read each story's
   `docs/contracts/<slug>.md` for detail as you reach its rows; you don't need every contract loaded
   up front.
+- The **design rationale and cross-cutting decisions** live in `docs/solution-design.md`, and the
+  current-state detail in the research docs (`docs/data-model.md`, `docs/automation.md`, …). Read
+  `docs/solution-design.md` for the cross-cutting decisions a brief must honor; pull from a research
+  doc only when a brief needs current-state context the contract didn't embed.
 - If `docs/CONTEXT.md` reads `Checkpoint commits: enabled` (or the user grants it in the prompt),
   first **confirm the project is a git repo** (`git rev-parse --is-inside-work-tree`) — checkpoint
   commits need one. If it is, **announce once** — *"Checkpoint commits enabled — committing on the
@@ -55,7 +59,7 @@ frontmatter flag, so it holds across every assistant.
    work item within it), Schema context, Test scenarios, Constraints, Dependencies, Expected
    outputs, Validation criteria — and dispatch the `salesforce-developer` agent with the `Agent`
    tool. Fold the relevant **Decisions & assumptions** — the story-specific ones from the contract
-   file plus any cross-cutting ones from `docs/CONTEXT.md` — into the brief's *Constraints* so the
+   file plus any cross-cutting ones from `docs/solution-design.md` — into the brief's *Constraints* so the
    build can't contradict a recorded decision. If the row's
    artifact already exists, brief the developer to **modify it additively**, preserving existing
    behavior. Run independent items in **parallel**; sequence a dependent chain in a **single** brief,
@@ -77,9 +81,9 @@ frontmatter flag, so it holds across every assistant.
    - the **user asked** for an architect or design review (now or during planning),
    - the **review gate (step 4) can't reach clean** after a fix round — escalate to the architect
      to adjudicate.
-   The architect judges **design conformance against the design contract, not code quality** (that
-   was step 4) — it reads the code-reviewer's report rather than re-running the `reviewing-*`/analyzer
-   skills. Scope the inspection to the **dependency cluster of what changed**: the changed story plus
+   The architect judges **design conformance against the design contract** (`docs/solution-design.md`
+   plus `docs/CONTEXT.md` and the contracts), **not code quality** (that was step 4) — it reads the
+   code-reviewer's report rather than re-running the `reviewing-*`/analyzer skills. Scope the inspection to the **dependency cluster of what changed**: the changed story plus
    the stories it depends on or that depend on it (per the `Depends on` column), so the whole package
    is verified to still work together; skip stories that already passed and have no dependency to the
    changed work. A **BLOCKED** report re-briefs `salesforce-developer` with its Recommended Actions;
