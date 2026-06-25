@@ -34,12 +34,10 @@ Together they make an agent reason like a Salesforce developer before it writes 
 
 The design follows a few principles:
 
-- **Research, plan, implement.** Map the codebase and data schema, gather requirements first
-  (`sf-research`: name the domains in your prompt, and it writes a reviewed `docs/<domain>.md` per
-  in-scope domain); then plan within the platform's architecture (`sf-plan`); then implement in the
-  right layer: declarative setup (objects, fields, permissions) first, business logic in code. Each
-  stage is human-gated, so you review the research docs before planning and the design contract before
-  building.
+- **Research, plan, implement.** Map the codebase and data schema, gather requirements first; then
+  plan within the platform's architecture; then implement in the right layer: declarative setup
+  (objects, fields, permissions) first, business logic in code. Each stage is human-gated, so you
+  review the research docs before planning and the design contract before building.
 - **Context is expensive, and bad context poisons everything.** You can't load all of Salesforce's
   platform rules into the context window, so the knowledge is isolated into per-skill **reference
   packs** and pulled in only when a task needs it.
@@ -59,7 +57,7 @@ org census), writing one `docs/<domain>.md` per in-scope domain that you review 
 
 | Skill | Stage | Covers |
 |---|---|---|
-| `sf-research` | Research | One prompt-driven skill that inventories the org's current state for the domains your prompt names, in dependency order (data-model → security → automation → ui → integration), writing a reviewable `docs/<domain>.md` per in-scope domain. It writes only those docs (never `docs/CONTEXT.md`) and can run on a schedule to keep them in sync. |
+| `sf-research` | Research | One prompt-driven skill that inventories the org's current state for the domains your prompt names, in dependency order (data-model → security → automation → ui → integration), writing a reviewable `docs/<domain>.md` per in-scope domain. |
 | `sf-plan` | Plan | Turns the reviewed research docs into a verified, completeness-checked design contract (`docs/solution-design.md` + `docs/CONTEXT.md` + one `docs/contracts/<slug>.md` per user story), grilling decisions and making the declarative-vs-code calls. |
 | `sf-build` | Build *(optional)* | Optional orchestrated build-and-review against the contract that dispatches the config skills and the `salesforce-developer` agent per work item then runs the `reviewing-*` battery as a gate, with deploys staying human-gated. |
 
