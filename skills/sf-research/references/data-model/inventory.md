@@ -1,6 +1,6 @@
 # Inventory: objects, fields, relationships, record types, picklists
 
-> Part of `researching-data-model` — see SKILL.md. Discovery, not design. Verify against
+> Part of `sf-research` (data-model domain) — see SKILL.md. Discovery, not design. Verify against
 > `force-app/**` first, then the org (org wins). Each question pairs with the read-only command that
 > answers it — run it; don't ask the user. **Bound this to the in-scope objects plus one collision
 > hop (their direct parents/children) — don't inventory the org's whole schema.**

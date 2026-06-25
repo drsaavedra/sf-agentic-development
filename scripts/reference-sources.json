@@ -479,63 +479,47 @@
         }
       ]
     },
-    "skills/researching-data-model/SKILL.md": {
+    "skills/sf-research/SKILL.md": {
       "basis": "expertise",
-      "_note": "Discovery-workflow dispatcher — how to inventory an org's current data model (read-only sf CLI + grep recipes), not platform rules. Describes the user's live org, so there is no Salesforce doc to ground against. Its incidental normative claims (master-detail constraints, LDV/skew thresholds, CMT vs custom settings) are owned and audited by sf-plan/references/data-model-decision.md."
+      "_note": "Prompt-driven discovery dispatcher — one skill across five domains (data model, automation, integration, UI, security & licensing); the prompt names which run. Describes how to inventory the user's live org (read-only sf CLI + grep recipes), not platform rules, so there is no single Salesforce doc to ground against. Its incidental normative claims (master-detail constraints, callout limits, the access model) are owned and audited by the sf-plan/references/*-decision.md packs."
     },
-    "skills/researching-data-model/references/inventory.md": {
+    "skills/sf-research/references/data-model/inventory.md": {
       "basis": "expertise",
       "_note": "Object/field/relationship discovery recipes. Incidental platform facts (standard object can't be the detail side, max 2 master-details per object, can't add a master-detail to a populated object) are owned by sf-plan/references/data-model-decision.md (tracked salesforce-docs)."
     },
-    "skills/researching-data-model/references/volumes-and-org-settings.md": {
+    "skills/sf-research/references/data-model/volumes-and-org-settings.md": {
       "basis": "expertise",
       "_note": "Volume/skew/config-storage discovery via COUNT() and describe queries. Incidental thresholds (LDV ~tens of millions, ownership skew ~10k, MetadataRelationship fields) are owned by sf-plan/references/data-model-decision.md."
     },
-    "skills/researching-automation/SKILL.md": {
-      "basis": "expertise",
-      "_note": "Discovery-workflow dispatcher — how to inventory existing automation and the framework new automation plugs into. Incidental platform facts (order of execution, Process Builder/Workflow retirement) are owned by sf-plan/references/automation-decision.md and reviewing-flow."
-    },
-    "skills/researching-automation/references/automation-framework.md": {
+    "skills/sf-research/references/automation/automation-framework.md": {
       "basis": "expertise",
       "_note": "Framework-discovery grep recipes (trigger handler, logger, async, Unit of Work, test factory). References ecosystem patterns (fflib, Nebula Logger) and de-facto repo conventions, not a single normative page."
     },
-    "skills/researching-automation/references/automation-landscape.md": {
+    "skills/sf-research/references/automation/automation-landscape.md": {
       "basis": "expertise",
       "_note": "Per-object automation inventory recipes. Incidental platform facts (order of execution, Process Builder/Workflow Rules retired Dec 31 2025) are owned by sf-plan/references/automation-decision.md and reviewing-flow (tracked salesforce-docs)."
     },
-    "skills/researching-integration-patterns/SKILL.md": {
-      "basis": "expertise",
-      "_note": "Discovery-workflow dispatcher — how to inventory external systems, auth, credentials, and limits. Incidental platform facts (callout/API limits, the Named Credential model, Platform Events vs CDC) are owned by sf-plan/references/integration-decision.md."
-    },
-    "skills/researching-integration-patterns/references/systems-and-auth.md": {
+    "skills/sf-research/references/integration/systems-and-auth.md": {
       "basis": "expertise",
       "_note": "External-system/auth/credential discovery recipes. Incidental platform facts (extensible vs legacy Named Credentials, External Credential auth protocols) are owned by sf-plan/references/integration-decision.md (tracked salesforce-docs)."
     },
-    "skills/researching-integration-patterns/references/format-and-limits.md": {
+    "skills/sf-research/references/integration/format-and-limits.md": {
       "basis": "expertise",
       "_note": "Format/limit/reliability discovery recipes. Incidental governor facts (100 callouts per transaction, the daily API limit, 120s callout timeout) are owned by sf-plan/references/integration-decision.md and reviewing-apex (tracked salesforce-docs)."
     },
-    "skills/researching-security-model/SKILL.md": {
-      "basis": "expertise",
-      "_note": "Discovery-workflow dispatcher — how to inventory the org's sharing model, permission strategy, and license entitlements. Incidental platform facts (the access model) are owned by sf-plan/references/security-decision.md."
-    },
-    "skills/researching-security-model/references/access-and-sharing.md": {
+    "skills/sf-research/references/security/access-and-sharing.md": {
       "basis": "expertise",
       "_note": "OWD/sharing/permission-set/FLS discovery recipes. Incidental platform facts (OWD options, the record-access ladder, permission-sets-vs-profiles) are owned by sf-plan/references/security-decision.md (tracked salesforce-docs)."
     },
-    "skills/researching-security-model/references/licenses-and-compliance.md": {
+    "skills/sf-research/references/security/licenses-and-compliance.md": {
       "basis": "expertise",
       "_note": "License/feature-entitlement and compliance discovery via org queries (UserLicense, PermissionSetLicense). Describes the user's org entitlements, not a normative doc; the Platform-license and Shield constraints it flags are owned by sf-plan/references/security-decision.md."
     },
-    "skills/researching-ui/SKILL.md": {
-      "basis": "expertise",
-      "_note": "Discovery-workflow dispatcher — how to inventory existing UI surfaces, reusable components, placement, and design constraints. Incidental platform facts (SLDS, placement targets, the internal-vs-Experience-Cloud fork) are owned by sf-plan/references/ui-decision.md and reviewing-lwc."
-    },
-    "skills/researching-ui/references/surfaces-and-reuse.md": {
+    "skills/sf-research/references/ui/surfaces-and-reuse.md": {
       "basis": "expertise",
       "_note": "Component/placement discovery recipes (reuse-before-invent). Incidental platform facts (FlexiPage placement targets, Aura as legacy, full-site routing to building-ui-bundle-app) are owned by sf-plan/references/ui-decision.md."
     },
-    "skills/researching-ui/references/design-constraints.md": {
+    "skills/sf-research/references/ui/design-constraints.md": {
       "basis": "expertise",
       "_note": "Design-system/accessibility/state discovery recipes. Incidental platform facts (SLDS styling hooks, WCAG, base-component conventions) are owned by reviewing-lwc and the applying-slds skill (tracked salesforce-docs)."
     }

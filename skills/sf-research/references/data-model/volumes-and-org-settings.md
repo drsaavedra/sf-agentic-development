@@ -1,6 +1,6 @@
 # Volumes, data skew, config storage, and org-wide settings
 
-> Part of `researching-data-model` — see SKILL.md. Discovery, not design. Counts come from queries,
+> Part of `sf-research` (data-model domain) — see SKILL.md. Discovery, not design. Counts come from queries,
 > never assumptions. If the org can't be queried, record "unknown (repo-only)". Volumes and skew are
 > **per in-scope object**; the org-wide settings below are one-shot org-level facts — check them once,
 > don't expand scope.

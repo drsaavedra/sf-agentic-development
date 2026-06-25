@@ -1,13 +1,13 @@
 ---
 name: sf-plan
-description: "Salesforce design and planning — turns the reviewed research docs (docs/data-model.md, docs/automation.md, docs/ui-design.md, docs/integration-patterns.md, docs/security-model.md, written by the researching-* skills) into a verified, completeness-checked design contract before any build: docs/solution-design.md, a lean docs/CONTEXT.md (objective, story index, work-item dispatch table, doc pointers), and one docs/contracts/<slug>.md per story. Makes the solution-shape and declarative-vs-code calls from the decision packs; does not re-explore the org — research already did. TRIGGER when: planning a feature whose research docs exist, or revising a design before a build. DO NOT TRIGGER when: the feature's research docs don't exist yet (run the matching researching-* skill first), a spec already exists and the task is to build (use /sf-build), or a trivial one-line fix."
+description: "Salesforce design and planning — turns the reviewed research docs (docs/data-model.md, docs/automation.md, docs/ui-design.md, docs/integration-patterns.md, docs/security-model.md, written by sf-research) into a verified, completeness-checked design contract before any build: docs/solution-design.md, docs/CONTEXT.md (objective, story index, work-item dispatch table, doc pointers), and one docs/contracts/<slug>.md per story. Takes the objective from its own prompt and owns docs/CONTEXT.md; makes the solution-shape and declarative-vs-code calls from the decision packs; does not re-explore the org — research already did. TRIGGER when: planning a feature whose research docs exist, or revising a design before a build. DO NOT TRIGGER when: the feature's research docs don't exist yet (run /sf-research first), a spec already exists and the task is to build (use /sf-build), or a trivial one-line fix."
 allowed-tools: Read, Grep, Glob, Bash, AskUserQuestion
 ---
 
 # Salesforce Planning (sf-plan)
 
 Produce a verified, completeness-checked design contract **before any build**, working from the
-**research docs** the `researching-*` skills already wrote and a human reviewed (`docs/data-model.md`,
+**research docs** `sf-research` already wrote and a human reviewed (`docs/data-model.md`,
 `docs/automation.md`, `docs/ui-design.md`, `docs/integration-patterns.md`, `docs/security-model.md`).
 Output is `docs/solution-design.md` (the design), a lean `docs/CONTEXT.md`, and one
 `docs/contracts/<slug>.md` per user story (see the Output contract below). This skill is **planning
@@ -20,18 +20,22 @@ is an optional orchestrated mode for large multi-story builds.
 
 Planning **consumes** the research stage's output; it does not rediscover the org. Before the phases:
 
-1. **Determine the feature's domains** from the request — data model (almost always), automation
-   (triggers / Flows / validation rules / roll-ups / async), UI, integration (an external system),
-   and security / sharing / licensing.
-2. **Require the matching research doc for each domain** — `docs/data-model.md`, `docs/automation.md`,
-   `docs/ui-design.md`, `docs/integration-patterns.md`, `docs/security-model.md`.
-3. **If a required doc is missing, stop.** Name the gap and tell the user to run the matching
-   `researching-*` skill (and review its doc) first — do **not** substitute your own exploration.
-   Planning on un-researched ground is the exact failure this split removed.
+1. **Take the objective from the `/sf-plan` prompt** and **determine the feature's domains** from the
+   request — data model (almost always), automation (triggers / Flows / validation rules / roll-ups /
+   async), UI, integration (an external system), and security / sharing / licensing. (`sf-research`
+   does not hand off an objective; you state it to `/sf-plan` directly.)
+2. **Require the matching research doc for each in-scope domain** — `docs/data-model.md`,
+   `docs/automation.md`, `docs/ui-design.md`, `docs/integration-patterns.md`,
+   `docs/security-model.md`.
+3. **If a required research doc is missing, stop.** Name the gap and tell the user to run
+   **`/sf-research`** (and review its doc) first — do **not** substitute your own exploration.
+   Planning on un-researched ground is the exact failure this split removed. The research docs are the
+   hard gate; `docs/CONTEXT.md` is your output, not a prerequisite (a *prior* CONTEXT.md from an
+   earlier `/sf-plan` run triggers Revise mode — see Phase 1).
 4. **Honor the docs' caveats.** A doc flagged `repo-only` or `LICENSING UNCONFIRMED` is a known risk —
    carry it into the design, don't silently resolve it by introspecting yourself.
 
-Proceed to the phases only once every needed doc is present.
+Proceed to the phases only once every needed research doc is present.
 
 ## Operating rules
 
@@ -54,8 +58,8 @@ Proceed to the phases only once every needed doc is present.
   name comes from the research docs, which already verified them against the org (or flagged
   `repo-only`). Pin the final names from there into each work item's *Schema context*, and refine
   `docs/data-model.md` / `docs/automation.md` in place when planning settles a name or detail. If a
-  name a decision hinges on isn't in the docs, that's a **research gap** — send it back to the
-  matching `researching-*` skill rather than introspecting the org yourself, and carry any
+  name a decision hinges on isn't in the docs, that's a **research gap** — send it back to
+  `sf-research` rather than introspecting the org yourself, and carry any
   `repo-only` / `LICENSING UNCONFIRMED` caveat forward into the design.
 - **Declarative-first, from the decision packs — not from memory.** Prefer standard objects and
   config — fields, roll-up summaries, validation rules, Flows, permission sets — over Apex; write
@@ -68,9 +72,11 @@ Proceed to the phases only once every needed doc is present.
 ## Phases
 
 1. **Read the research docs and map the solution** — first check whether `docs/CONTEXT.md` (or a
-   context doc the user points to) already exists; if so, work in **Revise mode** (below) — treat it
-   as prior truth, not something to overwrite. Confirm the prerequisite research docs are present
-   (above). Then **read the research docs** the feature touches — `docs/data-model.md`,
+   context doc the user points to) already exists. If an **already-structured spec** is present (a
+   `docs/CONTEXT.md` that carries the work-item dispatch table, from a prior `/sf-plan` run), work in
+   **Revise mode** (below) — treat it as prior truth, not something to overwrite. Otherwise you'll
+   write `docs/CONTEXT.md` fresh. Confirm the prerequisite research docs are present (above). Then
+   **read the research docs** the feature touches — `docs/data-model.md`,
    `docs/automation.md`, `docs/ui-design.md`, `docs/integration-patterns.md`,
    `docs/security-model.md` — plus the artifacts the prompt names, and from their current-state
    picture form a **candidate solution map**: what likely needs to change, what to reuse, and the
@@ -109,7 +115,7 @@ Proceed to the phases only once every needed doc is present.
    re-check:
    - every requirement has a home (a work-item row),
    - every object/field/relationship API name is pinned from the research docs (not guessed); any
-     research gap was sent back to the matching `researching-*` skill, not patched over,
+     research gap was sent back to `sf-research`, not patched over,
    - every **code** item carries concrete given/when/then test scenarios,
    - security is addressed (permission set / FLS / sharing model — from the security decision pack),
    - the design is bulk-safe and scales as data grows (assume it will),
@@ -165,10 +171,14 @@ reasoning, not a restatement of the dispatch table. It holds:
 
 ### `docs/CONTEXT.md` — the shared master (every agent reads this)
 
+`sf-plan` **owns this file** and writes its full structure from scratch (taking the objective from the
+`/sf-plan` prompt). `sf-research` never writes it. When a prior structured spec already exists, revise
+it in place rather than overwriting (Revise mode).
+
 Keep it an **index, not a detail dump** — no schema dumps, test scenarios, or design rationale here;
 those live in the contract files and `docs/solution-design.md`. It holds:
 
-- **Objective** — the problem and the intended outcome, in a few lines.
+- **Objective** — the problem and the intended outcome, in a few lines (from the `/sf-plan` prompt).
 - **User-story index** — one entry per story: its title, kebab-case slug, and a link to
   `docs/contracts/<slug>.md`, listed in build order.
 - **Work-item dispatch table** — every work item across all stories. This is the build dispatch list
