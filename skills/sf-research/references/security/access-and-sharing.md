@@ -1,6 +1,6 @@
 # Access and sharing inventory
 
-> Part of `researching-security-model` — see SKILL.md. Discovery, not design. Inventory the existing
+> Part of `sf-research` (security domain) — see SKILL.md. Discovery, not design. Inventory the existing
 > sharing model and permission strategy before naming a gap. Verify against `force-app/**` then the
 > org; if no org, flag `repo-only`. Bound the inventory to the in-scope objects and target user
 > populations plus one collision hop (the perm sets/profiles and sharing rules touching them) — not
@@ -39,7 +39,7 @@ OWD is the floor the rest of the sharing model builds up from — capture it per
 
 - **Which fields are sensitive?** — for fields the feature reads/writes, capture current FLS (visible/
   read-only/hidden per profile/permission set). Sensitive fields (PII, financial) need explicit FLS in
-  the plan. Cross-reference the field inventory from `researching-data-model`.
+  the plan. Cross-reference the field inventory from the data-model domain.
 
 ## Record-level access strategy
 
@@ -56,7 +56,7 @@ Record which the feature needs and whether existing rules cover it.
 ## Guest / community access
 
 - **Is an Experience Cloud surface involved?** — if so, capture guest-user access needs (guest user
-  profile, sharing sets, the tighter guest security model). Pair with `researching-ui`'s
+  profile, sharing sets, the tighter guest security model). Pair with the ui domain's
   Experience-Cloud fork. Guest access is a frequent design-gating constraint — flag it.
 
 ## What to hand to the doc

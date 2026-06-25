@@ -1,6 +1,6 @@
 # External systems, directionality, and authentication
 
-> Part of `researching-integration-patterns` — see SKILL.md. Discovery, not design. Inventory
+> Part of `sf-research` (integration domain) — see SKILL.md. Discovery, not design. Inventory
 > existing plumbing before naming a gap; the external system's auth is a fact to discover, not a
 > choice. If no org is connected, inventory the repo and flag `repo-only`. Bound the inventory to the
 > in-scope external system(s) and the credentials/events already wired to them — don't catalog every

@@ -53,8 +53,8 @@ user sees — it filters the view, it does **not** enforce security.
 - **Authenticated site users** — use **sharing sets** to grant access to records tied to the user's
   own account/contact, and **share groups** to share high-volume community users' records with
   internal users.
-- This rung pairs with the `researching-ui` internal-vs-Experience-Cloud fork — a public surface
-  changes the security design, not just the UI.
+- This rung pairs with the `sf-research` ui-domain internal-vs-Experience-Cloud fork — a public
+  surface changes the security design, not just the UI.
 
 ## Where it meets the rest of the design
 

@@ -15,8 +15,9 @@ baseline routes to them and adds only the cross-cutting deployment and git guard
 Follow these rules unless the user explicitly overrides them.
 
 > **Three stages for a planned feature — Research → Plan → Build, each human-gated.**
-> **Research:** run the `researching-*` skills to write a state-of-the-world `docs/<domain>.md` per
-> domain the feature touches (reviewed before planning). **Plan:** `/sf-plan` turns those docs into a
+> **Research:** run `/sf-research` — one prompt-driven skill that reads which domains your prompt
+> names and writes a state-of-the-world `docs/<domain>.md` per in-scope domain (reviewed before
+> planning). **Plan:** `/sf-plan` turns those docs into a
 > design contract — `docs/solution-design.md` + a lean `docs/CONTEXT.md` + per-story
 > `docs/contracts/<slug>.md` (it stops and routes back to Research if a needed doc is missing).
 > **Build:** by default, work one story at a time — open its `docs/contracts/<slug>.md` (with the
@@ -30,20 +31,28 @@ Follow these rules unless the user explicitly overrides them.
 
 ## Research Routing
 
-Research is the **first stage of a planned feature** — discovery before design. Each `researching-*`
-skill inventories one domain's current state (scoped to the feature, not an org census) and writes
-`docs/<domain>.md` for a human to review before `/sf-plan`. Run only the ones the feature touches.
+Research is the **first stage of a planned feature** — discovery before design. A single
+prompt-driven skill, **`/sf-research`**, reads which domains your prompt names and inventories only
+those (scoped to the feature, not an org census), writing one `docs/<domain>.md` per in-scope domain
+for a human to review before `/sf-plan`. The prompt is the optimizer — name the domains and what to
+look at, and `sf-research` loads the matching domain checklists. When several domains are in scope it
+researches them in **discovery order** — data-model → security → automation → ui → integration — so
+each builds on the earlier findings (security is per-object, automation runs on those objects,
+integration depends on the automation that drives it). Domain → doc, in that order:
 
-| Discover (before planning) | Skill | Writes |
-|---|---|---|
-| Existing objects, fields, relationships, record types, volumes, config storage, org-wide settings | `researching-data-model` | `docs/data-model.md` |
-| Automation already firing on the target objects (Flows, triggers, validation rules, roll-ups, async) + the framework new automation plugs into | `researching-automation` | `docs/automation.md` |
-| External systems, the auth they support, existing Named/External Credentials, data format & limits, events | `researching-integration-patterns` | `docs/integration-patterns.md` |
-| Existing LWC/Flow/page surfaces & reusable components, placement, internal-vs-Experience-Cloud, design/accessibility constraints | `researching-ui` | `docs/ui-design.md` |
-| OWD, sharing rules, permission sets vs profiles, FLS, record-level access, and the user/feature **license** inventory | `researching-security-model` | `docs/security-model.md` |
+| Domain (in scope when the prompt names it) | Writes |
+|---|---|
+| Objects, fields, relationships, record types, volumes, config storage, org-wide settings | `docs/data-model.md` |
+| OWD, sharing rules, permission sets vs profiles, FLS, record-level access, and the user/feature **license** inventory | `docs/security-model.md` |
+| Automation already firing on the target objects (Flows, triggers, validation rules, roll-ups, async) + the framework new automation plugs into | `docs/automation.md` |
+| Existing LWC/Flow/page surfaces & reusable components, placement, internal-vs-Experience-Cloud, design/accessibility constraints | `docs/ui-design.md` |
+| External systems, the auth they support, existing Named/External Credentials, data format & limits, events | `docs/integration-patterns.md` |
 
-These docs are `/sf-plan`'s required input — it stops and routes back here if one a feature needs is
-missing. `/sf-plan` then refines `docs/data-model.md` and `docs/automation.md` in place.
+`sf-research` has **two modes**: *feature research* (the prompt describes a feature to build → writes
+the in-scope docs **+ a lean `docs/CONTEXT.md`** capturing the objective, as a handoff to `/sf-plan`)
+and *standalone discovery* (just persist the org's current state → the docs only, no CONTEXT.md).
+The research docs are `/sf-plan`'s required input — it stops and routes back here if one a feature
+needs is missing. `/sf-plan` then refines `docs/data-model.md` and `docs/automation.md` in place.
 
 ## Authoring & Config Routing
 
@@ -106,7 +115,7 @@ by severity. The `architect` agent is the separate solution-design governance ga
 design before code and inspects the assembled build against the design contract (completeness, scope,
 design conformance), not code quality.
 
-The authored skills in this repo — the five `researching-*` skills, `sf-plan`, `sf-build`, and
+The authored skills in this repo — `sf-research`, `sf-plan`, `sf-build`, and
 `reviewing-apex` / `reviewing-lwc` / `reviewing-flow` — install into `.claude/skills/` at setup (see
 the README). All other skills referenced above come from `forcedotcom/sf-skills`
 (install: `npx skills add forcedotcom/sf-skills`).

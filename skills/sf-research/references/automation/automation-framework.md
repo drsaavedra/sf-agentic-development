@@ -1,6 +1,6 @@
 # The framework new automation plugs into
 
-> Part of `researching-automation` — see SKILL.md. Discovery, not design. Find the pattern in
+> Part of `sf-research` (automation domain) — see SKILL.md. Discovery, not design. Find the pattern in
 > `force-app/**` and name its entry point, or record its absence. Each question pairs with the grep
 > that answers it. These are **discover-once** patterns — find the framework the in-scope automation
 > plugs into; a representative sample is enough to infer each convention, no exhaustive census.

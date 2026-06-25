@@ -28,17 +28,18 @@ inherited or the Lightning Web Component someone built last year.
 
 This repo covers the hard part: **`reviewing-*` skills** that hold any code to the platform's rules (governor limits, bulk safety,
 FLS, trigger design), no matter who or what wrote it, plus a **research → plan → build** pipeline —
-the **`researching-*` skills** that map the org's current state, **`sf-plan`** that turns that into a
-verified design contract, and a build stage that ships it — making an agent reason like a Salesforce
-developer before it writes a line.
+**`sf-research`**, one prompt-driven skill that maps the org's current state, **`sf-plan`** that turns
+that into a verified design contract, and a build stage that ships it — making an agent reason like a
+Salesforce developer before it writes a line.
 
 The design follows a few principles:
 
 - **Research, plan, implement.** Map the codebase and data schema, gather requirements first
-  (the `researching-*` skills, one per domain → a reviewed `docs/<domain>.md`); then plan within the
-  platform's architecture (`sf-plan`); then implement in the right layer: declarative setup (objects,
-  fields, permissions) first, business logic in code. Each stage is human-gated — you review the
-  research docs before planning and the design contract before building.
+  (`sf-research` — name the domains in your prompt, it writes a reviewed `docs/<domain>.md` per
+  in-scope domain); then plan within the platform's architecture (`sf-plan`); then implement in the
+  right layer: declarative setup (objects, fields, permissions) first, business logic in code. Each
+  stage is human-gated — you review the research docs before planning and the design contract before
+  building.
 - **Context is expensive, and bad context poisons everything.** You can't load all of Salesforce's
   platform rules into the context window, so the knowledge is isolated into per-skill **reference
   packs** and pulled in only when a task needs it.
@@ -52,19 +53,15 @@ The design follows a few principles:
 
 ### Skills
 
-**Research → Plan → Build** — the pipeline for a planned feature. Each research skill inventories one
-domain's current state (scoped to the feature, not an org census) and writes a doc you review before
-planning:
+**Research → Plan → Build** — the pipeline for a planned feature. `sf-research` is one prompt-driven
+skill: name the domains in your prompt and it inventories only those (scoped to the feature, not an
+org census), writing one `docs/<domain>.md` per in-scope domain that you review before planning:
 
 | Skill | Stage | Covers |
 |---|---|---|
-| `researching-data-model` | Research | Existing objects, fields, relationships, record types, volumes, config storage, org-wide settings → `docs/data-model.md` |
-| `researching-automation` | Research | Automation already firing on the target objects (Flows, triggers, validation rules, roll-ups, async) and the framework new automation plugs into → `docs/automation.md` |
-| `researching-integration-patterns` | Research | External systems, supported auth, existing Named/External Credentials, data format & limits, events → `docs/integration-patterns.md` |
-| `researching-ui` | Research | Existing LWC/Flow/page surfaces & reusable components, placement, internal-vs-Experience-Cloud, design/accessibility constraints → `docs/ui-design.md` |
-| `researching-security-model` | Research | OWD, sharing, permission sets vs profiles, FLS, record-level access, and the user/feature license inventory → `docs/security-model.md` |
-| `sf-plan` | Plan | Turns the reviewed research docs into a verified, completeness-checked design contract — `docs/solution-design.md` + a lean `docs/CONTEXT.md` + one `docs/contracts/<slug>.md` per user story: grills decisions and makes the declarative-vs-code calls |
-| `sf-build` | Build *(optional)* | Orchestrated build & review against the contract: dispatches the config skills and the `salesforce-developer` agent per work item, then runs the `reviewing-*` battery as a gate. Optional — the default build is the main agent working one story at a time; deploys stay human-gated |
+| `sf-research` | Research | One prompt-driven skill that inventories the org's current state for the domains your prompt names — in dependency order (data-model → security → automation → ui → integration) — writing a reviewable `docs/<domain>.md` per in-scope domain plus a lean `docs/CONTEXT.md` in feature mode. |
+| `sf-plan` | Plan | Turns the reviewed research docs into a verified, completeness-checked design contract — `docs/solution-design.md` + `docs/CONTEXT.md` + one `docs/contracts/<slug>.md` per user story — grilling decisions and making the declarative-vs-code calls. |
+| `sf-build` | Build *(optional)* | Optional orchestrated build-and-review against the contract that dispatches the config skills and the `salesforce-developer` agent per work item then runs the `reviewing-*` battery as a gate, with deploys staying human-gated. |
 
 **Review** — hold any code to the platform's rules, no matter who or what wrote it:
 
@@ -77,22 +74,22 @@ planning:
 The apex/lwc/flow quality skills also bundle optional **domain reference packs** (B2B Commerce
 today) — see [domain-specific reference packs](#domain-specific-reference-packs).
 
-The five `researching-*` skills, `sf-plan`, and (optionally) `sf-build` drive the pipeline end to
+`sf-research`, `sf-plan`, and (optionally) `sf-build` drive the pipeline end to
 end; see [Shipping a planned feature](#shipping-a-planned-feature).
 
 ### Agents
 
 | Agent | Role |
 |---|---|
-| `salesforce-developer` | Receives a brief from the main agent; builds all automation — Apex (via TDD), LWC, Flows — in an isolated, parallelizable context; quality rules and project constraints come from the skills and brief; produces a build summary |
-| `code-reviewer` | On-demand end-of-build **code-quality** review — runs the matching `reviewing-*` skills plus the analyzer over the delivered Apex/LWC/Flows and reports defects by severity; reviews only, never builds |
-| `architect` | On-demand independent **solution-design** review — a pre-code design gate plus a dependency-scoped whole-build inspection against the design contract (completeness, scope, design conformance), reading the code-reviewer's report for code quality rather than re-running it; flags project-specific constraint violations (e.g. additive-only) only when the spec/brief/ADRs impose them; produces a gap-analysis report |
+| `salesforce-developer` | Builds all automation — Apex (via TDD), LWC, Flows — from a main-agent brief in an isolated, parallelizable context, applying the skills' quality rules and producing a build summary. |
+| `code-reviewer` | On-demand end-of-build **code-quality** review that runs the matching `reviewing-*` skills plus the analyzer over the delivered Apex/LWC/Flows and reports defects by severity, never building. |
+| `architect` | On-demand **solution-design** review — a pre-code design gate plus a whole-build inspection against the design contract for completeness, scope, and design conformance, producing a gap-analysis report. |
 
 See [docs/ORCHESTRATION.md](docs/ORCHESTRATION.md) for the full workflow: the work-brief template, when to parallelize developer instances, and the review/fix loop.
 
 ### Agent Instruction File
 
-`CLAUDE.md` at your project root is the instruction file Claude Code reads on every session. It does one job: route context to the right skill — research to the matching `researching-*` skill, authoring to each `generating-*` / config skill (which also self-trigger), and review to the right `reviewing-*` skill as an end-of-build pass. Everything else — safety rules, quality gates, domain knowledge (including the B2B Commerce packs) — lives in the skills themselves.
+`CLAUDE.md` at your project root is the instruction file Claude Code reads on every session. It does one job: route context to the right skill — research to `sf-research`, authoring to each `generating-*` / config skill (which also self-trigger), and review to the right `reviewing-*` skill as an end-of-build pass. Everything else — safety rules, quality gates, domain knowledge (including the B2B Commerce packs) — lives in the skills themselves.
 
 ---
 
@@ -100,12 +97,13 @@ See [docs/ORCHESTRATION.md](docs/ORCHESTRATION.md) for the full workflow: the wo
 
 For a *planned* feature — not an ad-hoc fix — the toolkit runs three human-gated stages:
 
-- **Research** — run the `researching-*` skills for the domains the feature touches. Each inventories
-  one slice of the org's current state — data model, automation, integrations, UI, security — scoped
-  to the feature (not an org census) and writes a state-of-the-world `docs/<domain>.md` for you to
-  review. This is where platform realities surface *before* design: a missing license, an object
-  already populated so it can't take a master-detail, a sharing model that won't grant the access the
-  feature needs.
+- **Research** — run **`/sf-research`**, naming in your prompt the domains the feature touches. One
+  prompt-driven skill inventories only those slices of the org's current state — data model,
+  automation, integrations, UI, security — scoped to the feature (not an org census) and writes a
+  state-of-the-world `docs/<domain>.md` per in-scope domain for you to review. This is where platform
+  realities surface *before* design: a missing license, an object already populated so it can't take
+  a master-detail, a sharing model that won't grant the access the feature needs. (It can also run
+  standalone, just to persist current-state docs for a repo.)
 - **Plan** — **`/sf-plan`** consumes those reviewed docs (it stops and routes you back to Research if
   one it needs is missing), then grills you to shared understanding one prose question at a time —
   with recommended choices, settling the overall solution shape before the per-capability
@@ -127,23 +125,22 @@ skills under [Skill Routing](#skill-routing) directly.
 
 ### Example
 
-First research the domains the feature touches. A merge that reparents Account children isn't just a
-data-model question — the automation that fires when those children move, and the sharing that governs
-who can see them after, both shape the design:
+First research the domains the feature touches — in a single `/sf-research` prompt that names them. A
+merge that reparents Account children isn't just a data-model question — the automation that fires
+when those children move, and the sharing that governs who can see them after, both shape the design.
+Name all three and `sf-research` runs exactly those, skipping UI and integration:
 
 ```text
-/researching-data-model the Account child relationships and merge-related fields, for a dedupe console
-```
-```text
-/researching-automation existing triggers, flows, and validation rules on Account and its reparented
-children (Contacts, Opportunities, Cases) — what fires on reparent, and the recursion/order risk
-```
-```text
-/researching-security-model OWD, sharing rules, and manual shares on Account and those child objects —
-what access breaks or has to be recomputed when a child is reparented onto the surviving Account
+/sf-research I want a console where a user picks two duplicate Accounts, chooses which one survives,
+reparents all the child records onto it, and retires the loser. Research the child relationships of
+Account to get a picture of the scale, map the data model and OWD/sharing design, and research existing
+automations on Account and its child objects to see what fires on
+reparenting and the recursion/order risk.
 ```
 
-Review the `docs/*.md` each research skill writes, then hand the lot to `/sf-plan`:
+Review the `docs/*.md` `sf-research` writes — `docs/data-model.md`, `docs/automation.md`,
+`docs/security-model.md` here, plus the lean `docs/CONTEXT.md` capturing the objective — then hand the
+lot to `/sf-plan`:
 
 ```text
 /sf-plan I want a console where a user picks two duplicate Accounts, chooses which one

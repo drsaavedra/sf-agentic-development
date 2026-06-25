@@ -1,6 +1,6 @@
 # Existing surfaces, reusable components, and placement
 
-> Part of `researching-ui` — see SKILL.md. Discovery, not design. Reuse-before-invent applies hardest
+> Part of `sf-research` (ui domain) — see SKILL.md. Discovery, not design. Reuse-before-invent applies hardest
 > to UI. Name actual component/page API names from `force-app/**`; if no org is connected, flag
 > `repo-only`. **Bound this to the feature:** the component(s) the request targets, the components
 > they import or reuse, and what shares their placement surface — not every bundle in the org.

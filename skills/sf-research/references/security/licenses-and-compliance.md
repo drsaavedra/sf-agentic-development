@@ -1,6 +1,6 @@
 # License and feature inventory, and compliance
 
-> Part of `researching-security-model` — see SKILL.md. This is the surprise the whole research stage
+> Part of `sf-research` (security domain) — see SKILL.md. This is the surprise the whole research stage
 > is named for: "we don't have that license" must surface here, not mid-build. Licensing can only be
 > confirmed against the org — if no org is connected, mark every license **UNCONFIRMED (repo-only)**.
 > Scope this to the **target user population** and the features the request assumes — the org-wide
@@ -39,7 +39,7 @@ lacks the Experience Cloud / CPQ / Field Service entitlement the feature assumes
 - **Shield Platform Encryption** — is it enabled, and would the feature's fields need encryption?
   Encrypted fields carry query/automation constraints — flag them.
 - **Data residency** — any requirement that data stay in a region; relevant for integrations
-  (cross-ref `researching-integration-patterns`) and storage choices.
+  (cross-ref the integration domain) and storage choices.
 - **Audit / compliance regime** — note any HIPAA/GDPR/FINRA-style constraint that shapes access and
   retention.
 

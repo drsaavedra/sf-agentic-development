@@ -1,6 +1,6 @@
 # Data format, limits, reliability, and event fit
 
-> Part of `researching-integration-patterns` — see SKILL.md. Discovery, not design. The contract
+> Part of `sf-research` (integration domain) — see SKILL.md. Discovery, not design. The contract
 > availability and the volume-vs-limits picture decide which approaches are even possible — capture
 > them so `sf-plan` chooses from a real set. Everything here is about the in-scope integration(s) —
 > no org-wide inventory.
@@ -21,7 +21,7 @@ This drives the whole declarative-vs-code ladder — discover it first.
 Limits turn a clean design into a redesign mid-build — quantify them in research.
 
 - **How often, how much?** — per-transaction count, peak/day, payload size. Ask the system owner and
-  estimate from the data volumes (`researching-data-model`).
+  estimate from the data volumes (the data-model domain).
 - **Against the limits** — flag pressure on: **100 callouts per transaction**, the **daily API
   request limit**, callout timeout (120s), and heap. A per-record callout over a bulk operation is a
   classic blow-up — note it.
