@@ -19,8 +19,12 @@ Follow these rules unless the user explicitly overrides them.
 > domain the feature touches (reviewed before planning). **Plan:** `/sf-plan` turns those docs into a
 > design contract — `docs/solution-design.md` + a lean `docs/CONTEXT.md` + per-story
 > `docs/contracts/<slug>.md` (it stops and routes back to Research if a needed doc is missing).
-> **Build:** `/sf-build`. The routing below governs everything else — ad-hoc edits, fixes, reviews,
-> audits, config, and ops.
+> **Build:** by default, work one story at a time — open its `docs/contracts/<slug>.md` (with the
+> research docs and `docs/solution-design.md` as context; a fresh session per story keeps context
+> lean) and build it with the Authoring & Review routing below. `/sf-build` is an **optional**
+> orchestrated mode that dispatches subagents per work item — heavier on tokens, worth it only for
+> large multi-story builds. The routing below governs the default build and everything else — ad-hoc
+> edits, fixes, reviews, audits, config, and ops.
 
 ---
 

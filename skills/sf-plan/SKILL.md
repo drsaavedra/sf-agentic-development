@@ -12,7 +12,9 @@ Produce a verified, completeness-checked design contract **before any build**, w
 Output is `docs/solution-design.md` (the design), a lean `docs/CONTEXT.md`, and one
 `docs/contracts/<slug>.md` per user story (see the Output contract below). This skill is **planning
 only**: it does **not** re-explore the org or author any artifact (Apex, LWC, Flow, metadata) —
-research gathered the current state, and `/sf-build` builds. End by handing off to `/sf-build`.
+research gathered the current state, and the **build stage** builds. End by handing off to the build
+stage — by default the user (or main agent) builds one story at a time from its contract; `/sf-build`
+is an optional orchestrated mode for large multi-story builds.
 
 ## Prerequisite — the research docs must exist
 
@@ -118,7 +120,7 @@ Proceed to the phases only once every needed doc is present.
      git repo (`git rev-parse --is-inside-work-tree`):
      - **Git repo present** → **ask once whether to enable checkpoint commits** for the build, via
        the `AskUserQuestion` picker (Enabled / Disabled, recommended *Enabled* for long or multi-item
-       builds): *"Should `/sf-build` checkpoint-commit each work item as it passes review (on the
+       builds): *"Should the build checkpoint-commit each work item as it passes review (on the
        current branch), so progress is captured and referenceable in a handover?"*
      - **No git repo** → offer to initialize one via the picker (*Initialize git* / *Skip*). If the
        user accepts, run `git init` in the project folder, then ask the checkpoint question above. If
@@ -130,8 +132,9 @@ Proceed to the phases only once every needed doc is present.
      design decisions, and risks — enough to review without opening the file.
    - tell the user: review the summary; open `docs/solution-design.md` and `docs/CONTEXT.md` (and the
      relevant `docs/contracts/<slug>.md`) for full detail if doubtful; have the developer/architect
-     review the spec (a manual step); then run `/sf-build` to build.
-   - **do not invoke `/sf-build` or start building yourself** — stop here. The spec is meant to be
+     review the spec (a manual step); then build — by default one story at a time from its contract
+     (a fresh session per story keeps context lean), or via `/sf-build` for an orchestrated build.
+   - **do not start building yourself or invoke `/sf-build`** — stop here. The spec is meant to be
      reviewed before any build, so leave the decision to proceed with the user.
 
 ## Output contract — `docs/solution-design.md` + `docs/CONTEXT.md` + `docs/contracts/<slug>.md`
@@ -167,8 +170,9 @@ those live in the contract files and `docs/solution-design.md`. It holds:
 - **Objective** — the problem and the intended outcome, in a few lines.
 - **User-story index** — one entry per story: its title, kebab-case slug, and a link to
   `docs/contracts/<slug>.md`, listed in build order.
-- **Work-item dispatch table** — every work item across all stories. This is the `/sf-build`
-  dispatch list and the global dependency graph:
+- **Work-item dispatch table** — every work item across all stories. This is the build dispatch list
+  and the global dependency graph — the main agent's work index by default, or `/sf-build`'s dispatch
+  list in orchestrated mode:
 
   | # | Story | Work item | Metadata type | Config or code | Depends on | Commit |
   |---|---|---|---|---|---|---|
@@ -177,20 +181,20 @@ those live in the contract files and `docs/solution-design.md`. It holds:
   - **Code rows** → built by `salesforce-developer` (Apex via TDD; LWC/Flow via the validate loop).
   - `Story` links to the `docs/contracts/<slug>.md` that holds the row's full detail; `Depends on`
     orders the build — a row builds only after the rows it lists, config or code.
-  - `Commit` — leave empty (`—`); `/sf-build` fills the short commit hash here when the row passes
+  - `Commit` — leave empty (`—`); the build fills the short commit hash here when the row passes
     review, but only if checkpoint commits are enabled (below).
 - **Doc pointers** — links to the research docs the stories build on (`docs/data-model.md`,
   `docs/automation.md`, `docs/ui-design.md`, `docs/integration-patterns.md`, `docs/security-model.md`
   — those that apply) and to `docs/solution-design.md`. The dispatch table and contracts cite these
   rather than repeating their content.
-- **`Architect review: recommended | not needed`** — one line with a one-line reason, so `/sf-build`
+- **`Architect review: recommended | not needed`** — one line with a one-line reason, so the build
   knows whether to invoke the `architect` agent (the solution-design gate — design review and the
   end-of-sprint whole-build inspection against the design contract) without having to judge it
   itself. Recommend it when the design shows concrete complexity signals — a new or changed data
   model, cross-object automation, callouts / async (governor-limit risk), or a multi-domain or
   many-item build; otherwise mark it *not needed*.
 - **`Checkpoint commits: enabled | disabled`** — one line recording the user's answer to the
-  handoff checkpoint question (Phase 8). On `enabled`, `/sf-build` commits each work item on the
+  handoff checkpoint question (Phase 8). On `enabled`, the build commits each work item on the
   current branch as it passes review and fills the `Commit` column / contract Build log; on
   `disabled` (the default) it commits nothing. This is the recorded grant — see
   [`docs/ORCHESTRATION.md`](../../docs/ORCHESTRATION.md) **Checkpoint commits**.
@@ -200,8 +204,10 @@ those live in the contract files and `docs/solution-design.md`. It holds:
 
 ### `docs/contracts/<slug>.md` — one per user story (the scoped contract)
 
-Each file must be **self-contained enough that `/sf-build` can cut a work brief from it without
-opening any other story**. Use the same kebab-case `<slug>` as the index entry. It holds:
+Each file must be **self-contained enough that the build can cut a work brief from it without
+opening any other story** — whether the main agent works the story directly (the default, a fresh
+session per contract) or `/sf-build` dispatches it. Use the same kebab-case `<slug>` as the index
+entry. It holds:
 
 - **Story** — title, objective, and acceptance criteria.
 - **Work items in detail** — for each item the story owns (matching its rows in the dispatch table),
@@ -209,9 +215,9 @@ opening any other story**. Use the same kebab-case `<slug>` as the index entry. 
   `docs/data-model.md`),
   **Test scenarios** (concrete given/when/then — required for every code item), **Constraints**
   (project-specific rules), **Expected outputs** (artifacts to produce), **Validation criteria**
-  (exit conditions). Write each complete enough that `/sf-build` rediscovers nothing.
+  (exit conditions). Write each complete enough that the build rediscovers nothing.
 - **Decisions & assumptions (story-specific)** — decisions local to this story, each with its reason.
-- **Build log** — leave a stub heading; `/sf-build` fills it (only when checkpoint commits are
+- **Build log** — leave a stub heading; the build fills it (only when checkpoint commits are
   enabled), one line per work item: `§N <work item> — <short hash> · review passed · <date>`. This
   is the per-story handover record; the dispatch table's `Commit` column is its index.
 
