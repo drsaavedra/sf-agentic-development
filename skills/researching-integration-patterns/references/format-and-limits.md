@@ -2,7 +2,8 @@
 
 > Part of `researching-integration-patterns` — see SKILL.md. Discovery, not design. The contract
 > availability and the volume-vs-limits picture decide which approaches are even possible — capture
-> them so `sf-plan` chooses from a real set.
+> them so `sf-plan` chooses from a real set. Everything here is about the in-scope integration(s) —
+> no org-wide inventory.
 
 ## Data format and contract availability
 

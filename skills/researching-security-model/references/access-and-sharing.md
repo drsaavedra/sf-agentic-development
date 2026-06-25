@@ -2,7 +2,9 @@
 
 > Part of `researching-security-model` — see SKILL.md. Discovery, not design. Inventory the existing
 > sharing model and permission strategy before naming a gap. Verify against `force-app/**` then the
-> org; if no org, flag `repo-only`.
+> org; if no org, flag `repo-only`. Bound the inventory to the in-scope objects and target user
+> populations plus one collision hop (the perm sets/profiles and sharing rules touching them) — not
+> the org's entire sharing model.
 
 ## Org-wide defaults (OWD)
 

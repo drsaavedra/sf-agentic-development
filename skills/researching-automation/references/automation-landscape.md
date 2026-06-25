@@ -3,7 +3,8 @@
 > Part of `researching-automation` — see SKILL.md. Discovery, not design. Before any automation is
 > planned you must know what already fires on the target objects; the "one automation strategy per
 > object" guardrail is unenforceable without this inventory. Discovery only — the Flow-vs-Apex
-> *choice* stays with `sf-plan`.
+> *choice* stays with `sf-plan`. Bound the inventory to the in-scope objects plus one collision hop —
+> related objects whose automation a change here would invoke.
 
 ## What already fires on each in-scope object
 

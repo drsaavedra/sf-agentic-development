@@ -2,15 +2,18 @@
 
 > Part of `researching-data-model` — see SKILL.md. Discovery, not design. Verify against
 > `force-app/**` first, then the org (org wins). Each question pairs with the read-only command that
-> answers it — run it; don't ask the user.
+> answers it — run it; don't ask the user. **Bound this to the in-scope objects plus one collision
+> hop (their direct parents/children) — don't inventory the org's whole schema.**
 
 ## Objects in scope
 
 Which objects does the feature touch? Inventory each before declaring any gap.
 
-- **What objects exist?** — `sf sobject list --sobject all` (org) and the metadata tree under
-  `force-app/main/default/objects/` (repo). Standard objects (Account, Contact, Case, Opportunity, …)
-  before custom — note which standard objects already model the concept.
+- **Which objects are in scope?** — start from the objects the request names or implies; don't list
+  the whole org. Run `sf sobject describe` on each in-scope object (below), and take **one collision
+  hop** to objects directly related to them (parents/children from the describe relationships). Reach
+  for `sf sobject list` only to discover which standard object models the concept — not as a routine
+  full census.
 - **What does each look like?** — `sf sobject describe --sobject <Name>` returns fields, types,
   relationships, record types, and child relationships in one call. Read it before reading XML.
 - **Custom objects already present** — `force-app/**/objects/*__c/` and the describe `custom` flag.

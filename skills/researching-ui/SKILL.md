@@ -18,6 +18,12 @@ fork here.
 
 ## Operating rules
 
+- **Scope from the request, not the org.** Derive the in-scope set — the components and surfaces the
+  feature changes — from the prompt first, and inventory only those plus **one collision hop** (the
+  components they import/reuse and anything sharing their placement surface). Don't census the org —
+  listing every bundle is the anti-pattern this guards against. If the request is too vague to scope,
+  ask one scoping question rather than inventorying to compensate. (Whole-org documentation is a
+  separate, opt-in mode — see below.)
 - **Verify, never guess.** Inventory real components and pages under `force-app/**` (`lwc/`, `aura/`,
   `flows/`, `flexipages/`) and confirm against the org where it helps. **If no org is connected,
   inventory the repo alone and flag the doc `repo-only`.** Name actual component/page API names —
@@ -28,10 +34,15 @@ fork here.
 - **The placement and the Experience-Cloud question are discovery, not preference.** Where the UI must
   live, and whether it's internal or a public site, follow from the requirement and the org's setup —
   capture them, don't default them.
+- **Org-survey mode is opt-in.** Only when the user explicitly asks to document the whole org/domain
+  (not a specific feature) do you drop the scope bound and inventory wholesale; the feature-scoped
+  default above holds otherwise.
 
 ## Phases: Discover → Analyze → Document
 
-1. **Discover.** Capture org context (reachable? else `repo-only`). Then work the two reference
+1. **Discover.** **Set scope first** — from the feature request, list the components and placement
+   surfaces in scope; everything below is bounded to those + one collision hop, not an org-wide
+   census. Then capture org context (reachable? else `repo-only`). Then work the two reference
    checklists: existing surfaces + reusable components + placement + the internal/Experience-Cloud
    fork, and the design-system/branding/accessibility/state constraints. Read the bundles and pages;
    ask the user only for intent the metadata can't show (e.g. "is this for internal users or
@@ -56,6 +67,8 @@ Read both — what exists and the constraints both shape the component contract 
 
 Write these sections (omit one only if genuinely N/A). If no org was reachable, add a first line:
 `> **Status: repo-only** — components/pages verified against force-app/** only, not org-confirmed.`
+Keep the doc **scoped to the feature** — a later feature appends its own in-scope findings, so this
+is the union of what features have needed, not a complete org model.
 
 - **Scope** — what UI the feature needs, and for whom.
 - **Existing surfaces & reusable components** — relevant LWC/Aura/Flow/page API names already present,

@@ -3,6 +3,8 @@
 > Part of `researching-security-model` — see SKILL.md. This is the surprise the whole research stage
 > is named for: "we don't have that license" must surface here, not mid-build. Licensing can only be
 > confirmed against the org — if no org is connected, mark every license **UNCONFIRMED (repo-only)**.
+> Scope this to the **target user population** and the features the request assumes — the org-wide
+> license queries below are one-shot facts, not an invitation to catalog every entitlement.
 
 ## Why this gates the design
 

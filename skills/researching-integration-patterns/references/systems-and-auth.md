@@ -2,7 +2,9 @@
 
 > Part of `researching-integration-patterns` — see SKILL.md. Discovery, not design. Inventory
 > existing plumbing before naming a gap; the external system's auth is a fact to discover, not a
-> choice. If no org is connected, inventory the repo and flag `repo-only`.
+> choice. If no org is connected, inventory the repo and flag `repo-only`. Bound the inventory to the
+> in-scope external system(s) and the credentials/events already wired to them — don't catalog every
+> integration in the org.
 
 ## The external system(s) and which way data flows
 
@@ -29,9 +31,9 @@ This is the surprise to surface early — Salesforce must match what the system 
 
 ## Existing credentials — don't rebuild plumbing
 
-- **Named Credentials already configured** — `force-app/**/namedCredentials/*.namedCredential-meta.xml`
-  and `sf org list metadata --metadata-type NamedCredential` (org). List name + endpoint; an existing
-  one pointing at the target system is a reuse candidate.
+- **Named Credentials already configured** — search `force-app/**/namedCredentials/` (and
+  `sf org list metadata --metadata-type NamedCredential`) for one whose endpoint points at an in-scope
+  system; that's a reuse candidate. You're looking for the in-scope systems' plumbing, not a full list.
 - **External Credentials** — `force-app/**/externalCredentials/`. Note the auth protocol/principals
   already set up.
 - **Legacy named credentials** — distinguish the modern extensible Named Credentials (Winter '23+)

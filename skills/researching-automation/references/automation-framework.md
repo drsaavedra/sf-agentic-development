@@ -2,12 +2,13 @@
 
 > Part of `researching-automation` — see SKILL.md. Discovery, not design. Find the pattern in
 > `force-app/**` and name its entry point, or record its absence. Each question pairs with the grep
-> that answers it.
+> that answers it. These are **discover-once** patterns — find the framework the in-scope automation
+> plugs into; a representative sample is enough to infer each convention, no exhaustive census.
 
 ## Trigger framework
 
-- **One trigger per object?** — list `force-app/**/triggers/*.trigger`; flag any object with more than
-  one trigger.
+- **One trigger per object?** — check the in-scope objects' triggers (and scan `force-app/**/triggers/`
+  for the overall convention); flag any in-scope object with more than one trigger.
 - **Handler base class?** — grep triggers for the handler call
   (`grep -rh "new .*Handler\|TriggerHandler\|\.run()" force-app/**/triggers/`). The repo commonly
   references a `TriggerHandler.cls` base. Record the base class name and **how a handler extends it**

@@ -20,6 +20,11 @@ already fires and the framework new automation slots into.
 
 ## Operating rules
 
+- **Scope from the request, not the org.** Derive the in-scope set — the objects whose automation the
+  feature touches — from the prompt first, and inventory only that set plus **one collision hop**
+  (automation that shares those objects' save order, and the framework new automation plugs into).
+  Don't census the org. If the request is too vague to scope, ask one scoping question rather than
+  inventorying to compensate. (Whole-org documentation is a separate, opt-in mode — see below.)
 - **Verify, never guess.** Read the actual Flows, triggers, classes, and validation rules under
   `force-app/**` first, then confirm against the org where it adds truth — **the org wins** on
   divergence. Read-only `sf` CLI introspection is free: `sf sobject describe --sobject <Name>` for
@@ -33,10 +38,15 @@ already fires and the framework new automation slots into.
   there is none.
 - **Name the absence too.** "No trigger handler framework; triggers carry logic inline" is a finding
   that shapes the plan as much as "a `TriggerHandler` base is in use."
+- **Org-survey mode is opt-in.** Only when the user explicitly asks to document the whole org/domain
+  (not a specific feature) do you drop the scope bound and inventory wholesale; the feature-scoped
+  default above holds otherwise.
 
 ## Phases: Discover → Analyze → Document
 
-1. **Discover.** Capture org context first — org type (prod/sandbox/scratch) and whether an org is
+1. **Discover.** **Set scope first** — from the feature request, list the objects whose automation is
+   in play; everything below is bounded to that set + one collision hop, not an org-wide census. Then
+   capture org context — org type (prod/sandbox/scratch) and whether an org is
    reachable (`sf org display`); if not, the doc is `repo-only`. Then work the two reference
    checklists below: inventory the automation already firing on the in-scope objects (triggers, Flows,
    validation rules, roll-ups, legacy Process Builder/Workflow) and their order of execution, and the
@@ -64,6 +74,8 @@ Read both — the live automation and the framework it plugs into are both input
 
 Write these sections (omit one only if genuinely N/A; never pad). If no org was reachable, add a
 first line: `> **Status: repo-only** — patterns verified against force-app/** only, not org-confirmed.`
+Keep the doc **scoped to the feature** — a later feature appends its own in-scope findings, so this
+is the union of what features have needed, not a complete org model.
 
 - **Scope** — which objects this feature touches, and the automation areas inventoried.
 - **Automation landscape (target objects)** — every trigger/Flow/validation rule/roll-up firing on

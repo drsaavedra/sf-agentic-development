@@ -20,6 +20,11 @@ before `sf-plan` plans.
 
 ## Operating rules
 
+- **Scope from the request, not the org.** Derive the in-scope set — the external systems the feature
+  talks to — from the prompt first, and inventory only those plus **one collision hop** (the
+  credentials and events already wired to them). Don't census the org. If the request is too vague to
+  scope, ask one scoping question rather than inventorying to compensate. (Whole-org documentation is
+  a separate, opt-in mode — see below.)
 - **Verify, never guess.** Inventory existing integration metadata in `force-app/**` (Named
   Credentials, External Credentials, External Services, remote site settings) and confirm against the
   org where possible. **If no org is connected, inventory the repo alone and flag the doc
@@ -30,10 +35,15 @@ before `sf-plan` plans.
 - **The external system's constraints are facts, not preferences.** What auth it supports, whether it
   publishes an OpenAPI/WSDL spec, and its rate limits are discovered (asked of the system owner if
   needed), not chosen.
+- **Org-survey mode is opt-in.** Only when the user explicitly asks to document the whole org/domain
+  (not a specific feature) do you drop the scope bound and inventory wholesale; the feature-scoped
+  default above holds otherwise.
 
 ## Phases: Discover → Analyze → Document
 
-1. **Discover.** Capture org context (reachable? else `repo-only`). Then work the two reference
+1. **Discover.** **Set scope first** — from the feature request, list the external systems in scope;
+   everything below is bounded to those + one collision hop, not an org-wide census. Then capture org
+   context (reachable? else `repo-only`). Then work the two reference
    checklists: the external systems + auth they support + existing credentials, and the data
    format + limits + reliability needs. Read the integration metadata; ask the system owner only what
    the repo/org can't reveal.
@@ -57,6 +67,8 @@ Read both — auth and limits both gate the approach `sf-plan` can choose.
 
 Write these sections (omit one only if genuinely N/A). If no org was reachable, add a first line:
 `> **Status: repo-only** — integration metadata verified against force-app/** only, not org-confirmed.`
+Keep the doc **scoped to the feature** — a later feature appends its own in-scope findings, so this
+is the union of what features have needed, not a complete org model.
 
 - **Scope** — which external system(s) the feature integrates with, and the business reason.
 - **External systems & directionality** — per system: name, outbound/inbound/bidirectional, what it

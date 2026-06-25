@@ -2,13 +2,16 @@
 
 > Part of `researching-ui` — see SKILL.md. Discovery, not design. Reuse-before-invent applies hardest
 > to UI. Name actual component/page API names from `force-app/**`; if no org is connected, flag
-> `repo-only`.
+> `repo-only`. **Bound this to the feature:** the component(s) the request targets, the components
+> they import or reuse, and what shares their placement surface — not every bundle in the org.
 
 ## Existing UI surfaces and reusable components
 
-- **What LWCs exist?** — `force-app/**/lwc/*/` (each folder is a bundle). List bundles relevant to the
-  feature; read the `.js-meta.xml` `targets` to see where each can be placed and whether it's exposed.
-  Note any that are clearly reusable building blocks (generic datatable, modal, picker).
+- **Which LWCs are in scope?** — start from the component(s) the request names; read each bundle's
+  `.js-meta.xml` `targets` (where it can be placed, whether it's exposed) and its imports. Then take
+  **one collision hop**: the components it imports/reuses and any that share its placement surface.
+  Don't enumerate every bundle in the org — note reusable building blocks (generic datatable, modal,
+  picker) only when they fall in that radius.
 - **Aura components** — `force-app/**/aura/`. Legacy, but existing ones may already cover the need;
   note them as reference (don't plan new Aura).
 - **Screen Flows with UI** — `force-app/**/flows/*.flow-meta.xml` with screens. An existing guided
@@ -16,9 +19,10 @@
 - **Reuse vs reference** — mark each found component as a **reuse candidate** (drop-in usable) or
   **reference-only** (shows the pattern but not directly reusable). `sf-plan` can only choose reuse if
   research surfaced the component.
-- **Duplicate-component risk** — grep for components doing the same job
-  (`grep -rl "lightning-datatable" force-app/**/lwc/`) so the plan extends one rather than adding an
-  Nth copy.
+- **Duplicate-component risk (within scope)** — when the feature would add a new component, grep for
+  an existing one doing that same job (`grep -rl "lightning-datatable" force-app/**/lwc/`) so the plan
+  extends it rather than adding an Nth copy. Scope the search to the capability you're about to add,
+  not a full catalog.
 
 ## Placement surfaces
 

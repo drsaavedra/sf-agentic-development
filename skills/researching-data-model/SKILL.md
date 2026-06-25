@@ -17,6 +17,11 @@ it there.
 
 ## Operating rules
 
+- **Scope from the request, not the org.** Derive the in-scope set — the objects and fields the
+  feature stores or relates — from the prompt first, and inventory only that set plus **one collision
+  hop** (directly related objects, and fields that could duplicate what you'd add). Don't census the
+  org. If the request is too vague to scope, ask one scoping question rather than inventorying to
+  compensate. (Whole-org documentation is a separate, opt-in mode — see below.)
 - **Verify, never guess.** Confirm every object, field, and relationship API name against the repo
   (`force-app/**`) first, then the org — **the org wins** on divergence. Read-only `sf` CLI
   introspection is free: `sf sobject list`, `sf sobject describe --sobject <Name>`,
@@ -28,10 +33,15 @@ it there.
   or record type usually beats a new object, and `sf-plan` can only choose reuse if research found it.
 - **Don't fabricate counts.** Record volumes come from a `COUNT()` query, not a guess. If the org
   can't be queried, write "unknown (repo-only)", not a number.
+- **Org-survey mode is opt-in.** Only when the user explicitly asks to document the whole org/domain
+  (not a specific feature) do you drop the scope bound and inventory wholesale; the feature-scoped
+  default above holds otherwise.
 
 ## Phases: Discover → Analyze → Document
 
-1. **Discover.** Capture org context first — org type (prod/sandbox/scratch) and whether an org is
+1. **Discover.** **Set scope first** — from the feature request, list the objects (and their fields)
+   in scope; everything below is bounded to that set + one collision hop, not an org-wide census. Then
+   capture org context — org type (prod/sandbox/scratch) and whether an org is
    reachable (`sf org display`); if not, the doc is `repo-only`. Then work the two reference
    checklists below: inventory objects/fields/relationships/record-types/picklists from
    `force-app/**` and `sf sobject describe`, and query record volumes + org-wide settings. Read the
@@ -57,6 +67,8 @@ Most features touch both — read both before writing the doc.
 
 Write these sections (omit one only if genuinely N/A; never pad). If no org was reachable, add a
 first line: `> **Status: repo-only** — names verified against force-app/** only, not org-confirmed.`
+Keep the doc **scoped to the feature** — a later feature appends its own in-scope findings, so this
+is the union of what features have needed, not a complete org model.
 
 - **Scope** — which objects this feature touches, and why they were inventoried.
 - **Objects & fields** — per object: API name, custom/standard, the fields relevant to the feature

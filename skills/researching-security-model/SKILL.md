@@ -19,6 +19,11 @@ Experience-Cloud fork.
 
 ## Operating rules
 
+- **Scope from the request, not the org.** Derive the in-scope set — the objects and user populations
+  whose access the feature touches — from the prompt first, and inventory only those plus **one
+  collision hop** (the perm sets/profiles granting those objects, and the licenses the target users
+  hold). Don't census the org. If the request is too vague to scope, ask one scoping question rather
+  than inventorying to compensate. (Whole-org documentation is a separate, opt-in mode — see below.)
 - **Verify, never guess.** Inventory sharing/permission metadata in `force-app/**` (`sharingRules/`,
   `profiles/`, `permissionsets/`, object `<sharingModel>`) and confirm against the org. **Licenses
   especially must be confirmed against the org** (`sf data query` on `UserLicense`/`PermissionSetLicense`)
@@ -29,10 +34,15 @@ Experience-Cloud fork.
   record OWD and the role hierarchy before naming a gap.
 - **Licensing absence is a finding, not a footnote.** "Target users hold Platform licenses; the
   feature needs full Sales Cloud" must surface in research — it can invalidate the whole approach.
+- **Org-survey mode is opt-in.** Only when the user explicitly asks to document the whole org/domain
+  (not a specific feature) do you drop the scope bound and inventory wholesale; the feature-scoped
+  default above holds otherwise.
 
 ## Phases: Discover → Analyze → Document
 
-1. **Discover.** Capture org context (reachable? else `repo-only`). Then work the two reference
+1. **Discover.** **Set scope first** — from the feature request, list the objects and user populations
+   in scope; everything below is bounded to those + one collision hop, not an org-wide census. Then
+   capture org context (reachable? else `repo-only`). Then work the two reference
    checklists: access & sharing (OWD, roles, sharing rules, perm-sets-vs-profiles, FLS, record-level
    strategy), and licenses & compliance. Query the org for license entitlement; read the sharing
    metadata; ask the user only for intent (e.g. which user population this targets).
@@ -56,6 +66,8 @@ Read both — the sharing model and the license entitlement both gate what `sf-p
 
 Write these sections (omit one only if genuinely N/A). If no org was reachable, add a first line:
 `> **Status: repo-only** — sharing verified against force-app/** only; LICENSING UNCONFIRMED (no org).`
+Keep the doc **scoped to the feature** — a later feature appends its own in-scope findings, so this
+is the union of what features have needed, not a complete org model.
 
 - **Scope** — which objects/users the feature's access touches.
 - **OWD & sharing** — org-wide default per in-scope object, and how it constrains visibility.
