@@ -13,7 +13,8 @@ Experience Builder data bindings replace it) — from two locally downloaded rep
 
 1. Produce evidence-backed research findings plus an implementation `plan.md` in
    `research/b2b-commerce/`.
-2. Author a new **`generating-b2b-lwc`** skill (domain overlay on `generating-lwc-components`).
+2. Author a new **`generating-b2b-lwc`** skill — a standalone domain skill carrying only the B2B
+   Commerce knowledge Claude's base model can't reliably know, with `reviewing-lwc` as the gate.
 3. Upgrade **`reviewing-lwc`**'s existing `references/commerce-b2b.md` with the same grounded
    patterns, in reviewing voice.
 
@@ -32,7 +33,7 @@ Where the two conflict, the open-source repo wins and the divergence is recorded
 
 | Question | Decision |
 |---|---|
-| Shape of `generating-b2b-lwc` | **Domain overlay** — assumes `generating-lwc-components` owns base LWC quality and `applying-slds` owns styling; adds only the B2B Commerce layer. Mirrors the applying-slds pairing. |
+| Shape of `generating-b2b-lwc` | **Standalone domain skill** (revised from the earlier "domain overlay" answer) — no dependency on sf-skills (`generating-lwc-components`, `applying-slds`), which the user plans to remove in separate work. It assumes Claude's base-model LWC competence for generic code and carries only the B2B Commerce domain delta the model can't reliably know: the `commerce/*`/`experience/*` API surface, expression bindings, `sfdc_cms__lwc` bundle conventions, storefront patterns. `reviewing-lwc` is the quality gate on the output. |
 | Research depth | **Full sweep by family** — exhaustive scripted census over all ~410 bundles + judgment-guided deep reads per family. |
 | Findings/plan location | `research/b2b-commerce/` (subfolder of the repo's existing `research/` convention). |
 | Repo weighting | Open-source repo primary; commerce-on-lightning secondary/contrast. |
@@ -99,11 +100,16 @@ First authoring skill owned by this repo. House conventions throughout: frontmat
 with TRIGGER / DO NOT TRIGGER clauses, lean SKILL.md with a quick-reference table and a
 `references/` routing table, Cross-Skill Integration section.
 
-- **Contract:** overlay — `generating-lwc-components` owns base LWC quality, `applying-slds` owns
-  styling; this skill adds only the B2B Commerce storefront layer.
+- **Contract:** standalone domain skill. It does not depend on any sf-skills skill and does not
+  re-teach base LWC authoring — Claude's base model is assumed competent there, and `reviewing-lwc`
+  gates the output. The skill carries only the B2B Commerce domain delta: proprietary platform
+  knowledge that is thin in model training data.
 - **Triggers:** building/editing storefront LWC (cart, checkout, PDP/PLP, search, quick order,
   Experience Builder commerce components). Does NOT trigger for generic LWC or for reviews
   (that is `reviewing-lwc`).
+- **Cross-Skill Integration:** points at `reviewing-lwc` (the review gate for what it produces),
+  not at sf-skills. No hard reference to `generating-lwc-components` or `applying-slds` anywhere
+  in the skill.
 - **Core content** (from findings): the no-Apex data-access decision ladder (expression-bound
   `@api` properties → wire adapters → imperative `commerce/*` APIs → Apex only as documented last
   resort), per-family API guidance, composition conventions from the open-source repo
@@ -127,8 +133,8 @@ Expanded in place — no restructuring of the skill:
 ### Routing updates
 
 - `CLAUDE.md` Authoring & Config table: new `generating-b2b-lwc` row (trigger: B2B/B2C Commerce
-  storefront LWC).
-- `CLAUDE.md` "LWC ↔ SLDS bridge" note: add the B2B overlay pairing.
+  storefront LWC). No other CLAUDE.md changes — the broader rescoping away from sf-skills is the
+  user's separate effort, and this skill's row must survive it (no sf-skills wording in the row).
 - README authored-skills list updated.
 - The two skills stay symmetric: same patterns, authoring voice vs reviewing voice.
 
@@ -159,7 +165,10 @@ plan.md, each skill deliverable) on `feature/commerce-b2b-open-source-patterns`.
 
 ## Out of scope
 
-- Modifying upstream sf-skills (`generating-lwc-components` etc.) — the overlay only pairs with them.
+- Removing the sf-skills dependency from CLAUDE.md/README/setup — that is the user's separate
+  planned effort. This work only ensures the new skill and the reviewing-lwc upgrade have **zero
+  references to sf-skills skills**, so they survive that removal untouched.
+- Modifying upstream sf-skills (`generating-lwc-components` etc.).
 - The `integrating-b2b-commerce-open-code-components` installed skill (copies components into a
   store) — unrelated to authoring/reviewing; no overlap, no changes.
 - Deploying anything to a Salesforce org.
