@@ -72,6 +72,13 @@ org census), writing one `docs/<domain>.md` per in-scope domain that you review 
 The apex/lwc/flow quality skills also bundle optional **domain reference packs** (B2B Commerce
 today); see [domain-specific reference packs](#domain-specific-reference-packs).
 
+**Authoring (domain).** The repo also owns one **authoring** domain skill — the first here that
+generates rather than reviews:
+
+| Skill | Covers |
+|---|---|
+| `generating-b2b-lwc` | B2B/B2C Commerce storefront LWC authoring for an Experience Cloud (LWR) store — cart, checkout, PDP/PLP, search, quick order, account/order/quote/subscription, and Experience-Builder commerce components. Standalone; its quality gate is `reviewing-lwc`. |
+
 `sf-research`, `sf-plan`, and (optionally) `sf-build` drive the pipeline end to
 end; see [Shipping a planned feature](#shipping-a-planned-feature).
 
@@ -254,6 +261,7 @@ Nothing else to configure: the instruction file is skill routing only, and the `
 |---|---|
 | Apex / Apex tests | `generating-apex` / `generating-apex-test` |
 | Lightning Web Components | `generating-lwc-components` |
+| B2B/B2C Commerce storefront LWC (cart, checkout, PDP/PLP, search, quick order, account/order/quote/subscription, Experience-Builder commerce components) | `generating-b2b-lwc` |
 | SLDS styling (blueprints, hooks, utilities, icons) / compliance audit | `applying-slds` / `validating-slds` |
 | Flows | `generating-flow` |
 | Declarative metadata (objects, fields, tabs, apps, permission sets, FlexiPages, validation rules, list views) | `generating-custom-object` and siblings |

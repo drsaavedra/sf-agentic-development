@@ -65,6 +65,7 @@ is the primary path, not the only one.
 | Apex — write/edit/refactor a class, trigger, service, selector, batch/queueable/schedulable, invocable, `@AuraEnabled` controller, or `@RestResource` endpoint | `generating-apex` |
 | Apex **test** classes — TestDataFactory, bulk (251+), coverage, test-fix loops | `generating-apex-test` |
 | Lightning Web Components — create/edit a bundle, wire service, Jest specs | `generating-lwc-components` |
+| B2B/B2C Commerce storefront LWC — cart, checkout, PDP/PLP, search, quick order, account/order/quote/subscription, or any Experience-Builder commerce component (LWR storefront) | `generating-b2b-lwc` |
 | Styling UI to SLDS — blueprints, styling hooks, utility classes, icons; modals, forms, data tables, theming, dark mode | `applying-slds` |
 | Flows — screen, record-triggered (before/after-save), scheduled, autolaunched; "when a record is created/updated", automation | `generating-flow` |
 | Custom objects | `generating-custom-object` |
