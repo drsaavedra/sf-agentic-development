@@ -46,6 +46,12 @@
   `@wire`, or run a mutation. The container owns data access and the Experience-Builder design
   surface; the leaf is presentation-only over `@api` props. Flag a `*Ui` leaf with a builder surface,
   a data wire, or a cart/wishlist write.
+- Where accessibility wiring reaches **across** components (combobox/listbox/menu relays that push
+  `aria-expanded`/`aria-activedescendant` onto located elements by `querySelector` + property
+  assignment), every component in the chain must render **light DOM**
+  (`static renderMode = 'light'`) — a property assignment cannot cross a shadow boundary, and a
+  shadow component in the middle of such a relay breaks it silently. Flag a shadow-DOM component
+  inside a cross-component ARIA relay.
 - In an SSR-capable component (`lightning__ServerRenderableWithHydration`), gate every DOM/browser
   call (`document`, `window`, `IntersectionObserver`) behind `!import.meta.env.SSR` (or
   `globalThis.document?.` optional chaining) and tear observers down in `disconnectedCallback`. Flag
@@ -210,7 +216,10 @@ Cross-cutting on these APIs:
   idiom that presence-checks a global before re-injecting.)*
 - Gate guest-vs-authenticated feature access on `SessionContextAdapter.isLoggedIn` checked at the
   point of interaction (redirect guests to Login rather than rendering a disabled control) — this is
-  the attested gating channel, and guest/auth *is* checked client-side to drive the redirect. Never
+  the attested gating channel, and guest/auth *is* checked client-side to drive the redirect. On the
+  mutation error path, `toCommerceError(error).code === 'GUEST_INSUFFICIENT_ACCESS'` diverts a guest
+  to login instead of a toast — check the sentinel is a bundle constant, not a re-typed string
+  literal at each site (a real typo risk). Never
   block page rendering on a permission check. `@salesforce/userPermission` /
   `@salesforce/customPermission` are **not** used (0 imports across the repos). *(permission modules:
   not attested in source; docs-backed only.)*
