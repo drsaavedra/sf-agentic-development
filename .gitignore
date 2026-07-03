@@ -1,13 +1,8 @@
 # Local backtracking reference — not for public consumption
 original-agents/
 original-file/
-# research/b2b-commerce/ is a committed deliverable of the B2B Commerce research effort
-# (docs/superpowers/specs/2026-07-02-b2b-commerce-skills-design.md); everything else directly
-# under research/ stays ignored (git can't re-include a path under a fully-ignored parent, so
-# the parent is ignored one level at a time rather than recursively — same pattern as .claude/*
-# below).
-research/*
-!research/b2b-commerce/
+research/
+docs/superpowers/
 
 # OS
 .DS_Store
