@@ -19,7 +19,7 @@ const root = path.join(__dirname, '..');
 const claudeMd = fs.readFileSync(path.join(root, 'CLAUDE.md'), 'utf8').replace(/\r\n/g, '\n');
 
 // The review skills authored IN this repo — they must exist as skills/<name>/SKILL.md.
-const AUTHORED_SKILLS = ['reviewing-apex', 'reviewing-lwc', 'reviewing-flow'];
+const AUTHORED_SKILLS = ['reviewing-apex', 'reviewing-lwc', 'reviewing-flow', 'generating-b2b-lwc'];
 
 // Skills pulled from forcedotcom/sf-skills that the routing tables reference. Keep in sync with the
 // routing tables in CLAUDE.md. Used to prove the file references no typo'd skill name.

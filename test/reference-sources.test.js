@@ -60,6 +60,17 @@ test('discovery finds the sf-plan decision packs', () => {
   }
 });
 
+test('discovery recurses into references/ subdirectories (sf-research grouped packs)', () => {
+  const files = discoverReferenceFiles(root);
+  for (const f of [
+    'skills/sf-research/references/data-model/inventory.md',
+    'skills/sf-research/references/automation/automation-framework.md',
+    'skills/sf-research/references/ui/surfaces-and-reuse.md',
+  ]) {
+    assert.ok(files.includes(f), 'expected discovery to include nested pack ' + f);
+  }
+});
+
 test('discovery includes each skill SKILL.md body', () => {
   const files = discoverReferenceFiles(root);
   for (const f of [

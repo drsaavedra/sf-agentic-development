@@ -361,7 +361,7 @@
     },
     "skills/reviewing-lwc/references/commerce-b2b.md": {
       "basis": "salesforce-docs",
-      "lastValidated": "2026-06-18",
+      "lastValidated": "2026-07-03",
       "sources": [
         {
           "url": "https://developer.salesforce.com/docs/commerce/salesforce-commerce/guide/b2b-b2c-comm-display-lwc-apis.html",
@@ -369,9 +369,42 @@
         },
         {
           "url": "https://developer.salesforce.com/docs/commerce/salesforce-commerce/guide/b2b-b2c-comm-checkout-checkoutsavable.html",
-          "anchors": ["useCheckoutComponent", "checkout", "mixin"]
+          "anchors": ["CheckoutComponentBase", "dispatchUpdateAsync", "dispatchCommit", "expression binding"]
         }
       ]
+    },
+    "skills/generating-b2b-lwc/SKILL.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-07-03",
+      "sources": [
+        {
+          "url": "https://developer.salesforce.com/docs/commerce/salesforce-commerce/guide/b2b-b2c-comm-display-lwc-apis.html",
+          "anchors": ["commerce/cartApi", "commerce/checkoutCartApi", "commerce/checkoutApi", "commerce/actionApi", "CheckoutComponentBase", "dispatchUpdateAsync", "expression binding"]
+        }
+      ],
+      "_note": "Quick Reference summary of the generating-b2b-lwc packs; grounded against the Display LWC APIs guide (the storefront module + expression-binding surface). Its expertise-basis references (component-structure, events-state-errors, accessibility-and-styling) are grounded in the repo's B2B Commerce research and tracked separately below."
+    },
+    "skills/generating-b2b-lwc/references/data-access.md": {
+      "basis": "salesforce-docs",
+      "lastValidated": "2026-07-03",
+      "sources": [
+        {
+          "url": "https://developer.salesforce.com/docs/commerce/salesforce-commerce/guide/b2b-b2c-comm-display-lwc-apis.html",
+          "anchors": ["commerce/cartApi", "commerce/checkoutCartApi", "commerce/checkoutApi", "commerce/actionApi", "CheckoutComponentBase", "dispatchUpdateAsync", "expression binding"]
+        }
+      ]
+    },
+    "skills/generating-b2b-lwc/references/component-structure.md": {
+      "basis": "expertise",
+      "_note": "Bundle-shape conventions (CMS sfdc_cms__lwc vs classic packaging, the container/*Ui split, Experience-Builder exposure meta, labels/i18n) grounded in this repo's B2B Commerce research — the two public forcedotcom component repos (b2b-commerce-open-source-components, authoritative; commerce-on-lightning-components, contrast). Not a single normative Salesforce doc page."
+    },
+    "skills/generating-b2b-lwc/references/events-state-errors.md": {
+      "basis": "expertise",
+      "_note": "Runtime-behavior conventions (custom event contracts, processing/loading flags, undefined-first-render guards, error normalization, preview/SSR guards) grounded in this repo's B2B Commerce research — the two public forcedotcom component repos (b2b-commerce-open-source-components, authoritative; commerce-on-lightning-components, contrast). Not a single normative Salesforce doc page."
+    },
+    "skills/generating-b2b-lwc/references/accessibility-and-styling.md": {
+      "basis": "expertise",
+      "_note": "Accessibility idioms, the experience/styling → --com-c-* styling bridge, and the testing-setup note grounded in this repo's B2B Commerce research — the two public forcedotcom component repos (b2b-commerce-open-source-components, authoritative; commerce-on-lightning-components, contrast). Not a single normative Salesforce doc page."
     },
     "skills/sf-plan/references/data-model-decision.md": {
       "basis": "salesforce-docs",
