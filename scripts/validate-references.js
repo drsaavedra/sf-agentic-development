@@ -24,8 +24,10 @@ const root = path.join(__dirname, '..');
 const manifestPath = path.join(root, 'scripts', 'reference-sources.json');
 
 // Discover groundable docs: each skill/agent's own body (skills/<name>/SKILL.md) plus its
-// reference packs (skills/<name>/references/*.md and agents/<name>/references/*.md). The SKILL.md
-// Quick Reference carries the same release-sensitive claims as the packs, so it is audited too.
+// reference packs (skills/<name>/references/**/*.md and agents/<name>/references/**/*.md). The
+// SKILL.md Quick Reference carries the same release-sensitive claims as the packs, so it is audited
+// too. references/ is walked recursively so skills that group packs into subdirectories (e.g.
+// sf-research's data-model/, automation/) are covered, not just flat top-level packs.
 // Returns repo-relative POSIX paths so they match the manifest keys on every OS.
 function discoverReferenceFiles(repoRoot) {
   const found = [];
@@ -39,12 +41,24 @@ function discoverReferenceFiles(repoRoot) {
       if (fs.existsSync(skillFile)) found.push(`${top}/${entry.name}/SKILL.md`);
       const refsDir = path.join(topDir, entry.name, 'references');
       if (!fs.existsSync(refsDir)) continue;
-      for (const f of fs.readdirSync(refsDir)) {
-        if (f.endsWith('.md')) found.push(`${top}/${entry.name}/references/${f}`);
-      }
+      const base = `${top}/${entry.name}/references`;
+      for (const rel of walkMarkdown(refsDir)) found.push(`${base}/${rel}`);
     }
   }
   return found.sort();
+}
+
+// Yield every .md file under `dir` as a POSIX-relative path, recursing into subdirectories.
+function walkMarkdown(dir, prefix = '') {
+  const out = [];
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (e.isDirectory()) {
+      out.push(...walkMarkdown(path.join(dir, e.name), `${prefix}${e.name}/`));
+    } else if (e.name.endsWith('.md')) {
+      out.push(`${prefix}${e.name}`);
+    }
+  }
+  return out;
 }
 
 function daysBetween(a, b) {
