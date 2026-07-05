@@ -560,8 +560,8 @@ created lead ends user-owned
 ```
 
 **The build — one instance, two artifact types.** The developer runs the Apex work first
-(`generating-apex-test` → `generating-apex`, validate loop until the invocable's scenarios are
-green), then the Flow work (`generating-flow`, validate). The `reviewing-*` quality pass over both
+(test classes first, then the implementation — TDD — with the validate loop until the invocable's
+scenarios are green), then the Flow work (author the flow metadata, validate). The `reviewing-*` quality pass over both
 artifacts is the end-of-build gate (the `code-reviewer` agent, whose "Flow + Apex invocable" row
 loads both `reviewing-flow` and `reviewing-apex`), not a step inside the dev loop. Because the flow
 only fires on create and reassigns the lead

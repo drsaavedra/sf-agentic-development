@@ -60,7 +60,7 @@ a Salesforce build is a fundamentally different shape of problem:
 | Security is something you design | FLS / CRUD / sharing are platform primitives | Security becomes a **permission-set + `with sharing`** decision, not an auth design |
 | "What framework / stack?" | It's **Apex** (Java-*ish*, not Java) and **LWC** (its own framework) — non-negotiable | Skips stack questions; asks the Salesforce fork questions (Screen Flow vs LWC, Flow vs Apex, sync vs async) |
 | Brainstorm → `writing-plans` → implement | Our `/sf-build` + work-brief template already do task decomposition | **Collapse** brainstorm + writing-plans into one skill; the output feeds `/sf-build` directly |
-| You build integrations (auth, servers, API plumbing) | **Connected Apps**, **Named Credentials**, and **External Services** are platform primitives | Routes integration to Named Credential / External Service config (`building-sf-integrations`), not bespoke plumbing |
+| You build integrations (auth, servers, API plumbing) | **Connected Apps**, **Named Credentials**, and **External Services** are platform primitives | Routes integration to Named Credential / External Service config, not bespoke plumbing |
 | You build and host an external-facing web app / SPA | **Experience Cloud** delivers external-facing sites on-platform | Routes a public/partner site to an **Experience site**, not a from-scratch web app |
 | Unconstrained OOP / high-level paradigms | **Governor limits** cap SOQL / DML / CPU / heap per transaction — the same patterns don't carry over | Designs **bulk-safe by construction**: no per-record SOQL/DML, batch/async for volume |
 

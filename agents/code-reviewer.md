@@ -59,16 +59,17 @@ downgrade: the safe default is the stronger model.
 
 ## Skills to invoke
 
-Load the quality skill matching each artifact under review, plus the analyzer (it covers all
-three domains). When an artifact spans two domains, load both.
+Load the quality skill matching each artifact under review, plus the Code Analyzer CLI —
+`sf code-analyzer run --target <files>` (it covers all three domains). When an artifact spans two
+domains, load both.
 
 | Artifact under review | Skill(s) |
 |---|---|
-| Apex — classes, triggers, services, or test classes | `running-code-analyzer` + `reviewing-apex` |
+| Apex — classes, triggers, services, or test classes | Code Analyzer CLI + `reviewing-apex` |
 | Apex exposing `@AuraEnabled` methods to LWC | `reviewing-apex` · `reviewing-lwc` |
-| Lightning Web Components | `running-code-analyzer` + `reviewing-lwc` |
+| Lightning Web Components | Code Analyzer CLI + `reviewing-lwc` |
 | LWC backed by an Apex controller | `reviewing-lwc` · `reviewing-apex` |
-| Flows | `running-code-analyzer` + `reviewing-flow` |
+| Flows | Code Analyzer CLI + `reviewing-flow` |
 | Flow calling an Apex invocable action | `reviewing-flow` · `reviewing-apex` |
 
 ## What to check
