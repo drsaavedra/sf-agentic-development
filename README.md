@@ -224,6 +224,11 @@ Apex/LWC/Flows/metadata directly; the `reviewing-*` skills are the quality gate.
 file is skill routing only, and the `salesforce-developer`, `code-reviewer`, and `architect`
 agents ask for the paths they need when you dispatch them.
 
+Optionally copy [`templates/code-analyzer.yml`](templates/code-analyzer.yml) into your Salesforce
+project root: it elevates the security rules the `reviewing-*` packs treat as non-negotiable, so
+`sf code-analyzer run` enforces them mechanically on every change — including quick fixes that
+never get a full `reviewing-*` pass.
+
 <details>
 <summary><strong>Manual setup (no installer)</strong></summary>
 

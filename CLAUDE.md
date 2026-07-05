@@ -93,6 +93,12 @@ spans domains loads each matching skill: an Apex class and an LWC fire both rows
 Each `reviewing-*` skill names its cross-domain partner under its own **Cross-Skill Integration**
 (e.g. an LWC with an `@AuraEnabled` Apex controller pulls in `reviewing-apex` alongside).
 
+**Quick fixes don't get a `reviewing-*` pass.** For a small ad-hoc edit to existing code, the
+objective gates in Authoring are the full quality bar — `sf project deploy validate`, the affected
+tests, and `sf code-analyzer run` over the changed files. Reserve the `reviewing-*` skills for new
+artifacts, changes that touch triggers, sharing, or security, pre-deploy audits, and explicit
+review requests.
+
 | Artifact under review | Skill |
 |---|---|
 | Apex — classes, triggers, services, or test classes | `reviewing-apex` |
