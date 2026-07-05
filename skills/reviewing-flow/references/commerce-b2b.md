@@ -6,7 +6,7 @@
 > buyer/catalog/pricebook context. Apply these rules *on top of* the base Flow quality rules. For the
 > Commerce data model, see the
 > [B2B/B2C Commerce Developer Guide](https://developer.salesforce.com/docs/commerce/salesforce-commerce/guide/b2b-b2c-comm-dev-guide.html)
-> or the `fetching-salesforce-docs` skill.
+> or fetch it via WebFetch/WebSearch.
 
 ## Entitlement and context — never bypass it
 

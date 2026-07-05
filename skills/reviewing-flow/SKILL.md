@@ -1,6 +1,6 @@
 ---
 name: reviewing-flow
-description: "Use when reviewing or auditing Salesforce Flows — a review pass over existing or freshly built Flows, run as a discrete step at the end of a build or on demand, not chained onto every edit. Covers loop and collection optimization (Get Records in loop, Collection Filter/Sort, Transform, early exit), entry-condition discipline, Send Email limits, fault handling and Custom Error, DML-in-loop prevention, hardcoded ID elimination, recursion guards, async paths, complexity limits, flow tests, and naming conventions. Detailed rules live in references/ — read the file(s) matching the artifact's domains. If the Flow invokes Apex actions, also load reviewing-apex. TRIGGER when: the task is to review or audit Flows, or to review a completed build before deploy. DO NOT TRIGGER as the authoring skill, and do not auto-fire after each generated file — for creating or editing Flows use generating-flow."
+description: "Use when reviewing or auditing Salesforce Flows — a review pass over existing or freshly built Flows, run as a discrete step at the end of a build or on demand, not chained onto every edit. Covers loop and collection optimization (Get Records in loop, Collection Filter/Sort, Transform, early exit), entry-condition discipline, Send Email limits, fault handling and Custom Error, DML-in-loop prevention, hardcoded ID elimination, recursion guards, async paths, complexity limits, flow tests, and naming conventions. Detailed rules live in references/ — read the file(s) matching the artifact's domains. If the Flow invokes Apex actions, also load reviewing-apex. TRIGGER when: the task is to review or audit Flows, or to review a completed build before deploy. DO NOT TRIGGER as the authoring skill, and do not auto-fire after each generated file — authoring happens directly (base model); this skill is the quality gate afterward."
 ---
 
 # Salesforce Flow Quality
@@ -9,7 +9,7 @@ Invoke when reviewing or auditing Flows — as the end-of-build quality pass or 
 
 **Cross-domain:** an `@InvocableMethod` Apex action pairs with `reviewing-apex`, an embedded LWC screen component with `reviewing-lwc` — see Cross-Skill Integration below.
 
-This skill complements `generating-flow` (which covers how to build a Flow) by specifying the quality bar it must meet.
+Authoring is done directly by the base model; this skill specifies the quality bar every Flow must meet, no matter who or what wrote it.
 
 **Schema truth:** flag any guessed object, field, or relationship API name. Verify names against local metadata (`force-app/**`) first, then the org — the org wins on divergence. Use read-only sf CLI commands (`sf sobject describe`, `sf data query`) to confirm; never rely on Developer Console snippets.
 
@@ -65,5 +65,4 @@ This skill owns the Flow side of a review. Delegate the rest:
 |---|---|
 | Flow invokes an `@InvocableMethod` Apex action | `reviewing-apex` — load alongside to apply bulk safety, security, and testing rules to the action class |
 | Screen Flow embeds a custom LWC screen component, or an LWC launches this Flow | `reviewing-lwc` — load alongside to review the component side of the integration |
-| Author or edit the Flow under review | `generating-flow` |
-| Static analysis (Flow scanner, SFGE) over the reviewed Flow | `running-code-analyzer` |
+| Static analysis (Flow scanner, SFGE) over the reviewed Flow | Code Analyzer CLI — `sf code-analyzer run --target <files>` |

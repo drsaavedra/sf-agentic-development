@@ -4,7 +4,7 @@
 > is a B2B/B2C Commerce storefront artifact (LWR/Aura storefront, cart/checkout/PDP/PLP, quick order).
 > Apply these rules *on top of* the base LWC quality rules. For the current API surface, see the
 > [B2B/B2C Commerce Developer Guide](https://developer.salesforce.com/docs/commerce/salesforce-commerce/guide/b2b-b2c-comm-dev-guide.html)
-> or the `fetching-salesforce-docs` skill — docs supplement these rules, never replace them.
+> or fetch it via WebFetch/WebSearch — docs supplement these rules, never replace them.
 > Where a rule says *source-attested* / "across 409 bundles", the evidence base is Salesforce's two
 > public component repos: `forcedotcom/b2b-commerce-open-source-components` (372 bundles,
 > authoritative) and `forcedotcom/commerce-on-lightning-components` (37 bundles, contrast); rules

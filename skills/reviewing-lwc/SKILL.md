@@ -1,6 +1,6 @@
 ---
 name: reviewing-lwc
-description: "Use when reviewing or auditing Lightning Web Components — a review pass over existing or freshly built components, run as a discrete step at the end of a build or on demand, not chained onto every edit. Covers component architecture, LDS/Apex/GraphQL data sourcing, template directives, async/event patterns, performance, and Jest testing. Detailed rules live in references/ — read the file(s) matching the artifact's domains. If the component has an Apex controller, also load reviewing-apex. TRIGGER when: the task is to review or audit LWC, or to review a completed build before deploy. DO NOT TRIGGER as the authoring skill, and do not auto-fire after each generated file — for creating or editing LWC use generating-lwc-components."
+description: "Use when reviewing or auditing Lightning Web Components — a review pass over existing or freshly built components, run as a discrete step at the end of a build or on demand, not chained onto every edit. Covers component architecture, LDS/Apex/GraphQL data sourcing, template directives, async/event patterns, performance, and Jest testing. Detailed rules live in references/ — read the file(s) matching the artifact's domains. If the component has an Apex controller, also load reviewing-apex. TRIGGER when: the task is to review or audit LWC, or to review a completed build before deploy. DO NOT TRIGGER as the authoring skill, and do not auto-fire after each generated file — authoring happens directly (base model; generating-b2b-lwc for Commerce storefront LWC); this skill is the quality gate afterward."
 ---
 
 # Salesforce LWC Quality
@@ -9,7 +9,7 @@ Invoke when reviewing or auditing LWC components — as the end-of-build quality
 
 **Cross-domain:** an `@AuraEnabled` Apex controller pairs with `reviewing-apex`, a Flow screen component or embedded Flow with `reviewing-flow` — see Cross-Skill Integration below.
 
-This skill complements `generating-lwc-components` (which covers how to produce a component) by specifying the quality bar it must meet.
+Authoring is done directly by the base model (or `generating-b2b-lwc` for Commerce storefronts); this skill specifies the quality bar every component must meet, no matter who or what wrote it.
 
 **Schema truth:** flag any guessed object, field, or relationship API name (including `@salesforce/schema` imports). Verify names against local metadata (`force-app/**`) first, then the org — the org wins on divergence. Use read-only sf CLI commands (`sf sobject describe`, `sf data query`) to confirm; never rely on Developer Console snippets.
 
@@ -80,6 +80,5 @@ This skill owns the LWC side of a review. Delegate the rest:
 |---|---|
 | Component is backed by an `@AuraEnabled` Apex controller | `reviewing-apex` — load alongside; this skill reviews the consumer, `reviewing-apex` reviews the Apex contract |
 | Component targets `lightning__FlowScreen`, or launches/embeds a Flow (`lightning-flow`, `lightning/flowSupport`) | `reviewing-flow` — load alongside to review the Flow side of the integration |
-| Author or edit the component under review | `generating-lwc-components` |
-| Audit the component for SLDS compliance | `validating-slds` |
-| Static analysis (ESLint, RetireJS) over the reviewed code | `running-code-analyzer` |
+| Audit the component for SLDS compliance | SLDS docs (lightningdesignsystem.com) via WebFetch — check blueprints, styling hooks, utility classes |
+| Static analysis (ESLint, RetireJS) over the reviewed code | Code Analyzer CLI — `sf code-analyzer run --target <files>` |

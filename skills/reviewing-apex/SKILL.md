@@ -1,6 +1,6 @@
 ---
 name: reviewing-apex
-description: "Use when reviewing or auditing Apex code — a review pass over existing or freshly built Apex, run as a discrete step at the end of a build or on demand, not chained onto every edit. Covers governor limits, trigger design, security, architecture, async patterns, error handling, and test quality. Detailed rules live in references/ — read the file(s) matching the artifact's domains. If the Apex includes @AuraEnabled methods, also load reviewing-lwc. TRIGGER when: the task is to review or audit Apex (classes, triggers, services, or test classes), or to review a completed build before deploy. DO NOT TRIGGER as the authoring skill, and do not auto-fire after each generated file — for writing or refactoring Apex use generating-apex or generating-apex-test."
+description: "Use when reviewing or auditing Apex code — a review pass over existing or freshly built Apex, run as a discrete step at the end of a build or on demand, not chained onto every edit. Covers governor limits, trigger design, security, architecture, async patterns, error handling, and test quality. Detailed rules live in references/ — read the file(s) matching the artifact's domains. If the Apex includes @AuraEnabled methods, also load reviewing-lwc. TRIGGER when: the task is to review or audit Apex (classes, triggers, services, or test classes), or to review a completed build before deploy. DO NOT TRIGGER as the authoring skill, and do not auto-fire after each generated file — authoring happens directly (base model + TDD); this skill is the quality gate afterward."
 ---
 
 # Salesforce Apex Quality
@@ -9,7 +9,7 @@ Invoke when reviewing or auditing Apex — as the end-of-build quality pass or o
 
 **Cross-domain:** `@AuraEnabled` methods pair with `reviewing-lwc`, `@InvocableMethod` actions with `reviewing-flow` — see Cross-Skill Integration below.
 
-This skill complements `generating-apex` and `generating-apex-test` (which cover how to produce an artifact) by specifying the quality bar those artifacts must meet.
+Authoring is done directly by the base model; this skill specifies the quality bar every Apex artifact must meet, no matter who or what wrote it.
 
 **Schema truth:** flag any guessed object, field, or relationship API name. Verify names against local metadata (`force-app/**`) first, then the org — the org wins on divergence. Use read-only sf CLI commands (`sf sobject describe`, `sf data query`) to confirm; never rely on Developer Console snippets.
 
@@ -89,6 +89,4 @@ This skill owns the Apex side of a review. Delegate the rest:
 |---|---|
 | Class exposes `@AuraEnabled` methods to a component | `reviewing-lwc` — load alongside; this skill reviews the Apex contract, `reviewing-lwc` reviews the consumer |
 | Class exposes an `@InvocableMethod` action called by a Flow | `reviewing-flow` — load alongside to review the Flow that calls this action |
-| Author or refactor the Apex under review | `generating-apex` |
-| Author or fix the test class under review | `generating-apex-test` |
-| Static analysis (PMD, SFGE) over the reviewed code | `running-code-analyzer` |
+| Static analysis (PMD, SFGE) over the reviewed code | Code Analyzer CLI — `sf code-analyzer run --target <files>` |
