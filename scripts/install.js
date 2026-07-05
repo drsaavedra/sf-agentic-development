@@ -10,7 +10,6 @@
 'use strict';
 
 const fs = require('fs');
-const os = require('os');
 const path = require('path');
 const readline = require('node:readline');
 
@@ -274,24 +273,6 @@ function lineUI() {
 }
 
 // ---------------------------------------------------------------------------
-// Dependency detection — skills installed by `npx skills add` are plain
-// folders with a SKILL.md, in the project's or the user's skills directory.
-// ---------------------------------------------------------------------------
-
-function skillInstalled(skillName) {
-  const home = os.homedir();
-  const dirs = [
-    path.join(target, assistant.skillsDir),
-    path.join(home, '.claude', 'skills'),
-  ];
-  return dirs.some((d) => fs.existsSync(path.join(d, skillName, 'SKILL.md')));
-}
-
-function sfSkillsInstalled() {
-  return skillInstalled('generating-apex');
-}
-
-// ---------------------------------------------------------------------------
 
 async function main() {
   if (path.resolve(pkgRoot) === path.resolve(target)) {
@@ -366,16 +347,7 @@ async function main() {
         : action + ' ' + assistant.baseline + ' (managed block)'
     );
 
-    // Dependency — sf-skills is the toolkit's one required base. We don't install it for the
-    // user (that would be a user-global change as a side effect of a project install, and the
-    // scope is theirs to choose); detect it and, if absent, point them at the one command to run.
-    const needSfSkills = !sfSkillsInstalled();
-
-    console.log('\nDone.' + (needSfSkills ? ' Remaining steps:' : ''));
-    if (needSfSkills) {
-      console.log('  ! Salesforce base skills (forcedotcom/sf-skills) not detected. Install separately:');
-      console.log('       npx skills add forcedotcom/sf-skills');
-    }
+    console.log('\nDone.');
     console.log(
       '\nAgent notes: the installed ' +
         assistant.baseline +

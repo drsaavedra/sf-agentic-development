@@ -20,9 +20,8 @@ ship a new feature the way Salesforce expects.
 
 ## Why this exists
 
-Generating Apex, LWC, and Flows is the easy part. Salesforce even ships
-**[skills](https://github.com/forcedotcom/sf-skills)** for it. The hard part is everything around
-it. Salesforce isn't traditional software development; it's metadata-driven, multitenant, and bound
+Generating Apex, LWC, and Flows is the easy part — modern Claude models write them well from
+trained knowledge alone. The hard part is everything around it. Salesforce isn't traditional software development; it's metadata-driven, multitenant, and bound
 by hard platform limits a generator can only enforce on code it writes itself, not on the Apex Class you
 inherited or the Lightning Web Component someone built last year.
 
@@ -87,14 +86,14 @@ end; see [Shipping a planned feature](#shipping-a-planned-feature).
 | Agent | Role |
 |---|---|
 | `salesforce-developer` | Builds all automation (Apex via TDD, LWC, Flows) from a main-agent brief in an isolated, parallelizable context, applying the skills' quality rules and producing a build summary. |
-| `code-reviewer` | On-demand end-of-build **code-quality** review that runs the matching `reviewing-*` skills plus the analyzer over the delivered Apex/LWC/Flows and reports defects by severity, never building. |
+| `code-reviewer` | On-demand end-of-build **code-quality** review that runs the matching `reviewing-*` skills plus the Code Analyzer CLI over the delivered Apex/LWC/Flows and reports defects by severity, never building. |
 | `architect` | On-demand **solution-design** review: a pre-code design gate plus a whole-build inspection against the design contract for completeness, scope, and design conformance, producing a gap-analysis report. |
 
 See [docs/ORCHESTRATION.md](docs/ORCHESTRATION.md) for the full workflow: the work-brief template, when to parallelize developer instances, and the review/fix loop.
 
 ### Agent Instruction File
 
-`CLAUDE.md` at your project root is the instruction file Claude Code reads on every session. It does one job: route context to the right skill. Research goes to `sf-research`, authoring to each `generating-*` / config skill (which also self-trigger), and review to the right `reviewing-*` skill as an end-of-build pass. Everything else (safety rules, quality gates, domain knowledge including the B2B Commerce packs) lives in the skills themselves.
+`CLAUDE.md` at your project root is the instruction file Claude Code reads on every session. It does one job: route context to the right skill. Research goes to `sf-research`, authoring happens directly under the baseline's Authoring rules (`generating-b2b-lwc` for Commerce storefront LWC), and review goes to the right `reviewing-*` skill as an end-of-build pass. Everything else (safety rules, quality gates, domain knowledge including the B2B Commerce packs) lives in the skills themselves.
 
 ---
 
@@ -220,17 +219,10 @@ injects the routing into your project's `CLAUDE.md` as a managed block.
 
 ### After the installer
 
-The installer does not install these for you; it only detects them and prints a reminder if
-they're missing, leaving the install scope (project vs. user) your choice. Install the Salesforce
-base skills (`generating-apex`, `generating-lwc-components`, `deploying-metadata`, `querying-soql`,
-and more) yourself:
-
-```bash
-npx skills add forcedotcom/sf-skills
-```
-
-Nothing else to configure: the instruction file is skill routing only, and the `salesforce-developer`,
-`code-reviewer`, and `architect` agents ask for the paths they need when you dispatch them.
+Nothing else to install — the toolkit has no external skill dependencies. Claude authors
+Apex/LWC/Flows/metadata directly; the `reviewing-*` skills are the quality gate. The instruction
+file is skill routing only, and the `salesforce-developer`, `code-reviewer`, and `architect`
+agents ask for the paths they need when you dispatch them.
 
 <details>
 <summary><strong>Manual setup (no installer)</strong></summary>
@@ -253,22 +245,18 @@ Nothing else to configure: the instruction file is skill routing only, and the `
 
 ## Skill Routing
 
-`CLAUDE.md` carries two explicit context→skill routing tables (**Authoring & Config Routing** and **Review Routing**) so the main agent routes from a compact index instead of relying on each skill's `description` being loaded. Each skill also self-triggers from its own `description` as a fallback. The full tables live in the instruction file; the summary below is representative.
+`CLAUDE.md` carries two explicit context→skill routing sections (**Authoring** and **Review Routing**) so the main agent routes from a compact index instead of relying on each skill's `description` being loaded. Each skill also self-triggers from its own `description` as a fallback. The full sections live in the instruction file; the summary below is representative.
 
-**Authoring & Config.** Match the context to its skill and invoke it before building:
+**Authoring.** Claude authors all Salesforce artifacts directly — no per-artifact authoring
+skill. One domain routes to a skill first:
 
 | Context | Skill |
 |---|---|
-| Apex / Apex tests | `generating-apex` / `generating-apex-test` |
-| Lightning Web Components | `generating-lwc-components` |
-| B2B/B2C Commerce storefront LWC (cart, checkout, PDP/PLP, search, quick order, account/order/quote/subscription, Experience-Builder commerce components) | `generating-b2b-lwc` |
-| SLDS styling (blueprints, hooks, utilities, icons) / compliance audit | `applying-slds` / `validating-slds` |
-| Flows | `generating-flow` |
-| Declarative metadata (objects, fields, tabs, apps, permission sets, FlexiPages, validation rules, list views) | `generating-custom-object` and siblings |
-| Ops (tests, logs, SOQL, data, integrations, analyzer, deploy) | `running-apex-tests`, `debugging-apex-logs`, `querying-soql`, `handling-sf-data`, `building-sf-integrations`, `running-code-analyzer`, `deploying-metadata` |
+| B2B/B2C Commerce storefront LWC (cart, checkout, PDP/PLP, search, quick order, Experience-Builder commerce components) | `generating-b2b-lwc` |
 
-> **TDD for Apex:** `generating-apex-test` (failing tests first) → `generating-apex` (minimum to pass).
-> **SLDS pairing:** `applying-slds` doesn't auto-delegate from `generating-lwc-components`; pair them when building or restyling LWC UI.
+> **TDD for Apex:** failing tests first, then the minimum implementation to pass.
+> **Objective gates:** `sf project deploy validate`, `sf apex run test`, and `sf code-analyzer run`
+> verify every build; `reviewing-*` is the quality review on top.
 
 **Review** is a separate end-of-build pass (not chained onto every edit): run the matching `reviewing-*` skill at the end of a build (typically via the `code-reviewer` agent), on an explicit review request, or as a quality gate. Cross-domain work loads both skills, in the order shown:
 
@@ -370,7 +358,7 @@ alongside the Salesforce skills.
 ## Maintaining
 
 Maintaining this repo (editing `CLAUDE.md` and the skills, re-grounding the reference packs,
-bumping the sf-skills pin, and the repository layout) is documented in **[docs/MAINTAINING.md](docs/MAINTAINING.md)**.
+and the repository layout) is documented in **[docs/MAINTAINING.md](docs/MAINTAINING.md)**.
 
 ## License
 
