@@ -49,7 +49,7 @@ orchestration; invocable Apex does the heavy lifting it calls.
 | Large data volumes, stateful chunking | Batch Apex |
 | On a schedule, declarative | Scheduled Flow |
 | On a schedule, complex / code | Schedulable Apex (often enqueues a Batch/Queueable) |
-| Fire-and-forget, decoupled integration | Platform Event (see `building-sf-integrations`) |
+| Fire-and-forget, decoupled integration | Platform Event |
 
 ## Guardrails
 

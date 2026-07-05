@@ -8,11 +8,11 @@
 
 # Salesforce Project — Claude Baseline
 
-Routing rules for Claude Code working on Salesforce — Apex, LWC, Experience Cloud, B2B
-Commerce, metadata, and Salesforce CLI projects. Its main job is to fire the right skill at the
-right time. Each skill carries its own safety rules, quality gates, and domain knowledge, so this
-baseline routes to them and adds only the cross-cutting deployment and git guardrails below.
-Follow these rules unless the user explicitly overrides them.
+Rules for Claude Code working on Salesforce — Apex, LWC, Experience Cloud, B2B Commerce,
+metadata, and Salesforce CLI projects. Claude's base model authors Salesforce code and metadata
+directly from trained knowledge; the authored skills below add the two things the model can't be
+trusted to carry alone — proprietary domain surfaces (`generating-b2b-lwc`) and this project's
+quality bar (`reviewing-*`). Follow these rules unless the user explicitly overrides them.
 
 > **Three stages for a planned feature — Research → Plan → Build, each human-gated.**
 > **Research:** run `/sf-research` — one prompt-driven skill that reads which domains your prompt
@@ -22,9 +22,9 @@ Follow these rules unless the user explicitly overrides them.
 > `docs/contracts/<slug>.md` (it stops and routes back to Research if a needed doc is missing).
 > **Build:** by default, work one story at a time — open its `docs/contracts/<slug>.md` (with the
 > research docs and `docs/solution-design.md` as context; a fresh session per story keeps context
-> lean) and build it with the Authoring & Review routing below. `/sf-build` is an **optional**
-> orchestrated mode that dispatches subagents per work item — heavier on tokens, worth it only for
-> large multi-story builds. The routing below governs the default build and everything else — ad-hoc
+> lean) and build it under the Authoring rules below. `/sf-build` is an **optional** orchestrated
+> mode that dispatches subagents per work item — heavier on tokens, worth it only for large
+> multi-story builds. The rules below govern the default build and everything else — ad-hoc
 > edits, fixes, reviews, audits, config, and ops.
 
 ---
@@ -54,46 +54,35 @@ keep the org docs in sync. The research docs are `/sf-plan`'s required input —
 back here if one a feature needs is missing. `/sf-plan` then refines `docs/data-model.md` and
 `docs/automation.md` in place.
 
-## Authoring & Config Routing
+## Authoring
 
-Match the active context to its skill and invoke it before building. This table is the fast routing
-index; each skill also self-triggers from its own `description` on the relevant files, so the table
-is the primary path, not the only one.
+Claude authors all Salesforce artifacts directly — Apex classes/triggers/tests, LWC bundles,
+Flows, SOQL, and declarative metadata (objects, fields, tabs, apps, permission sets, FlexiPages,
+validation rules, list views, sharing rules) — without loading a per-artifact authoring skill.
+One domain routes to a skill before building:
 
 | Context | Skill |
 |---|---|
-| Apex — write/edit/refactor a class, trigger, service, selector, batch/queueable/schedulable, invocable, `@AuraEnabled` controller, or `@RestResource` endpoint | `generating-apex` |
-| Apex **test** classes — TestDataFactory, bulk (251+), coverage, test-fix loops | `generating-apex-test` |
-| Lightning Web Components — create/edit a bundle, wire service, Jest specs | `generating-lwc-components` |
 | B2B/B2C Commerce storefront LWC — cart, checkout, PDP/PLP, search, quick order, account/order/quote/subscription, or any Experience-Builder commerce component (LWR storefront) | `generating-b2b-lwc` |
-| Styling UI to SLDS — blueprints, styling hooks, utility classes, icons; modals, forms, data tables, theming, dark mode | `applying-slds` |
-| Flows — screen, record-triggered (before/after-save), scheduled, autolaunched; "when a record is created/updated", automation | `generating-flow` |
-| Custom objects | `generating-custom-object` |
-| Custom fields — formula, roll-up summary, lookup, master-detail, picklist | `generating-custom-field` |
-| Custom tabs — object tabs, web tabs, Visualforce/Lightning component & page tabs; navigation for a custom object | `generating-custom-tab` |
-| Custom applications — tab-based apps, App Launcher navigation, branding, action overrides | `generating-custom-application` |
-| Permission sets — object/field permissions, FLS, tab visibility | `generating-permission-set` |
-| Lightning pages (FlexiPages) — record/app/home pages | `generating-flexipage` |
-| Validation rules | `generating-validation-rule` |
-| List views | `generating-list-view` |
-| A complete multi-component Lightning app from a description | `generating-lightning-app` |
-| Run Apex tests / check coverage / fix failing tests | `running-apex-tests` |
-| Analyze debug logs, governor limits, stack traces | `debugging-apex-logs` |
-| Write or optimize SOQL/SOSL queries | `querying-soql` |
-| Bulk data import/export, seed or clean org records, test data | `handling-sf-data` |
-| Named Credentials, External Services, REST/SOAP callouts, Platform Events, CDC | `building-sf-integrations` |
-| Static analysis / code scan (PMD, ESLint, Flow, SFGE, RetireJS) | `running-code-analyzer` |
-| Deploy metadata, generate a `package.xml` / manifest, validate / quick-deploy, or CI/CD | `deploying-metadata` |
 
-> **TDD for Apex** — author or extend the test class first (`generating-apex-test`), then
-> implement the minimum to make it pass (`generating-apex`). Exceptions: metadata-only
-> changes, trivial non-logic edits, and user-declared prototypes or spikes.
->
-> **LWC ↔ SLDS bridge.** When building or restyling LWC UI, pair `generating-lwc-components`
-> with `applying-slds` (SLDS blueprints, styling hooks, utility classes, icons) — the LWC
-> skill covers SLDS conceptually but its own cross-skill delegation does **not** route to it. To
-> audit an existing component for SLDS compliance (scorecard / production-readiness check), use
-> `validating-slds`.
+Authoring rules (always apply):
+
+- **TDD for Apex** — author or extend the test class first, then implement the minimum to make it
+  pass. Exceptions: metadata-only changes, trivial non-logic edits, and user-declared prototypes
+  or spikes.
+- **Objective gates, not vibes** — verify with `sf project deploy validate` (free to run any
+  time), `sf apex run test`, and `sf code-analyzer run` over changed files. Fix what they surface
+  before reporting done.
+- **Knowledge-cutoff guard** — Salesforce ships three releases a year. If the work touches a
+  platform feature, API version behavior, or limit that may post-date training — or you are not
+  certain of the current syntax — fetch the official docs (developer.salesforce.com,
+  help.salesforce.com) via WebFetch/WebSearch before authoring. Never guess at release-sensitive
+  claims.
+- **Schema truth** — verify object/field/relationship API names against local metadata
+  (`force-app/**`) first, then the org (`sf sobject describe`, read-only). Never invent API names.
+- **Ops through the sf CLI** — deploys, org introspection, SOQL, data loads, debug logs, and
+  static analysis all run through `sf` commands directly; check `sf <command> --help` when unsure
+  of current flags.
 
 ## Review Routing
 
@@ -104,6 +93,12 @@ spans domains loads each matching skill: an Apex class and an LWC fire both rows
 Each `reviewing-*` skill names its cross-domain partner under its own **Cross-Skill Integration**
 (e.g. an LWC with an `@AuraEnabled` Apex controller pulls in `reviewing-apex` alongside).
 
+**Quick fixes don't get a `reviewing-*` pass.** For a small ad-hoc edit to existing code, the
+objective gates in Authoring are the full quality bar — `sf project deploy validate`, the affected
+tests, and `sf code-analyzer run` over the changed files. Reserve the `reviewing-*` skills for new
+artifacts, changes that touch triggers, sharing, or security, pre-deploy audits, and explicit
+review requests.
+
 | Artifact under review | Skill |
 |---|---|
 | Apex — classes, triggers, services, or test classes | `reviewing-apex` |
@@ -111,15 +106,13 @@ Each `reviewing-*` skill names its cross-domain partner under its own **Cross-Sk
 | Flows | `reviewing-flow` |
 
 For the deep code-quality gate after a build, dispatch the `code-reviewer` agent — it runs the
-table above plus `running-code-analyzer` over the delivered artifacts and reports defects
+table above plus the Code Analyzer CLI over the delivered artifacts and reports defects
 by severity. The `architect` agent is the separate solution-design governance gate — it clears the
 design before code and inspects the assembled build against the design contract (completeness, scope,
 design conformance), not code quality.
 
-The authored skills in this repo — `sf-research`, `sf-plan`, `sf-build`, and
-`reviewing-apex` / `reviewing-lwc` / `reviewing-flow` — install into `.claude/skills/` at setup (see
-the README). All other skills referenced above come from `forcedotcom/sf-skills`
-(install: `npx skills add forcedotcom/sf-skills`).
+All skills referenced in this file are authored in this repo and install into `.claude/skills/`
+at setup (see the README). There are no external skill dependencies.
 
 ## Deployment & git safety
 

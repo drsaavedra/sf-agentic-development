@@ -37,7 +37,7 @@ interactivity Screen Flow's standard components don't cover.
   FlexiPage), a utility-bar item, a quick action, or an Experience Cloud page. Placement shapes the
   component contract — record context vs none, target objects.
 - For a full **Experience Cloud site/storefront app** (multi-page SPA), that is a different
-  architecture — route it to `building-ui-bundle-app`, not a single LWC.
+  architecture — plan it as a dedicated site build, not a single LWC.
 
 ## Guardrails
 

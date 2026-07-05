@@ -4,9 +4,10 @@
 // the installer injects into a project as a managed block. Run on every PR via `npm test`.
 // Zero dependencies: Node's built-in test runner + assert. CLAUDE.md is no longer rendered from a
 // template, so this reads it directly. The contract under test:
-//   1. Every skill the routing references resolves to a known skill name (the typo guard).
+//   1. Every skill the routing references resolves to a skill authored in this repo (the typo
+//      guard — the sf-skills dependency is gone).
 //   2. The three skills authored IN this repo are referenced AND exist on disk.
-//   3. The structural anchors a router relies on are present (the two routing-table headings + the
+//   3. The structural anchors a router relies on are present (the Authoring + Review headings + the
 //      git-safety section).
 //   4. No leftover template syntax survives from the old rendering pipeline.
 
@@ -18,37 +19,12 @@ const path = require('node:path');
 const root = path.join(__dirname, '..');
 const claudeMd = fs.readFileSync(path.join(root, 'CLAUDE.md'), 'utf8').replace(/\r\n/g, '\n');
 
-// The review skills authored IN this repo — they must exist as skills/<name>/SKILL.md.
+// The skills authored IN this repo — the only skills the toolkit ships or references.
+// (sf-research / sf-plan / sf-build are also authored here but don't match SKILL_PREFIX,
+// so the typo guard doesn't need them in KNOWN; the on-disk check below covers them.)
 const AUTHORED_SKILLS = ['reviewing-apex', 'reviewing-lwc', 'reviewing-flow', 'generating-b2b-lwc'];
 
-// Skills pulled from forcedotcom/sf-skills that the routing tables reference. Keep in sync with the
-// routing tables in CLAUDE.md. Used to prove the file references no typo'd skill name.
-const SF_SKILLS_ALLOWLIST = [
-  'generating-apex',
-  'generating-apex-test',
-  'generating-lwc-components',
-  'generating-flow',
-  'running-apex-tests',
-  'debugging-apex-logs',
-  'generating-custom-object',
-  'generating-custom-field',
-  'generating-custom-tab',
-  'generating-custom-application',
-  'generating-permission-set',
-  'generating-flexipage',
-  'generating-validation-rule',
-  'generating-list-view',
-  'deploying-metadata',
-  'querying-soql',
-  'handling-sf-data',
-  'building-sf-integrations',
-  'running-code-analyzer',
-  'generating-lightning-app',
-  'applying-slds',
-  'validating-slds',
-];
-
-const KNOWN = new Set([...AUTHORED_SKILLS, ...SF_SKILLS_ALLOWLIST]);
+const KNOWN = new Set(AUTHORED_SKILLS);
 
 // A skill-shaped backtick token: every skill these tables route to begins with one of these verb
 // prefixes. This deliberately excludes the agents (`code-reviewer`, `architect`), the workflow
@@ -83,7 +59,7 @@ test('every authored skill is referenced in CLAUDE.md and exists on disk', () =>
 
 test('CLAUDE.md contains the routing and safety section headings', () => {
   for (const heading of [
-    '## Authoring & Config Routing',
+    '## Authoring',
     '## Review Routing',
     '## Deployment & git safety',
   ]) {

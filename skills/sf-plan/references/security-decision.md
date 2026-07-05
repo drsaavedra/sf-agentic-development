@@ -38,7 +38,7 @@ rows*. Start at the most restrictive OWD and add access outward — never the re
    genuine exceptions only, not a design mechanism.
 5. **Apex managed sharing** — programmatic `__Share` rows for access rules the declarative tools can't
    express (computed, multi-criteria, cross-object). The last rung — reach here only when role
-   hierarchy + sharing rules can't model the requirement. Build owned by `generating-apex`.
+   hierarchy + sharing rules can't model the requirement. Built as Apex at the build stage, gated by `reviewing-apex`.
 
 **To narrow, not widen:** a **restriction rule** scopes a user's existing read access *down* to records
 matching its criteria (supported on custom and external objects, contracts, events, tasks, and time
@@ -67,7 +67,7 @@ user sees — it filters the view, it does **not** enforce security.
 - **Encryption & compliance** — Shield Platform Encryption (a licensed add-on) and any compliance
   constraints come from the security-model research doc; decide them there, not from memory.
 - **Apex runs in system mode by default** — `with sharing` / `WITH USER_MODE` enforcement is the build
-  concern of `generating-apex` / `reviewing-apex`. This pack picks the *sharing model*; those enforce
+  concern of the Apex build, gated by `reviewing-apex`. This pack picks the *sharing model*; those enforce
   it in code.
 
 ## Guardrails

@@ -74,7 +74,8 @@ trigger.
   `reviewing-apex`).
 - **Design for failure** — idempotency (safe re-invocation), error handling, and retry/recovery;
   don't commit Salesforce changes until the remote success is confirmed.
-- The integration **build** is owned by `building-sf-integrations` — this pack picks the *approach*;
-  that skill implements the Named Credential, External Service, Platform Event, or CDC plumbing.
+- The integration **build** — the Named Credential / External Credential, External Service,
+  Platform Event, or CDC plumbing plus any callout Apex — is authored directly at build time;
+  this pack picks the *approach*.
 - These criteria are maintained against official Salesforce docs; if a limit or capability looks like
   it may have changed, flag it for the maintainer rather than guessing.

@@ -44,12 +44,12 @@ and requirements before proceeding.
 
 ## Skills to invoke
 
-| Task | Skill |
+| Task | Tool |
 |---|---|
-| Querying org data to verify deployed config matches the design | `querying-soql` |
-| Investigating runtime / design issues in logs | `debugging-apex-logs` |
+| Querying org data to verify deployed config matches the design | `sf data query` (read-only SOQL) |
+| Investigating runtime / design issues in logs | `sf apex log get` / `sf apex log list` |
 
-Code quality is **not** yours to re-run. The `reviewing-*` skills and `running-code-analyzer` belong
+Code quality is **not** yours to re-run. The `reviewing-*` skills and the Code Analyzer CLI belong
 to the `code-reviewer` agent; read its report (default `docs/code-review-report.md`) as your
 code-quality input rather than re-running those skills.
 

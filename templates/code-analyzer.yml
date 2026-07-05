@@ -1,0 +1,32 @@
+# Salesforce Code Analyzer (v5) configuration — copy into your Salesforce project root
+# (next to sfdx-project.json); `sf code-analyzer run` picks it up automatically.
+#
+# Elevates the rules this toolkit's reviewing-* packs treat as non-negotiable, so the analyzer
+# enforces them mechanically on every change — including quick fixes that don't get a
+# reviewing-* pass. To make the elevated security rules a hard gate (locally or in CI):
+#
+#   sf code-analyzer run --workspace force-app --severity-threshold 2
+#
+# The command exits non-zero when any violation meets or exceeds the threshold. Severity scale:
+# 1 Critical, 2 High, 3 Moderate, 4 Low, 5 Info. Per the Code Analyzer docs, keep this file
+# lean — list only the rules you deliberately override.
+
+rules:
+  pmd:
+    # The #1 AppExchange security-review failure; run FLS/CRUD checks in every code path
+    # (reviewing-apex/references/security.md prescribes Severity 1 + fail CI on it).
+    ApexCRUDViolation:
+      severity: 1
+    # Sharing is declared deliberately — `with sharing` by default, `without sharing` isolated
+    # and justified (reviewing-apex/references/security.md).
+    ApexSharingViolations:
+      severity: 1
+    # Architecture bar (reviewing-apex/references/architecture.md). Moderate: surfaced on every
+    # run but deliberately below a --severity-threshold 2 gate, so a quick fix inside a large
+    # legacy class isn't blocked by pre-existing design debt.
+    ExcessiveClassLength:
+      severity: 3
+    ExcessivePublicCount:
+      severity: 3
+    AvoidDeeplyNestedIfStmts:
+      severity: 3

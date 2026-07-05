@@ -5,7 +5,7 @@
 > controllers, or SOQL/DML against Commerce objects. Apply these rules *on top of* the base Apex
 > quality rules. For the current API surface, see the
 > [B2B/B2C Commerce Developer Guide](https://developer.salesforce.com/docs/commerce/salesforce-commerce/guide/b2b-b2c-comm-dev-guide.html)
-> or the `fetching-salesforce-docs` skill.
+> or fetch it via WebFetch/WebSearch.
 
 ## ConnectApi and extension points over raw SOQL/DML
 

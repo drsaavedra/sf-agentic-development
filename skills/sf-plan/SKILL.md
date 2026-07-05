@@ -2,6 +2,7 @@
 name: sf-plan
 description: "Salesforce design and planning — turns the reviewed research docs (docs/data-model.md, docs/automation.md, docs/ui-design.md, docs/integration-patterns.md, docs/security-model.md, written by sf-research) into a verified, completeness-checked design contract before any build: docs/solution-design.md, docs/CONTEXT.md (objective, story index, work-item dispatch table, doc pointers), and one docs/contracts/<slug>.md per story. Takes the objective from its own prompt and owns docs/CONTEXT.md; makes the solution-shape and declarative-vs-code calls from the decision packs; does not re-explore the org — research already did. TRIGGER when: planning a feature whose research docs exist, or revising a design before a build. DO NOT TRIGGER when: the feature's research docs don't exist yet (run /sf-research first), a spec already exists and the task is to build (use /sf-build), or a trivial one-line fix."
 allowed-tools: Read, Grep, Glob, Bash, AskUserQuestion
+disable-model-invocation: true
 ---
 
 # Salesforce Planning (sf-plan)
@@ -188,7 +189,7 @@ those live in the contract files and `docs/solution-design.md`. It holds:
   | # | Story | Work item | Metadata type | Config or code | Depends on | Commit |
   |---|---|---|---|---|---|---|
 
-  - **Config rows** → built with the matching `generating-*` config skill.
+  - **Config rows** → authored directly by the main agent (declarative metadata, inline).
   - **Code rows** → built by `salesforce-developer` (Apex via TDD; LWC/Flow via the validate loop).
   - `Story` links to the `docs/contracts/<slug>.md` that holds the row's full detail; `Depends on`
     orders the build — a row builds only after the rows it lists, config or code.

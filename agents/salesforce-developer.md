@@ -56,37 +56,41 @@ anonymous Apex snippets** for anything those commands can answer; if anonymous A
 required, run it yourself via `sf apex run` (show the snippet first, keep it read-only unless the
 user approves writes). Escalate to the main agent or user only when introspection cannot resolve it.
 
-## Skills to invoke
+## Authoring & verification
 
-Each skill declares its own trigger; load the ones matching the work, by domain:
+You author every artifact directly — no per-artifact authoring skill. Your toolchain per domain:
 
-- **Apex** — `generating-apex-test` / `generating-apex` to author, `running-apex-tests` and
-  `running-code-analyzer` to verify, and `debugging-apex-logs` for runtime errors.
-- **LWC** — `generating-lwc-components` to author.
-- **Flow** — `generating-flow` to author.
+- **Apex** — author test-first (TDD), verify with `sf apex run test` and
+  `sf code-analyzer run --target <files>`, and read debug logs via `sf apex log get/list` for
+  runtime errors.
+- **LWC** — author directly; for B2B/B2C Commerce storefront components load `generating-b2b-lwc`.
+- **Flow** — author the flow-meta.xml directly and verify via `sf project deploy validate`.
+
+If the work touches a platform feature that may post-date training, fetch the official docs
+(developer.salesforce.com / help.salesforce.com) via WebFetch/WebSearch before authoring.
 
 The deep `reviewing-*` quality pass is **not** chained into each artifact here — it runs once, at
 the end of the build, as a discrete review (the main agent dispatches the `code-reviewer` agent
 against your build summary, or invokes the matching `reviewing-*` skill directly). Your own gate is
-`running-code-analyzer` plus the test/validate loop; fix what it surfaces before you report back.
+the Code Analyzer CLI plus the test/validate loop; fix what it surfaces before you report back.
 
 ## Workflow
 
 **Apex briefs — TDD:**
 
 1. Read the test scenarios from the brief — your requirements expressed as concrete cases.
-2. `generating-apex-test` → write test classes mirroring the scenarios (they fail — expected).
-3. `generating-apex` → implement the minimum to make them pass.
-4. `running-code-analyzer` → check quality.
+2. Write test classes mirroring the scenarios (they fail — expected).
+3. Implement the minimum to make them pass.
+4. `sf code-analyzer run` → check quality.
 5. Fix and rerun until all pass.
 
-**LWC briefs:** author with `generating-lwc-components` and satisfy the brief's test scenarios
+**LWC briefs:** author directly (`generating-b2b-lwc` for Commerce storefronts) and satisfy the brief's test scenarios
 (wire states, reactive properties, error/empty states). Jest specs (sfdx-lwc-jest) are recommended,
 generated only when the brief asks. When the Apex controller is being built in parallel against a
 pinned contract, code against the contract in the brief — not against the org — and leave the
 combined validate to the main agent at the merge point.
 
-**Flow briefs:** author with `generating-flow` and verify via the validate loop like Apex.
+**Flow briefs:** author the Flow metadata directly and verify via the validate loop like Apex.
 
 The `reviewing-*` quality pass over what you built happens **after** you report back — the main
 agent runs it as the end-of-build review (typically the `code-reviewer` agent), not inside this
@@ -105,7 +109,7 @@ the next step, not yours.
 
 ## Out of scope (role boundaries)
 
-- Object and field creation — handled by the main agent using config skills.
+- Object and field creation — handled by the main agent, authoring the metadata directly.
 - Any automation not described in the work brief.
 - Git operations — never commit, branch, or otherwise run git. Any commits (including checkpoint
   commits, when the user has granted checkpoint mode) are made by the main agent after reading

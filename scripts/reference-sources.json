@@ -1,5 +1,5 @@
 {
-  "_comment": "Maintainer manifest for skill/agent reference packs AND each skill's own SKILL.md body (the Quick Reference carries the same release-sensitive claims, so it is audited too). Tracks which are grounded in official Salesforce docs, the sources they were grounded against, and when each was last re-validated. Run `npm run validate:refs` each release; re-ground flagged entries by fetching their sources with the fetching-salesforce-docs skill, update the file, and bump lastValidated. URLs here are audit TARGETS — the grounding pass confirms each one resolves and repairs it if Salesforce moved or retired the page. Prefer the newer /docs/platform/... developer-doc URLs: the fetching-salesforce-docs extractor renders their article body cleanly, whereas legacy atlas.en-us.* pages often return only a shell. Pure process/orchestration skills (sf-plan, sf-build) are basis 'expertise' — workflow, not platform facts. See docs/MAINTAINING.md.",
+  "_comment": "Maintainer manifest for skill/agent reference packs AND each skill's own SKILL.md body (the Quick Reference carries the same release-sensitive claims, so it is audited too). Tracks which are grounded in official Salesforce docs, the sources they were grounded against, and when each was last re-validated. Run `npm run validate:refs` each release; re-ground flagged entries by fetching their sources (WebFetch/WebSearch), update the file, and bump lastValidated. URLs here are audit TARGETS — the grounding pass confirms each one resolves and repairs it if Salesforce moved or retired the page. Prefer the newer /docs/platform/... developer-doc URLs: they fetch cleanly, whereas legacy atlas.en-us.* pages often return only a shell (use WebSearch for those). Pure process/orchestration skills (sf-plan, sf-build) are basis 'expertise' — workflow, not platform facts. See docs/MAINTAINING.md.",
   "stalenessDays": 180,
   "references": {
     "skills/reviewing-apex/SKILL.md": {
@@ -65,7 +65,7 @@
     },
     "skills/reviewing-apex/references/architecture.md": {
       "basis": "expertise",
-      "_note": "Service-Selector-Domain layering and naming conventions are an enterprise design pattern (Apex Enterprise Patterns / Well-Architected), not a single normative reference page. Its versioned claims (v67 sharing default, PMD rule names) are audited via security.md and running-code-analyzer. No doc source tracked."
+      "_note": "Service-Selector-Domain layering and naming conventions are an enterprise design pattern (Apex Enterprise Patterns / Well-Architected), not a single normative reference page. Its versioned claims (v67 sharing default, PMD rule names) are audited via security.md and the Code Analyzer CLI. No doc source tracked."
     },
     "skills/reviewing-apex/references/async.md": {
       "basis": "salesforce-docs",
@@ -550,11 +550,11 @@
     },
     "skills/sf-research/references/ui/surfaces-and-reuse.md": {
       "basis": "expertise",
-      "_note": "Component/placement discovery recipes (reuse-before-invent). Incidental platform facts (FlexiPage placement targets, Aura as legacy, full-site routing to building-ui-bundle-app) are owned by sf-plan/references/ui-decision.md."
+      "_note": "Component/placement discovery recipes (reuse-before-invent). Incidental platform facts (FlexiPage placement targets, Aura as legacy, full-site routing to a dedicated site build) are owned by sf-plan/references/ui-decision.md."
     },
     "skills/sf-research/references/ui/design-constraints.md": {
       "basis": "expertise",
-      "_note": "Design-system/accessibility/state discovery recipes. Incidental platform facts (SLDS styling hooks, WCAG, base-component conventions) are owned by reviewing-lwc and the applying-slds skill (tracked salesforce-docs)."
+      "_note": "Design-system/accessibility/state discovery recipes. Incidental platform facts (SLDS styling hooks, WCAG, base-component conventions) are owned by reviewing-lwc (tracked salesforce-docs) and the SLDS documentation."
     }
   }
 }
