@@ -2,6 +2,7 @@
 name: sf-build
 description: "Orchestrated Salesforce build-and-review pipeline. Reads the approved design contract at docs/CONTEXT.md (its work-item dispatch table) and the per-story docs/contracts/<slug>.md detail, authors config rows inline and dispatches the salesforce-developer agent per code work item, then runs the reviewing-* battery as a deterministic gate. TRIGGER when: the user asks to build, implement, or execute an existing spec (docs/CONTEXT.md is present) — e.g. 'build the spec', 'implement the plan', 'let's build it'. DO NOT TRIGGER when: no spec exists yet (run /sf-plan first); immediately after /sf-plan unless the user signals to proceed (the spec is meant to be reviewed first); or for ad-hoc edits, fixes, single-artifact config, or review-only tasks (author directly per the project baseline, or use the matching reviewing-* skill). Deploys remain human-gated regardless."
 allowed-tools: Agent, Skill, Read, Grep, Glob, Bash
+disable-model-invocation: true
 ---
 
 # Salesforce Build Orchestrator (sf-build)

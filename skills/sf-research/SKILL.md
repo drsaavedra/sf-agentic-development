@@ -2,6 +2,7 @@
 name: sf-research
 description: "Salesforce state-of-the-world discovery — one prompt-driven skill that inventories the current org/repo across five domains (data model, automation, integration, UI, security & licensing) and writes a reviewable docs/<domain>.md per in-scope domain. The request names which domains to look at; only those run. Single-purpose: it researches and writes/refreshes the docs only — it never writes docs/CONTEXT.md (sf-plan owns that, taking the objective straight from its own prompt). Safe to run unattended on a schedule to keep the org docs in sync. Surfaces the constraints that bite at planning time — master-detail on a populated object, order-of-execution conflicts, unsupported auth, the missing license — before sign-off, not mid-build. TRIGGER when: starting research/discovery before a design, or asked to inventory, map, audit, refresh, or persist an org's data model, automation, integrations, UI surfaces, sharing model, or license entitlements. DO NOT TRIGGER when: choosing an approach or designing (use sf-plan); building (authored directly per the project baseline); or reviewing (reviewing-*)."
 allowed-tools: Read, Grep, Glob, Bash, AskUserQuestion
+disable-model-invocation: true
 ---
 
 # Salesforce Research
