@@ -9,7 +9,7 @@
 //   - prints a re-grounding worklist and exits non-zero when the release gate trips.
 //
 // What it does NOT do: semantically fact-check the prose. Re-grounding is a maintainer step —
-// fetch each pack's `sources` with the fetching-salesforce-docs skill, update the pack, and bump
+// fetch each pack's `sources` via WebFetch/WebSearch, update the pack, and bump
 // `lastValidated`. This script tells you WHICH packs need that and against WHICH sources.
 //
 // Usage:  node scripts/validate-references.js [--strict] [--today=YYYY-MM-DD]
@@ -150,7 +150,7 @@ function main() {
   const failing = errors.length > 0 || (strict && warnings.length > 0);
   if (failing) {
     console.error(
-      '\nRelease gate: re-ground the flagged packs with the fetching-salesforce-docs skill, ' +
+      '\nRelease gate: re-ground the flagged packs against their tracked sources (WebFetch/WebSearch), ' +
         'update them, and bump lastValidated in scripts/reference-sources.json.'
     );
     process.exit(1);

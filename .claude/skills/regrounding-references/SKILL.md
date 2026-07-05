@@ -1,6 +1,6 @@
 ---
 name: regrounding-references
-description: "Use when re-grounding this repo's skill/agent reference packs against official Salesforce docs — at a release, when a new Salesforce version may change documented behavior, or when `npm run validate:refs` flags packs as STALE / NEVER-VALIDATED / UNTRACKED / MISSING. Covers fetching each pack's tracked sources, fact-checking and retiring deprecated claims, picking up new-release best practices, and bumping lastValidated. Maintainer-only tooling for this repo — not shipped to consumers. TRIGGER when: revalidating references, grounding packs, a Salesforce release audit, or clearing validate:refs flags. DO NOT TRIGGER when: authoring/reviewing Salesforce artifacts (use the generating-*/reviewing-* skills) or fetching a single doc for an answer (use fetching-salesforce-docs directly)."
+description: "Use when re-grounding this repo's skill/agent reference packs against official Salesforce docs — at a release, when a new Salesforce version may change documented behavior, or when `npm run validate:refs` flags packs as STALE / NEVER-VALIDATED / UNTRACKED / MISSING. Covers fetching each pack's tracked sources, fact-checking and retiring deprecated claims, picking up new-release best practices, and bumping lastValidated. Maintainer-only tooling for this repo — not shipped to consumers. TRIGGER when: revalidating references, grounding packs, a Salesforce release audit, or clearing validate:refs flags. DO NOT TRIGGER when: authoring/reviewing Salesforce artifacts (use the reviewing-* skills) or fetching a single doc to answer a question (plain WebFetch/WebSearch)."
 ---
 
 # Re-grounding Reference Packs
@@ -22,14 +22,10 @@ Bumping a date you didn't earn silently ships stale guidance past a green gate.
 - A Salesforce release shipped (or is in preview) and may change documented behavior.
 - `npm run validate:refs` reports `STALE`, `NEVER VALIDATED`, `UNTRACKED`, or `MISSING FILE`.
 - You added, renamed, deleted, or rewrote a `references/*.md` or a `SKILL.md` body.
-- **A `forcedotcom/sf-skills` bump changed `skills-lock.json` hashes** — the `reviewing-*` packs are
-  grounded against specific sf-skill behavior, so re-check the packs matching the changed skills
-  (e.g. `generating-apex` changed → re-check `reviewing-apex`). The bump itself is a separate
-  procedure — see the `updating-sf-skills` skill, which hands off to this one.
 - Scheduled cadence (every `stalenessDays`, currently 180).
 
-Not for: writing/reviewing Salesforce code (use `generating-*` / `reviewing-*`), or a one-off doc
-lookup to answer a question (use `fetching-salesforce-docs` on its own).
+Not for: writing/reviewing Salesforce code (use the `reviewing-*` skills), or a one-off doc
+lookup to answer a question (plain WebFetch/WebSearch).
 
 ## Checklist (re-runnable each release)
 
@@ -60,19 +56,14 @@ Create a todo per step.
 
 ## Where to fetch each source
 
-The `fetching-salesforce-docs` skill (Playwright/Chromium extractor) is the default, but it does not
-render every Salesforce surface. Route by URL shape:
+Fetch with WebFetch/WebSearch; route by URL shape:
 
 | Source URL | How to fetch |
 |---|---|
-| `developer.salesforce.com/docs/platform/…` (LWC, newer dev docs) | `fetching-salesforce-docs` — renders the article body cleanly |
-| `help.salesforce.com/s/articleView…` | `fetching-salesforce-docs` — renders well |
-| `lightningdesignsystem.com/…` | `fetching-salesforce-docs` |
-| **`developer.salesforce.com/docs/atlas.en-us.*`** (most Apex docs) | **WebSearch / WebFetch against developer.salesforce.com** — headless Chromium returns only the cookie-consent shell here, even with `--stealth`. Use the indexed snippet + current canonical URL instead. |
-
-One-time runtime setup for the extractor lives in docs/MAINTAINING.md (isolated Python venv at
-`~/.claude/.fetching-salesforce-docs-runtime/`; on Windows invoke that Python directly with
-`SF_DOCS_RUNTIME_ACTIVE=1` — the `os.execve` re-exec segfaults under Git Bash).
+| `developer.salesforce.com/docs/platform/…` (LWC, newer dev docs) | WebFetch — renders the article body |
+| `help.salesforce.com/s/articleView…` | WebFetch; if it returns a shell, WebSearch the article title for the indexed body |
+| `lightningdesignsystem.com/…` | WebFetch |
+| **`developer.salesforce.com/docs/atlas.en-us.*`** (most Apex docs) | **WebSearch against developer.salesforce.com** — these pages are JS shells to direct fetches. Use the indexed snippet + current canonical URL. |
 
 ## Manifest entry reference (`scripts/reference-sources.json`)
 
@@ -107,7 +98,7 @@ Gate outcomes you're clearing: `UNTRACKED` (no entry), `NEVER VALIDATED` (null d
 | Mistake | Why it's wrong |
 |---|---|
 | Bumping `lastValidated` without fetching | The gate trusts the date — this ships stale guidance past a green check. The whole point of the run defeated. |
-| Trying the Playwright extractor on `atlas.en-us.*` Apex pages | Returns the consent shell, not the article. Use WebSearch/WebFetch for those. |
+| Direct-fetching `atlas.en-us.*` Apex pages | They return a JS shell, not the article. Use WebSearch for those. |
 | Softening a retired feature to "legacy" instead of deleting | Step 3 says cut deprecated claims. Stale guidance kept as prose still misleads. |
 | Deleting a `.md` but leaving its manifest entry (or vice-versa) | Trips `MISSING FILE` / `UNTRACKED`. File and entry move together. |
 | Bumping an `expertise` entry on the doc cadence | Expertise packs have no doc source and are skipped by the gate — there's nothing to reground. |
