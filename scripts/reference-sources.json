@@ -65,7 +65,7 @@
     },
     "skills/reviewing-apex/references/architecture.md": {
       "basis": "expertise",
-      "_note": "Service-Selector-Domain layering and naming conventions are an enterprise design pattern (Apex Enterprise Patterns / Well-Architected), not a single normative reference page. Its versioned claims (v67 sharing default, PMD rule names) are audited via security.md and running-code-analyzer. No doc source tracked."
+      "_note": "Service-Selector-Domain layering and naming conventions are an enterprise design pattern (Apex Enterprise Patterns / Well-Architected), not a single normative reference page. Its versioned claims (v67 sharing default, PMD rule names) are audited via security.md and the Code Analyzer CLI. No doc source tracked."
     },
     "skills/reviewing-apex/references/async.md": {
       "basis": "salesforce-docs",
@@ -550,7 +550,7 @@
     },
     "skills/sf-research/references/ui/surfaces-and-reuse.md": {
       "basis": "expertise",
-      "_note": "Component/placement discovery recipes (reuse-before-invent). Incidental platform facts (FlexiPage placement targets, Aura as legacy, full-site routing to building-ui-bundle-app) are owned by sf-plan/references/ui-decision.md."
+      "_note": "Component/placement discovery recipes (reuse-before-invent). Incidental platform facts (FlexiPage placement targets, Aura as legacy, full-site routing to a dedicated site build) are owned by sf-plan/references/ui-decision.md."
     },
     "skills/sf-research/references/ui/design-constraints.md": {
       "basis": "expertise",
