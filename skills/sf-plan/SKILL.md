@@ -188,7 +188,7 @@ those live in the contract files and `docs/solution-design.md`. It holds:
   | # | Story | Work item | Metadata type | Config or code | Depends on | Commit |
   |---|---|---|---|---|---|---|
 
-  - **Config rows** → built with the matching `generating-*` config skill.
+  - **Config rows** → authored directly by the main agent (declarative metadata, inline).
   - **Code rows** → built by `salesforce-developer` (Apex via TDD; LWC/Flow via the validate loop).
   - `Story` links to the `docs/contracts/<slug>.md` that holds the row's full detail; `Depends on`
     orders the build — a row builds only after the rows it lists, config or code.

@@ -1,6 +1,6 @@
 ---
 name: sf-build
-description: "Orchestrated Salesforce build-and-review pipeline. Reads the approved design contract at docs/CONTEXT.md (its work-item dispatch table) and the per-story docs/contracts/<slug>.md detail, dispatches config skills and the salesforce-developer agent per work item, then runs the reviewing-* battery as a deterministic gate. TRIGGER when: the user asks to build, implement, or execute an existing spec (docs/CONTEXT.md is present) — e.g. 'build the spec', 'implement the plan', 'let's build it'. DO NOT TRIGGER when: no spec exists yet (run /sf-plan first); immediately after /sf-plan unless the user signals to proceed (the spec is meant to be reviewed first); or for ad-hoc edits, fixes, single-artifact config, or review-only tasks (use the matching generating-* / reviewing-* skill). Deploys remain human-gated regardless."
+description: "Orchestrated Salesforce build-and-review pipeline. Reads the approved design contract at docs/CONTEXT.md (its work-item dispatch table) and the per-story docs/contracts/<slug>.md detail, authors config rows inline and dispatches the salesforce-developer agent per code work item, then runs the reviewing-* battery as a deterministic gate. TRIGGER when: the user asks to build, implement, or execute an existing spec (docs/CONTEXT.md is present) — e.g. 'build the spec', 'implement the plan', 'let's build it'. DO NOT TRIGGER when: no spec exists yet (run /sf-plan first); immediately after /sf-plan unless the user signals to proceed (the spec is meant to be reviewed first); or for ad-hoc edits, fixes, single-artifact config, or review-only tasks (author directly per the project baseline, or use the matching reviewing-* skill). Deploys remain human-gated regardless."
 allowed-tools: Agent, Skill, Read, Grep, Glob, Bash
 ---
 
@@ -46,14 +46,13 @@ frontmatter flag, so it holds across every assistant.
    each row against `force-app/**`: if its artifact already exists** (a revised spec, or a re-run),
    mark it for *additive modification*, not recreation — build greenfield only the rows with no
    existing artifact, and never clobber a row the change doesn't touch.
-2. **Build config rows inline** with the matching `generating-*` skill — `generating-custom-object`,
-   `generating-custom-field`, `generating-validation-rule`, `generating-permission-set`,
-   `generating-flexipage`, `generating-list-view`, etc. These stay with the main agent; they are
+2. **Build config rows inline** — the main agent authors declarative metadata directly (objects,
+   fields, validation rules, permission sets, FlexiPages, list views, etc.), verifying each row
+   with `sf project deploy validate` before moving on. These stay with the main agent; they are
    not dispatched to a subagent. **Integration config** — Named Credentials, External Credentials,
-   External Services, Platform Events, CDC — is built with `building-sf-integrations` (a code row
-   that also needs Apex callout logic goes to `salesforce-developer`, which applies the same skill).
-   For a row whose metadata already exists, modify it additively rather than regenerating over local
-   changes.
+   External Services, Platform Events, CDC — is likewise authored inline (a code row that also
+   needs Apex callout logic goes to `salesforce-developer`). For a row whose metadata already
+   exists, modify it additively rather than regenerating over local changes.
 3. **Build code rows via `salesforce-developer`.** For each code row, cut a **work brief** from its
    story's `docs/contracts/<slug>.md` — Objective, Spec reference (the contract file, `§N` for the
    work item within it), Schema context, Test scenarios, Constraints, Dependencies, Expected

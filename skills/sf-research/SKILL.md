@@ -1,6 +1,6 @@
 ---
 name: sf-research
-description: "Salesforce state-of-the-world discovery — one prompt-driven skill that inventories the current org/repo across five domains (data model, automation, integration, UI, security & licensing) and writes a reviewable docs/<domain>.md per in-scope domain. The request names which domains to look at; only those run. Single-purpose: it researches and writes/refreshes the docs only — it never writes docs/CONTEXT.md (sf-plan owns that, taking the objective straight from its own prompt). Safe to run unattended on a schedule to keep the org docs in sync. Surfaces the constraints that bite at planning time — master-detail on a populated object, order-of-execution conflicts, unsupported auth, the missing license — before sign-off, not mid-build. TRIGGER when: starting research/discovery before a design, or asked to inventory, map, audit, refresh, or persist an org's data model, automation, integrations, UI surfaces, sharing model, or license entitlements. DO NOT TRIGGER when: choosing an approach or designing (use sf-plan); building (generating-* / building-sf-integrations / applying-slds); or reviewing (reviewing-*)."
+description: "Salesforce state-of-the-world discovery — one prompt-driven skill that inventories the current org/repo across five domains (data model, automation, integration, UI, security & licensing) and writes a reviewable docs/<domain>.md per in-scope domain. The request names which domains to look at; only those run. Single-purpose: it researches and writes/refreshes the docs only — it never writes docs/CONTEXT.md (sf-plan owns that, taking the objective straight from its own prompt). Safe to run unattended on a schedule to keep the org docs in sync. Surfaces the constraints that bite at planning time — master-detail on a populated object, order-of-execution conflicts, unsupported auth, the missing license — before sign-off, not mid-build. TRIGGER when: starting research/discovery before a design, or asked to inventory, map, audit, refresh, or persist an org's data model, automation, integrations, UI surfaces, sharing model, or license entitlements. DO NOT TRIGGER when: choosing an approach or designing (use sf-plan); building (authored directly per the project baseline); or reviewing (reviewing-*)."
 allowed-tools: Read, Grep, Glob, Bash, AskUserQuestion
 ---
 
@@ -185,7 +185,7 @@ For **security** with no org, instead use:
 - **Placement** — where the UI must live (record page, app/home page, utility bar, quick action,
   Experience Cloud page) and the record/context that placement implies.
 - **Internal vs Experience Cloud** — internal Lightning Experience, or a public/partner Experience
-  Cloud site? If a full site, note the architecture fork to `building-ui-bundle-app`.
+  Cloud site? If a full site, note the architecture fork to a dedicated site build.
 - **Design system & branding** — SLDS usage, design tokens/branding constraints, base-component
   conventions.
 - **Accessibility** — the accessibility bar the feature must meet.
@@ -216,10 +216,5 @@ For **security** with no org, instead use:
 | Need | Hand to |
 |---|---|
 | Choose the solution shape, automation/UI/integration approach, standard-vs-custom, sharing design | `sf-plan` — **consumes** these docs instead of re-exploring the org |
-| Build objects/fields | `generating-custom-object`, `generating-custom-field` |
-| Build automation | `generating-flow`, `generating-apex`, `generating-apex-test` |
-| Build UI / styling | `generating-lwc-components`, `generating-flow`, `applying-slds` |
-| Build a full Experience Cloud site/app | `building-ui-bundle-app` |
-| Build integration plumbing / configure inbound auth | `building-sf-integrations`, `configuring-connected-apps` |
-| Build permission sets / FLS | `generating-permission-set` |
+| Build any artifact the research surfaced (objects, fields, automation, UI, integration config, permission sets) | Direct authoring under the project baseline's Authoring rules (base model; `generating-b2b-lwc` for Commerce storefront LWC) |
 | Review the resulting artifacts | `reviewing-apex`, `reviewing-lwc`, `reviewing-flow` |

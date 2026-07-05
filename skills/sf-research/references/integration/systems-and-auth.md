@@ -27,7 +27,7 @@ This is the surprise to surface early — Salesforce must match what the system 
 - **Per-user vs named-principal** — does each Salesforce user authenticate individually, or does the
   integration use one service principal? Affects the External Credential's principal type.
 - For **inbound** (system → Salesforce), the auth is a Connected App / External Client App + OAuth —
-  note it and hand the configuration to `configuring-connected-apps`.
+  note it — the Connected App / External Client App is configured directly at build time.
 
 ## Existing credentials — don't rebuild plumbing
 

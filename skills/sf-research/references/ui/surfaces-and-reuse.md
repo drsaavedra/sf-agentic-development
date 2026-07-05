@@ -45,8 +45,8 @@ This is the fork to surface in research, because a full site is a different arch
 - **Does an Experience Cloud site already exist?** — `force-app/**/experiences/` or
   `digitalExperiences/`, and `sf org list metadata` for `Network`/`ExperienceBundle`. Note existing
   sites the feature might extend.
-- **Full site vs single component** — a multi-page Experience Cloud site/storefront SPA routes to
-  `building-ui-bundle-app`, **not** a single LWC. If the requirement is a whole site, record the fork
+- **Full site vs single component** — a multi-page Experience Cloud site/storefront SPA is a
+  dedicated site build, **not** a single LWC. If the requirement is a whole site, record the fork
   prominently in **Surprises & constraints** so `sf-plan` plans the right architecture.
 
 ## What to hand to the doc

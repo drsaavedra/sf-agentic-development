@@ -1,7 +1,7 @@
 # Design system, branding, accessibility, and states
 
 > Part of `sf-research` (ui domain) — see SKILL.md. Discovery, not design. Capture the constraints the UI must
-> meet so `sf-plan` designs to the bar and `generating-lwc-components`/`applying-slds` build to it.
+> meet so `sf-plan` designs to the bar and the build stage builds to it.
 > These are project-level conventions — infer them from the in-scope components plus a representative
 > sample, not an org-wide catalog scan.
 
