@@ -40,6 +40,7 @@ Scan every artifact against this checklist.
 | Raw `SObject` returned from `@AuraEnabled` in a namespaced package | Typed DTO with unprefixed props — packaged custom fields serialize as `ns__Foo__c`, so the LWC reads `undefined` silently |
 | New entry-point class absent from any permission set's `classAccesses` | Ship the grant as metadata in the same changeset — works for the admin, inert for every other persona; no gate catches it |
 | Elevating `@InvocableMethod` guarded only by the calling Flow | Guard inside the Apex — invocables are reachable from any Flow and the Actions REST API |
+| Setup-object DML mixed with regular DML | `MIXED_DML_OPERATION` at runtime — split the transaction (`System.runAs` in tests, Queueable in prod) |
 | `global` on a member that is not subscriber-facing API | `public` — packaged `global` can never be renamed, narrowed, or removed |
 | State-changing callout from LWC | Initiate from trigger / Platform Event, not a direct `@AuraEnabled` call |
 | State-changing `@HttpGet` / page-load action | CSRF — GET handlers stay read-only; mutate via POST |
