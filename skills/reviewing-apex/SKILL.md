@@ -47,6 +47,7 @@ Scan every artifact against this checklist.
 | SOQL injection | Bind variables / `Database.queryWithBinds`; allowlist dynamic names |
 | Unescaped SOSL `FIND` term | Backslash-escape the SOSL reserved characters (listed in `references/security.md`); try/catch the call |
 | External text into a capped `Text(n)` field | `truncate()` to a `*_MAX` constant matching `<length>` in field-meta.xml — `STRING_TOO_LONG` rolls back the whole save |
+| Sync Apex reading `ContentVersion.VersionData` | Peak heap ≈ 2.33× file size vs 6 MB sync — check `ContentSize` first and cap |
 | Hardcoded secrets | Named Credentials / protected CMDT |
 | Hardcoded IDs | `Schema.describe` or CMDT / Custom Label |
 | Magic strings/numbers | `private static final` constants / CMDT |
