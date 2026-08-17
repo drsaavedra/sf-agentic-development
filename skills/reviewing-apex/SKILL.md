@@ -46,6 +46,7 @@ Scan every artifact against this checklist.
 | State-changing `@HttpGet` / page-load action | CSRF — GET handlers stay read-only; mutate via POST |
 | SOQL injection | Bind variables / `Database.queryWithBinds`; allowlist dynamic names |
 | Unescaped SOSL `FIND` term | Backslash-escape the SOSL reserved characters (listed in `references/security.md`); try/catch the call |
+| External text into a capped `Text(n)` field | `truncate()` to a `*_MAX` constant matching `<length>` in field-meta.xml — `STRING_TOO_LONG` rolls back the whole save |
 | Hardcoded secrets | Named Credentials / protected CMDT |
 | Hardcoded IDs | `Schema.describe` or CMDT / Custom Label |
 | Magic strings/numbers | `private static final` constants / CMDT |
