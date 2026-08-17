@@ -62,6 +62,8 @@ Scan every artifact against this checklist.
 | Duplicate async jobs | `QueueableDuplicateSignature` on `AsyncOptions` |
 | Batch errors vanish | `Database.RaisesPlatformEvents` + `BatchApexErrorEvent` subscriber |
 | Async for everything | Async only for callouts / volume / long-running |
+| Sync path that may exceed 5s | Keep sync work <5s (10–50 concurrent-long-running cap, by license count); offload slow work to async |
+| Publish/email per record | Aggregate — PE = DML/daily budget, email = 5,000/day org cap |
 | `SeeAllData=true` | `@TestSetup` + `TestDataFactory` |
 | Coverage without assertions | Assert outcomes with `Assert` class |
 | No bulk test | 201+ records for triggers and bulk-facing services |
@@ -82,7 +84,7 @@ Load a reference file when either applies:
 | CRUD/FLS, sharing keywords, dynamic SOQL, secrets, hardcoded IDs | `references/security.md` |
 | Class layering (Service/Selector/Domain), naming, class/method size | `references/architecture.md` |
 | `@AuraEnabled` or `ConnectApi` (also load `reviewing-lwc`) | `references/aura-enabled.md` |
-| Queueable, Batch, Schedulable, `@future`, callouts from trigger context | `references/async.md` |
+| Queueable, Batch, Schedulable, `@future`, callouts from trigger context, concurrent-load / capacity review | `references/async.md` |
 | try/catch, null safety, magic strings/numbers, debug logging, deep nesting | `references/error-handling-maintainability.md` |
 | Test classes (`*Test.cls` / `*_Test.cls`) | `references/testing.md` |
 | B2B Commerce storefront — ConnectApi, CartExtension calculators, cacheable storefront reads, Commerce-object SOQL, buyer/entitlement test data | `references/commerce-b2b.md` | <!-- domain:commerce -->
