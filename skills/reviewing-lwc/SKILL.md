@@ -44,6 +44,7 @@ Scan every artifact against this checklist.
 | LWC: bare `Event` / object in `detail` | `CustomEvent` with primitive payload; copy objects; pass record Id only |
 | LWC: `window.location` navigation | `NavigationMixin` from `lightning/navigation` |
 | LWC: `NavigationMixin` in a `LightningModal` class | Silent no-op — navigate from a `LightningElement` child or from the launcher after `close()` |
+| LWC: `blob:` / `data:` URI as iframe `src` | LWS allows `http://` / `https://` only — use a relative page URL |
 | LWC: own namespace in a `@salesforce/schema` module id | Compile error `LWC1504` — omit the prefix; UI API *string* field names keep it |
 | LWC: LMS subscription leak | `unsubscribe(this._subscription)` in `disconnectedCallback` |
 | LWC: window/document listener leak | `removeEventListener` in `disconnectedCallback` |
