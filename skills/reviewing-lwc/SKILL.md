@@ -43,6 +43,7 @@ Scan every artifact against this checklist.
 | LWC: object arg into an untyped Apex `Object` / `Map<String,Object>` param | Match the Apex inbound type — send primitives / `Map<String,String>`; untyped `Object` params fail JSON deserialization and the arg arrives `null` |
 | LWC: bare `Event` / object in `detail` | `CustomEvent` with primitive payload; copy objects; pass record Id only |
 | LWC: `window.location` navigation | `NavigationMixin` from `lightning/navigation` |
+| LWC: own namespace in a `@salesforce/schema` module id | Compile error `LWC1504` — omit the prefix; UI API *string* field names keep it |
 | LWC: LMS subscription leak | `unsubscribe(this._subscription)` in `disconnectedCallback` |
 | LWC: window/document listener leak | `removeEventListener` in `disconnectedCallback` |
 | LWC: cross-shadow DOM access | Communicate via `@api` methods and events |
