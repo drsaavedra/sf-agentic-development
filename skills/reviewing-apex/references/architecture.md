@@ -22,6 +22,13 @@ Additional rules:
 - In Selector field lists, prefer compile-time field references (`Schema.Account.Name` or a `Schema.SObjectField` constant) over string literals — field deletion is then caught at deploy time instead of failing at runtime.
 - Static analysis is part of the quality gate. Pair with the Code Analyzer CLI (`sf code-analyzer run`): `ApexCRUDViolation`, `ApexSharingViolations`, `ExcessiveClassLength`, `ExcessivePublicCount`, and `AvoidDeeplyNestedIfStmts` should be in the enforced rule set.
 
+## Managed-package permanence
+
+*Applies only when the repo builds a 1GP/2GP managed package.* Once a package version ships a `global` member, the platform forbids removing it, renaming it, or narrowing it — subscriber code may be compiled against it. Verbatim from the Apex Developer Guide: *"You can't delete a global class, interface, method, variable, or enum"*, *"You can't change the name of…"*, and *"You can't change the access modifier … from global to another access modifier."*
+
+- Flag every `global` class, method, inner class, `@InvocableMethod`, or `@InvocableVariable` that is not deliberately part of the subscriber-facing API. An invocable called only by an in-package Flow — and its Request/Result wrappers and their `@InvocableVariable` members — must be `public`: the Flow can still call it and the shape stays free to change. **The only chance to catch this is before the first package version containing the member.**
+- Flag any rename of a metadata API name arriving without matching destructive members. Renaming does not remove the old component from the org, so the old copy stays deployed, still compiles, and still runs under `RunLocalTests`. For an already-packaged component the rename is not available at all.
+
 ## Naming conventions
 
 | Artifact | Pattern |
