@@ -44,6 +44,7 @@ Scan every artifact against this checklist.
 | State-changing callout from LWC | Initiate from trigger / Platform Event, not a direct `@AuraEnabled` call |
 | State-changing `@HttpGet` / page-load action | CSRF — GET handlers stay read-only; mutate via POST |
 | SOQL injection | Bind variables / `Database.queryWithBinds`; allowlist dynamic names |
+| Unescaped SOSL `FIND` term | Backslash-escape the SOSL reserved characters (listed in `references/security.md`); try/catch the call |
 | Hardcoded secrets | Named Credentials / protected CMDT |
 | Hardcoded IDs | `Schema.describe` or CMDT / Custom Label |
 | Magic strings/numbers | `private static final` constants / CMDT |

@@ -21,6 +21,12 @@
 - **`String.escapeSingleQuotes()` is a secondary measure only** — it escapes quote characters in string literals but does nothing for injection into the query's structure. Structural elements (field names, object names, operators, `ORDER BY` directions) cannot be bound — validate them against a `Set<String>` allowlist or `Schema.describe`, never escape them.
 - **Treat every `@AuraEnabled` parameter as untrusted.** Validate all IDs and string inputs from LWCs or page state before use — an LWC wire parameter is user-controlled input.
 
+## SOSL injection and malformed search terms
+
+- **Escape the SOSL reserved set in any `FIND` / `Search.query` term built from user input, an uploaded document, or an integration payload.** The SOQL and SOSL Reference names them explicitly — `? & | ! { } [ ] ( ) ^ ~ * : \ " ' + -` — and each *"must be escaped (preceded by the backslash `\` character) to be properly interpreted"*. Unescaped they parse as search operators, so ordinary source data (`AirX (Charter) Ltd`, `Boutique-Air`) either returns wrong results or fails outright.
+- **`String.escapeSingleQuotes()`, SOSL bind variables, and `AccessLevel.USER_MODE` do nothing here.** None of them strip operator semantics from a search term — they address different attacks. Escaping the reserved set is a separate, explicit step.
+- **Wrap the call in try/catch and fall through to a safe path.** A term SOSL rejects (too short, or nothing but operators once escaped) throws at runtime and aborts the whole transaction rather than returning an empty list. Also bound the term length: a `SearchQuery` over 10,000 characters returns no rows, and over 4,000 characters has its logical operators removed.
+
 ## Hardcoded secrets and IDs
 
 - **Secrets in source** are visible to anyone with read access to the code or repo. Use Named Credentials or protected Custom Metadata — never string literals.
