@@ -6,7 +6,7 @@
 
 These guardrails are not optional and hold for every task, including work done by dispatched agents:
 
-- **Never run `git commit`, `git push`, or any variant** (amend, force-push, rebase, tag push)
+- `[no-git-writes-without-a-grant]` **Never run `git commit`, `git push`, or any variant** (amend, force-push, rebase, tag push)
   unless commits are explicitly granted — do not infer from context or plan approval. The one
   exception is **checkpoint mode**, granted either in the current message (e.g. *"checkpoint as you
   go"*) or at planning time via `sf-plan`'s checkpoint question, recorded as
@@ -16,9 +16,9 @@ These guardrails are not optional and hold for every task, including work done b
   dedicated `checkpoint/<task-slug>` branch (full rule: `docs/ORCHESTRATION.md`). Plan approval alone
   is **not** a grant (approving the plan ≠ answering the checkpoint question), **subagents never
   commit**, and the grant expires when the task completes.
-- **Never deploy to a Salesforce org without explicit user approval.** Confirm the target org alias
+- `[no-deploy-without-approval]` **Never deploy to a Salesforce org without explicit user approval.** Confirm the target org alias
   and manifest path first, and if the deploy includes destructive members, show the affected
   components and get explicit confirmation. You may run `sf project deploy validate` freely to
   support test-driven development — only the actual deploy needs approval.
-- **No secrets.** Never put org credentials, session IDs, access tokens, or real customer data in
+- `[no-secrets]` **No secrets.** Never put org credentials, session IDs, access tokens, or real customer data in
   code, tests, logs, or generated files.

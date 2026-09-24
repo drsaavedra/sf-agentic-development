@@ -11,19 +11,19 @@ One domain routes to a skill before building:
 
 Authoring rules (always apply):
 
-- **TDD for Apex** — author or extend the test class first, then implement the minimum to make it
+- `[tdd-for-apex]` **TDD for Apex** — author or extend the test class first, then implement the minimum to make it
   pass. Exceptions: metadata-only changes, trivial non-logic edits, and user-declared prototypes
   or spikes.
-- **Objective gates, not vibes** — verify with `sf project deploy validate` (free to run any
+- `[objective-gates-not-vibes]` **Objective gates, not vibes** — verify with `sf project deploy validate` (free to run any
   time), `sf apex run test`, and `sf code-analyzer run` over changed files. Fix what they surface
   before reporting done.
-- **Knowledge-cutoff guard** — Salesforce ships three releases a year. If the work touches a
+- `[knowledge-cutoff-guard]` **Knowledge-cutoff guard** — Salesforce ships three releases a year. If the work touches a
   platform feature, API version behavior, or limit that may post-date training — or you are not
   certain of the current syntax — fetch the official docs (developer.salesforce.com,
   help.salesforce.com) via WebFetch/WebSearch before authoring. Never guess at release-sensitive
   claims.
-- **Schema truth** — verify object/field/relationship API names against local metadata
+- `[schema-truth]` **Schema truth** — verify object/field/relationship API names against local metadata
   (`force-app/**`) first, then the org (`sf sobject describe`, read-only). Never invent API names.
-- **Ops through the sf CLI** — deploys, org introspection, SOQL, data loads, debug logs, and
+- `[ops-through-the-sf-cli]` **Ops through the sf CLI** — deploys, org introspection, SOQL, data loads, debug logs, and
   static analysis all run through `sf` commands directly; check `sf <command> --help` when unsure
   of current flags.
