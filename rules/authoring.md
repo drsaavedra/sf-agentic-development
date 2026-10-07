@@ -25,6 +25,9 @@ Authoring rules (always apply):
   claims.
 - `[schema-truth]` **Schema truth** — verify object/field/relationship API names against local metadata
   (`force-app/**`) first, then the org (`sf sobject describe`, read-only). Never invent API names.
+  Describe, `FieldDefinition` and SOQL `INVALID_TYPE` all read through the running user's access, so
+  "not found" proves nothing until a control the org must have reads cleanly. Read org feature
+  toggles from Settings metadata, not from a describe.
 - `[ops-through-the-sf-cli]` **Ops through the sf CLI** — deploys, org introspection, SOQL, data loads, debug logs, and
   static analysis all run through `sf` commands directly; check `sf <command> --help` when unsure
   of current flags.
