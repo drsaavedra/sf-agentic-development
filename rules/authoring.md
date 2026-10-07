@@ -14,9 +14,10 @@ Authoring rules (always apply):
 - `[tdd-for-apex]` **TDD for Apex** — author or extend the test class first, then implement the minimum to make it
   pass. Exceptions: metadata-only changes, trivial non-logic edits, and user-declared prototypes
   or spikes.
-- `[objective-gates-not-vibes]` **Objective gates, not vibes** — verify with `sf project deploy validate` (free to run any
-  time), `sf apex run test`, and `sf code-analyzer run` over changed files. Fix what they surface
-  before reporting done.
+- `[objective-gates-not-vibes]` **Objective gates, not vibes** — verify with `sf project deploy validate
+  --test-level RunSpecifiedTests --tests <tests>` (free to run any time) and `sf code-analyzer run`
+  over changed files. Fix what they surface before reporting done. `sf apex run test` runs the code
+  already in the org, not your working tree, so it never proves an uncommitted change.
 - `[knowledge-cutoff-guard]` **Knowledge-cutoff guard** — Salesforce ships three releases a year. If the work touches a
   platform feature, API version behavior, or limit that may post-date training — or you are not
   certain of the current syntax — fetch the official docs (developer.salesforce.com,

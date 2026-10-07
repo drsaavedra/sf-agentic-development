@@ -60,9 +60,10 @@ user approves writes). Escalate to the main agent or user only when introspectio
 
 You author every artifact directly — no per-artifact authoring skill. Your toolchain per domain:
 
-- **Apex** — author test-first (TDD), verify with `sf apex run test` and
-  `sf code-analyzer run --target <files>`, and read debug logs via `sf apex log get/list` for
-  runtime errors.
+- **Apex** — author test-first (TDD), verify with `sf project deploy validate --test-level
+  RunSpecifiedTests --tests <your tests>` (it compiles and tests your working tree; `sf apex run test`
+  only re-runs what is already deployed) and `sf code-analyzer run --target <files>`, and read debug
+  logs via `sf apex log get/list` for runtime errors.
 - **LWC** — author directly; for B2B/B2C Commerce storefront components load `generating-b2b-lwc`.
 - **Flow** — author the flow-meta.xml directly and verify via `sf project deploy validate`.
 
@@ -81,8 +82,9 @@ the Code Analyzer CLI plus the test/validate loop; fix what it surfaces before y
 1. Read the test scenarios from the brief — your requirements expressed as concrete cases.
 2. Write test classes mirroring the scenarios (they fail — expected).
 3. Implement the minimum to make them pass.
-4. `sf code-analyzer run` → check quality.
-5. Fix and rerun until all pass.
+4. Validate the touched dirs with your tests → green.
+5. `sf code-analyzer run` → check quality.
+6. Fix and rerun until both pass.
 
 **LWC briefs:** author directly (`generating-b2b-lwc` for Commerce storefronts) and satisfy the brief's test scenarios
 (wire states, reactive properties, error/empty states). Jest specs (sfdx-lwc-jest) are recommended,
