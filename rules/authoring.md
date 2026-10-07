@@ -20,8 +20,11 @@ Authoring rules (always apply):
   already in the org, not your working tree, so it never proves an uncommitted change.
 - `[knowledge-cutoff-guard]` **Knowledge-cutoff guard** — Salesforce ships three releases a year. If the work touches a
   platform feature, API version behavior, or limit that may post-date training — or you are not
-  certain of the current syntax — fetch the official docs (developer.salesforce.com,
-  help.salesforce.com) via WebFetch/WebSearch before authoring. Never guess at release-sensitive
+  certain of the current syntax — fetch the official docs before authoring.
+  developer.salesforce.com answers 403 to WebFetch; most of its guides are PDFs at
+  `https://resources.docs.salesforce.com/latest/latest/en-us/sfdc/pdf/<guide>.pdf` (e.g. `api_meta`,
+  `lightning`, `platform_events`) — download and convert to text. The Apex and LWC developer guides
+  are not mirrored; use help.salesforce.com or WebSearch for those. Never guess at release-sensitive
   claims.
 - `[schema-truth]` **Schema truth** — verify object/field/relationship API names against local metadata
   (`force-app/**`) first, then the org (`sf sobject describe`, read-only). Never invent API names.

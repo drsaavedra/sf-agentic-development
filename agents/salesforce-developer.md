@@ -67,8 +67,11 @@ You author every artifact directly — no per-artifact authoring skill. Your too
 - **LWC** — author directly; for B2B/B2C Commerce storefront components load `generating-b2b-lwc`.
 - **Flow** — author the flow-meta.xml directly and verify via `sf project deploy validate`.
 
-If the work touches a platform feature that may post-date training, fetch the official docs
-(developer.salesforce.com / help.salesforce.com) via WebFetch/WebSearch before authoring.
+If the work touches a platform feature that may post-date training, fetch the official docs before
+authoring. developer.salesforce.com answers 403 to WebFetch; most of its guides are PDFs at
+`https://resources.docs.salesforce.com/latest/latest/en-us/sfdc/pdf/<guide>.pdf` (e.g. `api_meta`,
+`lightning`, `platform_events`) — download and convert to text. The Apex and LWC developer guides are
+not mirrored; use help.salesforce.com or WebSearch for those.
 
 The deep `reviewing-*` quality pass is **not** chained into each artifact here — it runs once, at
 the end of the build, as a discrete review (the main agent dispatches the `code-reviewer` agent
