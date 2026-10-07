@@ -86,6 +86,10 @@
         {
           "url": "https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_gov_limits.htm",
           "anchors": ["asynchronous", "concurrent batch", "queueable", "50 million records"]
+        },
+        {
+          "url": "https://resources.docs.salesforce.com/latest/latest/en-us/sfdc/pdf/lightning.pdf",
+          "anchors": ["no longer offer an advantage", "only one continuation in progress", "three callouts"]
         }
       ]
     },
@@ -483,6 +487,10 @@
         {
           "url": "https://developer.salesforce.com/docs/atlas.en-us.platform_events.meta/platform_events/platform_events_intro.htm",
           "anchors": ["Platform Event", "Change Data Capture", "Pub/Sub API"]
+        },
+        {
+          "url": "https://resources.docs.salesforce.com/latest/latest/en-us/sfdc/pdf/lightning.pdf",
+          "anchors": ["no longer offer an advantage", "only one continuation in progress", "three callouts"]
         }
       ]
     },

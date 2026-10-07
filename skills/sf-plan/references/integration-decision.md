@@ -33,12 +33,17 @@ Salesforce's *Integration Patterns and Practices*.)
 
 | Scenario | Pattern | Typical implementation |
 |---|---|---|
-| Outbound; you need the response now (synchronous) | Remote Process Invocation — **Request and Reply** | External Services / Flow HTTP Callout / Apex callout. From a UI action use an **async continuation** to avoid synchronous-callout limits |
+| Outbound; you need the response now (synchronous) | Remote Process Invocation — **Request and Reply** | External Services / Flow HTTP Callout / Apex callout. From a UI action, an Apex **Continuation** keeps the UI responsive but raises no limit (see below) |
 | Outbound; you don't wait for completion | Remote Process Invocation — **Fire and Forget** | **Platform Event** (preferred) or async Apex callout |
 | An external system creates/reads/updates/deletes Salesforce data | **Remote Call-In** | Inbound REST / SOAP / Bulk / Pub-Sub API |
 | Keep data aligned both directions, in bulk | **Batch Data Synchronization** | Bulk API / ETL / middleware on a schedule (off-platform) |
 | The Salesforce UI must update when data changes | **UI Update Based on Data Changes** | **Platform Events / CDC** streamed over the Pub/Sub API (`empApi` in LWC) |
 | Show external data without storing it | **Data Virtualization** | **Salesforce Connect + External Objects** |
+
+**A Continuation is a UX choice, not a limits fix.** Since Winter '20 every callout is excluded from
+the long-running-request limit, so a Continuation gains nothing there; Salesforce still recommends it
+for responsiveness. It caps at 120 s and 3 callouts, and only one can be in progress per client. Work
+longer than ~2 minutes must leave the request: return the result by Platform Event or a polled record.
 
 **Callouts can't run in a trigger's synchronous context.** A fire-and-forget reaction to a data
 change goes through a **Platform Event** or async Apex (Queueable), never a direct callout in the

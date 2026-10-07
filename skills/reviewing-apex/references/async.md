@@ -12,7 +12,7 @@
 | Queueable + Finalizer | Default; job ID, chaining, non-primitive inputs, recovery |
 | Batch Apex | Very large datasets; `Database.getQueryLocator` in `start()` iterates up to 50M rows |
 | Schedulable / Scheduled Flow | Recurring schedules |
-| Continuation | Long-running callouts from LWC |
+| Continuation | Non-blocking callout from a UI action. UX only, not a limits fix: 120 s / 3 callouts, one in flight per client |
 
 - **Queueable chaining is one child per execution.** From within a running Queueable's `execute()` only **one** child job may be enqueued — a second `System.enqueueJob()` throws `System.LimitException`.
 - **Cap recursive chains with `AsyncOptions.MaximumQueueableStackDepth`** on the initial enqueue.
