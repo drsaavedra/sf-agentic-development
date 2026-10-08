@@ -132,17 +132,6 @@ Proceed to the phases only once every needed research doc is present.
      ("you decide") is resolved by you with the recommended option and recorded as an explicit
      assumption, which counts as resolved.
 8. **Hand off** — do this exactly:
-   - **Settle checkpoint mode first — before the summary.** Detect whether the project folder is a
-     git repo (`git rev-parse --is-inside-work-tree`):
-     - **Git repo present** → **ask once whether to enable checkpoint commits** for the build, via
-       the `AskUserQuestion` picker (Enabled / Disabled, recommended *Enabled* for long or multi-item
-       builds): *"Should the build checkpoint-commit each work item as it passes review (on the
-       current branch), so progress is captured and referenceable in a handover?"*
-     - **No git repo** → offer to initialize one via the picker (*Initialize git* / *Skip*). If the
-       user accepts, run `git init` in the project folder, then ask the checkpoint question above. If
-       the user declines, skip checkpoint entirely — it needs a repo — and move on.
-     - Record the outcome as the `Checkpoint commits: enabled | disabled` line in `docs/CONTEXT.md`
-       (default *disabled* when declined, or when there's no repo and the user skipped init).
    - announce: *"Plan generated at `docs/solution-design.md` + `docs/CONTEXT.md`."*
    - print a **high-level summary to the CLI**: objective, the config-vs-code work-item list, key
      design decisions, and risks — enough to review without opening the file.
@@ -202,7 +191,7 @@ those live in the contract files and `docs/solution-design.md`. It holds:
   - `Story` links to the `docs/contracts/<slug>.md` that holds the row's full detail; `Depends on`
     orders the build — a row builds only after the rows it lists, config or code.
   - `Commit` — leave empty (`—`); the build fills the short commit hash here when the row passes
-    review, but only if checkpoint commits are enabled (below).
+    review.
 - **Doc pointers** — links to the research docs the stories build on (`docs/data-model.md`,
   `docs/automation.md`, `docs/ui-design.md`, `docs/integration-patterns.md`, `docs/security-model.md`
   — those that apply) and to `docs/solution-design.md`. The dispatch table and contracts cite these
@@ -213,11 +202,6 @@ those live in the contract files and `docs/solution-design.md`. It holds:
   itself. Recommend it when the design shows concrete complexity signals — a new or changed data
   model, cross-object automation, callouts / async (governor-limit risk), or a multi-domain or
   many-item build; otherwise mark it *not needed*.
-- **`Checkpoint commits: enabled | disabled`** — one line recording the user's answer to the
-  handoff checkpoint question (Phase 8). On `enabled`, the build commits each work item on the
-  current branch as it passes review and fills the `Commit` column / contract Build log; on
-  `disabled` (the default) it commits nothing. This is the recorded grant — see
-  [`docs/ORCHESTRATION.md`](../../docs/ORCHESTRATION.md) **Checkpoint commits**.
 - **Design rationale** — the chosen solution shape, cross-cutting decisions, and assumptions live in
   `docs/solution-design.md`, not here; story-local decisions live in each contract file. CONTEXT
   stays the index.
@@ -237,8 +221,7 @@ entry. It holds:
   (project-specific rules), **Expected outputs** (artifacts to produce), **Validation criteria**
   (exit conditions). Write each complete enough that the build rediscovers nothing.
 - **Decisions & assumptions (story-specific)** — decisions local to this story, each with its reason.
-- **Build log** — leave a stub heading; the build fills it (only when checkpoint commits are
-  enabled), one line per work item: `§N <work item> — <short hash> · review passed · <date>`. This
+- **Build log** — leave a stub heading; the build fills it, one line per work item: `§N <work item> — <short hash> · review passed · <date>`. This
   is the per-story handover record; the dispatch table's `Commit` column is its index.
 
 A work brief's **Spec reference** is the story's `docs/contracts/<slug>.md` (with optional in-file

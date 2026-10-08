@@ -60,9 +60,10 @@ Four choices shape the repo:
 |---|---|
 | Validates, tests, the Code Analyzer and read-only org queries | A deploy to a sandbox, production, or any org that is not a scratch org |
 | A deploy to a scratch org (`isScratch: true` in `sf org list --json`), followed by a report of the alias, deploy ID and components | A destructive deploy, or a deploy to a scratch org someone else is using |
-| | Any git commit, unless you grant checkpoint commits, and every push |
+| Local commits on a working branch, one per reviewed work item | A push, a PR, a merge, or rewriting a branch someone else has |
 
-Only the main agent deploys. The full rule is `[no-deploy-without-approval]` in `rules/safety.md`.
+Only the main agent deploys or commits. The full rules are `[no-deploy-without-approval]` and
+`[commit-locally-ask-before-push]` in `rules/safety.md`.
 
 ## Shipping a planned feature
 
@@ -187,7 +188,7 @@ One example of what the reviews catch: asked to add address verification against
 `architect` blocked the design before any Apex existed, because a callout per record breaks the
 100-callout limit on a 200-record load.
 
-The work-brief template, dispatch rules, checkpoint commits and four worked examples are in
+The work-brief template, dispatch rules, commit points and four worked examples are in
 [docs/ORCHESTRATION.md](docs/ORCHESTRATION.md).
 
 ## Roadmap

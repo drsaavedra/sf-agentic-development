@@ -2,7 +2,7 @@
 
 > The summary and lifecycle diagram live in the [README](../README.md#how-the-agents-work-together);
 > this is the full working guide — the lifecycle steps, the work-brief template, dispatch rules,
-> checkpoint commits, prompting guidance, and four worked examples.
+> commits, prompting guidance, and four worked examples.
 
 How the main agent and the three repo agents work together on a feature. The pattern is adapted
 from [Agentic Project Management (APM)](https://github.com/sdi2200262/agentic-project-management):
@@ -137,50 +137,27 @@ Once dispatching, parallel or sequential:
   and embedded in both briefs. Integration is then verified with one combined validate at the
   merge point.
 
-## Checkpoint commits (opt-in)
+## Commits
 
-The git safety rule (never commit without an explicit grant — see `[no-git-writes-without-a-grant]` in
-`rules/safety.md`) means a long
-multi-brief run normally accumulates everything in the working tree — if work item four goes
-sideways, there is no stable point to roll back to, and a handover has no commit to point at.
-**Checkpoint mode** trades a single explicit grant for rollback safety and a referenceable history,
-the same shape as the TDD validate-loop exception (confirm once, then iterate automatically):
+The main agent commits locally without asking (`[commit-locally-ask-before-push]` in
+`rules/safety.md`), so a long multi-brief run always has a stable point to roll back to and a hash a
+handover can cite:
 
-1. **Grant** — enable it one of two explicit ways: (a) **at planning time**, by answering
-   `sf-plan`'s checkpoint question, which records `Checkpoint commits: enabled` in `docs/CONTEXT.md`
-   — `/sf-build` reads that flag and honors it with a one-time announcement; or (b) **in the prompt**
-   for one task: *"checkpoint as you go"*, *"enable checkpoint commits"*, or any equally explicit
-   wording (you can narrow it, e.g. *"only checkpoint completed work items, not every validate"*).
-   What never activates it: plan approval alone (approving the plan ≠ answering the checkpoint
-   question), or the agent inferring it because the run is long — the agent never turns checkpoint
-   mode on by itself. The grant is scoped to the task / the build of that spec; a new task or a spec
-   revision needs a fresh grant.
-2. **Branch** — depends on what the commit is for:
-   - **Durable review-gated milestones** (see *Stable points*) land on the **current working
-     branch** — they record work that passed review and are referenced by hash in handover, so they
-     belong in real history, not a throwaway branch.
-   - **Throwaway rollback checkpoints** (green validate, pre-risky-step) may instead go on a
-     dedicated `checkpoint/<task-slug>` branch created from HEAD, leaving your working branch clean.
-
-   If the working tree is dirty at grant time, the agent asks once whether to record a
-   `checkpoint: baseline (pre-task state)` commit first.
-3. **Stable points** — commits happen only at: **a review gate passed clean** (the `reviewing-*`
-   battery is clean for a work item or dependent chain, or the `architect` returned APPROVED), a
-   green validate, a completed work item (the commit includes its build summary), or immediately
-   before a risky/hard-to-undo step. Messages follow `checkpoint: <work item> — <state>` (e.g.
-   `checkpoint: account-rollups §1 open-case rollup — review passed`). Only the main agent commits —
-   developer, code-reviewer, and architect agents never run git — and parallel dispatches checkpoint
-   only at merge points, so a commit never captures another instance's partial work.
-4. **Record the hash for handover** — after a review-gated milestone commit, capture the short hash
-   (`git rev-parse --short HEAD`) and record it in the story's `docs/contracts/<slug>.md` **Build
-   log** and the **Commit** column of that row in the `docs/CONTEXT.md` dispatch table. The hash
-   isn't known until after the commit, so these doc edits ride along in the **next** milestone
-   commit, and a final **wrap-up commit** flushes the last row's notes — never `--amend`.
-5. **Wrap-up** — at task end the agent reports the branch and the checkpoint list (work item → short
-   hash). Rolling back to a checkpoint, merging or squashing into your branch, pushing, and deleting
-   any `checkpoint/<task-slug>` branch all remain explicit requests from you.
-
-The full rule is `[no-git-writes-without-a-grant]` in `rules/safety.md`.
+1. **Branch** — commits land on the current working branch, never on the default branch. On the
+   default branch, cut a working branch first.
+2. **Stable points** — a review gate passed clean (the `reviewing-*` battery is clean for a work item
+   or dependent chain, or the `architect` returned APPROVED), or a green validate immediately before a
+   risky, hard-to-undo step. One commit per work item: its artifacts, its tests and its build summary
+   together, with a message naming the work item (e.g. `account-rollups §1 open-case rollup`). Only
+   the main agent commits — developer, code-reviewer, and architect agents never run git — and
+   parallel dispatches commit only at merge points, so a commit never captures another instance's
+   partial work.
+3. **Record the hash for handover** — after a review-gated commit, capture the short hash
+   (`git rev-parse --short HEAD`) and record it where the plan tracks the work item (see
+   `sf-build`). The hash isn't known until after the commit, so that edit rides along in the **next**
+   commit, and a final **wrap-up commit** flushes the last one — never `--amend`.
+4. **Wrap-up** — at task end the agent reports the branch and the commit list (work item → short
+   hash). Pushing, opening a PR, merging, squashing and rolling back stay explicit requests from you.
 
 ## Prompting a pattern
 
@@ -202,8 +179,8 @@ architect gate** (it is on-demand, never automatic). Example prompts:
 
 The italicized phrases are the levers: *"in parallel where the pieces allow it"*, *"pin the
 contracts first"*, *"before any code is
-written"*, *"checkpoint as you go"*. Leave them out and the main agent still picks a sane shape — sequential, briefed,
-no review — and you can redirect at any checkpoint. Each worked example below opens with its
+written"*. Leave them out and the main agent still picks a sane shape — sequential, briefed,
+no review — and you can redirect at any step. Each worked example below opens with its
 kickoff prompt.
 
 ## Worked examples

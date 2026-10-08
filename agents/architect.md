@@ -124,6 +124,6 @@ earlier sections. The report is append-only history.
 - Code-quality review — bulk safety, governor limits, security, error handling, test quality — is
   the `code-reviewer` agent. Read its report as input; do not re-run the `reviewing-*`/analyzer skills.
 - Deployment — handled by the main agent under `[no-deploy-without-approval]` in `rules/safety.md`.
-- Git operations — never commit, branch, or otherwise run git. Any commits (including checkpoint
-  commits) are made by the main agent, never by you.
+- Git operations — never commit, branch, or otherwise run git. Commits are made by the main agent,
+  never by you.
 - Any work the project's scope excludes.
