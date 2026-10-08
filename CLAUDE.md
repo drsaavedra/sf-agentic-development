@@ -2,7 +2,7 @@
   SALESFORCE PROJECT — Claude Code instruction file.
   This file is hand-maintained — edit it directly. It is the canonical source the installer
   injects into a project's CLAUDE.md as a managed block.
-  Canonical rules:   rules/*.md             (installed into .claude/rules/ at setup)
+  Canonical rules:   rules/*.md             (installed into .claude/rules/sf-agentic-development/)
   Canonical skills:  skills/*/SKILL.md      (installed into .claude/skills/ at setup)
   Canonical agents:  agents/*.md            (installed into .claude/agents/ at setup)
   Keep this file a pointer. Rules belong in rules/*.md so they compose with whatever else
@@ -17,7 +17,7 @@ directly from trained knowledge; the authored skills add the two things the mode
 trusted to carry alone — proprietary domain surfaces (`generating-b2b-lwc`) and this project's
 quality bar (`reviewing-*`). Follow these rules unless the user explicitly overrides them.
 
-The rules themselves live in `.claude/rules/`, one file per topic:
+The rules themselves live in `.claude/rules/sf-agentic-development/`, one file per topic:
 
 | Rule file | Covers | Loads |
 |---|---|---|

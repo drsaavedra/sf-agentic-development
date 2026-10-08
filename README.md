@@ -45,7 +45,7 @@ Four choices shape the repo:
 
 ### Rules
 
-`CLAUDE.md` is a short pointer to four rule files that install into `.claude/rules/`:
+`CLAUDE.md` is a short pointer to four rule files that install into `.claude/rules/sf-agentic-development/`:
 
 | File | Covers |
 |---|---|
@@ -137,7 +137,7 @@ npx github:drsaavedra/sf-agentic-development
 ```
 
 The installer copies the skills and agents you pick into `.claude/`, the rules into
-`.claude/rules/`, and adds the `CLAUDE.md` pointer to your project's `CLAUDE.md` as a managed block.
+`.claude/rules/sf-agentic-development/` (its own folder, so your own rule files are never touched), and adds the `CLAUDE.md` pointer to your project's `CLAUDE.md` as a managed block.
 Nothing else needs installing.
 
 Optional: copy [`templates/code-analyzer.yml`](templates/code-analyzer.yml) to your project root.
@@ -149,7 +149,7 @@ enforces them on every change, including quick fixes that never get a full revie
 
 1. Copy the skills: `cp -r skills/* .claude/skills/`
 2. Copy the agents: `cp -r agents/* .claude/agents/`
-3. Copy the rules: `mkdir -p .claude/rules && cp rules/*.md .claude/rules/`
+3. Copy the rules: `mkdir -p .claude/rules/sf-agentic-development && cp rules/*.md .claude/rules/sf-agentic-development/`
 4. Copy `CLAUDE.md` to your project root, or merge it into the one you have.
 
 </details>

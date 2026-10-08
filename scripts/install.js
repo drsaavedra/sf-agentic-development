@@ -24,7 +24,7 @@ const assistant = {
   name: 'Claude Code',
   skillsDir: '.claude/skills',
   agentsDir: '.claude/agents',
-  rulesDir: '.claude/rules',
+  rulesDir: '.claude/rules/sf-agentic-development',
   baseline: 'CLAUDE.md',
 };
 

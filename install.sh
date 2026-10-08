@@ -5,7 +5,7 @@
 #   install.sh                        link skills + agents into ~/.claude-stack
 #   install.sh --check                report only; exit 1 if any link is wrong
 #   install.sh --pull                 copy a clobbered real file back over the repo copy
-#   install.sh --project <path>       also link rules/ into <path>/.claude/rules/sf-toolkit
+#   install.sh --project <path>       also link rules/ into <path>/.claude/rules/sf-agentic-development
 #   install.sh --check --project <p>  check the rules link too
 #
 # Skills and agents link per item rather than as whole directories: ~/.claude-stack/skills
@@ -18,7 +18,7 @@ set -uo pipefail
 
 REPO="$(cd "$(dirname "$0")" && pwd)"
 STACK="${CLAUDE_STACK:-$HOME/.claude-stack}"
-RULES_LINK_NAME="sf-toolkit"
+RULES_LINK_NAME="sf-agentic-development"
 
 MODE=install
 PROJECT=""

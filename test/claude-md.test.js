@@ -3,7 +3,7 @@
 // Release-validation tests for CLAUDE.md and rules/ — the hand-maintained Claude Code instruction
 // files the installer ships into a project. Run on every PR via `npm test`.
 // Zero dependencies: Node's built-in test runner + assert. CLAUDE.md is a pointer; the rules
-// themselves live in rules/*.md and install into .claude/rules/. The contract under test:
+// themselves live in rules/*.md and install into .claude/rules/sf-agentic-development/. The contract under test:
 //   1. Every skill the routing references resolves to a skill authored in this repo (the typo
 //      guard — the sf-skills dependency is gone).
 //   2. The skills authored IN this repo are referenced AND exist on disk.
