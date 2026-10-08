@@ -53,8 +53,8 @@ confirmation needed: `sf sobject list` / `sf sobject describe --sobject <Name>`,
 --query "..."` (add `--use-tooling-api` where applicable), `sf api request rest '/services/...'`,
 `sf org list metadata --metadata-type <Type>`. **Never ask the user to run Developer Console or
 anonymous Apex snippets** for anything those commands can answer; if anonymous Apex is genuinely
-required, run it yourself via `sf apex run` (show the snippet first, keep it read-only unless the
-user approves writes). Escalate to the main agent or user only when introspection cannot resolve it.
+required, run it yourself via `sf apex run` (show the snippet first, and keep it read-only unless
+the target is a scratch org you alone are using; anywhere else, writes need user approval). Escalate to the main agent or user only when introspection cannot resolve it.
 
 ## Authoring & verification
 
