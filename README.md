@@ -203,6 +203,11 @@ it matters. The gaps, in build order:
 4. **Durable run state,** so a long run survives a context reset.
 5. **An environment ladder.** Scratch-org deploys already run without asking. Sandboxes come next.
    Production always keeps a person's sign-off.
+6. **A tester agent that checks the work through the UI.** Validates and unit tests prove the code,
+   not that a user can actually do the thing. A `tester` agent drives the org in Chrome and walks
+   each acceptance criterion the way a user would. It finds its way from a feature map you keep in
+   the repo: one feature file per feature, saying where the feature lives, how a user gets there and
+   what a pass looks like.
 
 Rationale: [docs/VISION.md](docs/VISION.md).
 

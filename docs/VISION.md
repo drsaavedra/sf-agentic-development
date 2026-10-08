@@ -115,6 +115,15 @@ what makes the rest safe to turn on.
    survives context compaction and is auditable, instead of living only in chat context.
 5. **Environment ladder** — explicit promotion policy: total autonomy through sandbox, human
    signature at production.
+6. **UI verification — a `tester` agent and a feature map** — once the build loop's machine checks
+   pass, a `tester` agent verifies the acceptance criteria from the user's point of view by driving
+   the org in a browser (Claude in Chrome). It navigates from a **feature map** the master keeps in
+   the repo: one feature file per feature, recording who uses it, the route to it (app → tab →
+   record → action) and the observable result that counts as a pass. The map is to the tester what
+   the design contract is to the builder: without it the agent guesses its way through the UI, which
+   §3 rules out. The tester reports and never fixes; a failure routes back into the build loop like a
+   BLOCKED review, and any data it writes stays in a scratch org. The feature-file format is open;
+   Gherkin `.feature` files are the obvious candidate.
 
 ## 8. Principles
 
