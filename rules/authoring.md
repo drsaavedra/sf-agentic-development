@@ -16,7 +16,9 @@ Authoring rules (always apply):
   or spikes.
 - `[objective-gates-not-vibes]` **Objective gates, not vibes** — verify with `sf project deploy validate
   --test-level RunSpecifiedTests --tests <tests>` (free to run any time) and `sf code-analyzer run`
-  over changed files. Fix what they surface before reporting done. `sf apex run test` runs the code
+  over changed files. A payload with no Apex cannot use `NoTestRun`; validate it with
+  `--test-level RunRelevantTests` and report its 0/0 as "no tests ran". Fix what they surface
+  before reporting done. `sf apex run test` runs the code
   already in the org, not your working tree, so it never proves an uncommitted change.
 - `[knowledge-cutoff-guard]` **Knowledge-cutoff guard** — Salesforce ships three releases a year. If the work touches a
   platform feature, API version behavior, or limit that may post-date training — or you are not
