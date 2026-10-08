@@ -95,6 +95,10 @@ frontmatter flag, so it holds across every assistant.
 - **Deploys stay human-gated.** Validate is allowed — display the full command and confirm the
   first validate of a TDD loop (later iterations re-run automatically). **Never deploy** without
   explicit user approval.
+- **After a deploy, prove what landed.** Read each component back through the Tooling API
+  (`ApexClass.Body`, `LightningComponentResource.Source`) and match a string only the new version
+  holds; a deploy's per-component rows are not evidence. Hard-reload any open Lightning tab before
+  checking behaviour in the browser, since it keeps running the cached bundle.
 - **Git is gated by an explicit grant.** Commit nothing unless checkpoint commits are granted — the
   spec's `Checkpoint commits: enabled` flag, or an explicit in-prompt grant. *When granted*, first
   verify a git repo exists (`git rev-parse --is-inside-work-tree`); if none, offer `git init` or
