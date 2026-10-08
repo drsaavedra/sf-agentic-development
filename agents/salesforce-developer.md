@@ -97,11 +97,13 @@ the Code Analyzer CLI plus the test/validate loop; fix what it surfaces before y
 **Apex briefs — TDD:**
 
 1. Read the test scenarios from the brief — your requirements expressed as concrete cases.
-2. Write test classes mirroring the scenarios (they fail — expected).
+2. Write test classes mirroring the scenarios (they fail — expected). Read the failing line: the red
+   counts only if it is the behavioural assertion (a compile error is not that red; stub the method).
 3. Implement the minimum to make them pass.
 4. Validate the touched dirs with your tests → green.
-5. `sf code-analyzer run` → check quality.
-6. Fix and rerun until both pass.
+5. Falsify: revert each guard you added, confirm its test goes red, restore (see below).
+6. `sf code-analyzer run` → check quality.
+7. Fix and rerun until both pass.
 
 **LWC briefs:** author directly (`generating-b2b-lwc` for Commerce storefronts) and satisfy the brief's test scenarios
 (wire states, reactive properties, error/empty states). Jest specs (sfdx-lwc-jest) are recommended,
@@ -110,6 +112,18 @@ pinned contract, code against the contract in the brief — not against the org 
 combined validate to the main agent at the merge point.
 
 **Flow briefs:** author the Flow metadata directly and verify via the validate loop like Apex.
+
+**Prove each test can fail** (Apex and Jest alike):
+
+- A red counts only when the failing line is the behavioural assertion. A test that dies in setup,
+  on a control assertion, or because the running user cannot see the record stays red after the
+  fix and proves nothing.
+- Once green, delete or revert the code each guard covers and confirm its test goes red, then
+  restore. Do it per guard, not per suite: a suite that goes red overall can still carry a test that
+  never fails. Delete a test that stays green; it is decoration, not coverage. For a filter, place
+  the protected row where the rest of the query would otherwise select it.
+- Any sweep you report (a permission audit, a grep, a Jest selector) gets a control that must match
+  and a "checked N, failed n" count, so a zero is provably a zero.
 
 The `reviewing-*` quality pass over what you built happens **after** you report back — the main
 agent runs it as the end-of-build review (typically the `code-reviewer` agent), not inside this
