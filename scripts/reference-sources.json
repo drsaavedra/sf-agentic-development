@@ -415,6 +415,10 @@
       "lastValidated": "2026-06-20",
       "sources": [
         {
+          "url": "https://resources.docs.salesforce.com/rel1/doc/en-us/static/pdf/SF_Record-Locking-Cheatsheet_web.pdf",
+          "anchors": ["Locks only occur if lookup", "clear the value of this field"]
+        },
+        {
           "url": "https://help.salesforce.com/s/articleView?id=platform.relationships_considerations.htm&type=5",
           "anchors": ["master-detail", "junction", "lookup", "roll-up summary"]
         },
@@ -491,6 +495,14 @@
         {
           "url": "https://resources.docs.salesforce.com/latest/latest/en-us/sfdc/pdf/lightning.pdf",
           "anchors": ["no longer offer an advantage", "only one continuation in progress", "three callouts"]
+        },
+        {
+          "url": "https://resources.docs.salesforce.com/latest/latest/en-us/sfdc/pdf/platform_events.pdf",
+          "anchors": ["per unique browser session", "regardless of whether the transaction succeeds", "API request allocations are consumed"]
+        },
+        {
+          "url": "https://resources.docs.salesforce.com/latest/latest/en-us/sfdc/pdf/salesforce_change_data_capture.pdf",
+          "anchors": ["ignores sharing settings", "View All Records"]
         }
       ]
     },
