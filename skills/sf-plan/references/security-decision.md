@@ -45,6 +45,15 @@ matching its criteria (supported on custom and external objects, contracts, even
 sheets). Don't confuse it with a **scoping rule**, which only changes the *default* set of records a
 user sees — it filters the view, it does **not** enforce security.
 
+**Restriction-rule limits to design around:** View All / Modify All (on the object or org-wide) and
+system-mode code bypass them. They do not reach master-detail children, so a hidden parent's Name
+still resolves through a visible child — each child needs its own rule reading the master's field
+through one-level dot notation. Criteria cannot use formulas. They are enforced inside Apex tests, so
+a test persona the rule hides fails on the wrong check. `targetEntity` carries the namespace in a
+packaged org, and when last checked they could not ship in a 2GP managed package — confirm in the
+Metadata Coverage Report before choosing one. Prove each behaviour the design leans on with a probe
+validate and a failing control.
+
 ## Experience Cloud / guest access (only when the feature has a public or community surface)
 
 - **Guest (unauthenticated) users** — the **only** way to grant them record access is a **guest user
