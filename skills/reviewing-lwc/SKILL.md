@@ -52,6 +52,8 @@ Scan every artifact against this checklist.
 | LWC: guard/teardown keyed on a value the template never reads | No re-render is scheduled — bind it, use a setter, or dispatch from each mutation site |
 | LWC: own namespace in a `@salesforce/schema` module id | Compile error `LWC1504` — omit the prefix; UI API *string* field names keep it |
 | LWC: error handler referencing an undefined identifier | It throws before reporting, so the failure is silent — lint it and test a failure path |
+| LWC: `.catch(() => undefined)` / empty `catch {}` | Surface or log the failure; test that path once |
+| LWC: `message` listener trusting `event.origin` alone | Check `event.source === iframe.contentWindow` — VF pages in a namespace share an origin |
 | LWC: LMS subscription leak | `unsubscribe(this._subscription)` in `disconnectedCallback` |
 | LWC: window/document listener leak | `removeEventListener` in `disconnectedCallback` |
 | LWC: cross-shadow DOM access | Communicate via `@api` methods and events |
