@@ -1,8 +1,7 @@
 ---
 name: sf-research
-description: "Salesforce state-of-the-world discovery — one prompt-driven skill that inventories the current org/repo across five domains (data model, automation, integration, UI, security & licensing) and writes a reviewable docs/<domain>.md per in-scope domain. The request names which domains to look at; only those run. Single-purpose: it researches and writes/refreshes the docs only — it never writes docs/CONTEXT.md (sf-plan owns that, taking the objective straight from its own prompt). Safe to run unattended on a schedule to keep the org docs in sync. Surfaces the constraints that bite at planning time — master-detail on a populated object, order-of-execution conflicts, unsupported auth, the missing license — before sign-off, not mid-build. TRIGGER when: starting research/discovery before a design, or asked to inventory, map, audit, refresh, or persist an org's data model, automation, integrations, UI surfaces, sharing model, or license entitlements. DO NOT TRIGGER when: choosing an approach or designing (use sf-plan); building (authored directly per the project baseline); or reviewing (reviewing-*)."
+description: "Salesforce state-of-the-world discovery — one prompt-driven skill that inventories the current org/repo across five domains (data model, automation, integration, UI, security & licensing) and writes a reviewable docs/<domain>.md per in-scope domain. The request names which domains to look at; only those run. Single-purpose: it researches and writes/refreshes the docs only — it never writes docs/CONTEXT.md (sf-plan owns that, taking the objective straight from its own prompt). Safe to run unattended on a schedule to keep the org docs in sync. Surfaces the constraints that bite at planning time — master-detail on a populated object, order-of-execution conflicts, unsupported auth, the missing license — before sign-off, not mid-build. TRIGGER when: a feature or change spans more than one object, automation or integration and no current research doc covers those domains (the agent may invoke it on its own before planning); or asked to inventory, map, audit, refresh, or persist an org's data model, automation, integrations, UI surfaces, sharing model, or license entitlements. DO NOT TRIGGER when: the question is about one artifact or one object (read the file or describe the object directly); a current research doc already covers the domain; choosing an approach or designing (use sf-plan); building (authored directly per the project baseline); or reviewing (reviewing-*)."
 allowed-tools: Read, Grep, Glob, Bash, AskUserQuestion
-disable-model-invocation: true
 ---
 
 # Salesforce Research
@@ -21,7 +20,7 @@ file — planning gets its objective straight from the `/sf-plan` prompt, and `s
 Two ways it gets invoked, both producing the same output (just the domain docs):
 
 - **Before a design** — the prompt names a feature's domains; research those, scoped to the feature,
-  so a human can review the docs before `/sf-plan`.
+  so `sf-plan` (and a human, when they want to) can review the docs before planning.
 - **As a scheduled / unattended refresh** — run with no specific feature to **keep the org docs in
   sync** (e.g. a weekend job). This is the org-survey/refresh use: update the existing `docs/*`
   broadly across the in-scope domains. (See *Org-survey mode is opt-in* below.)
@@ -140,7 +139,7 @@ before it.
 ## Per-domain output contracts
 
 Write the sections for each in-scope domain (omit one only if genuinely N/A; never pad). Each doc
-ends with **Surprises & constraints** — the design-gating findings a human must see before planning.
+ends with **Surprises & constraints** — the design-gating findings planning must see first.
 
 **Status line** — if no org was reachable, add it as the doc's first line:
 `> **Status: repo-only** — <domain> verified against force-app/** only, not org-confirmed.`

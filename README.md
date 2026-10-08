@@ -27,8 +27,8 @@ Four choices shape the repo:
 
 | Skill | Use it to |
 |---|---|
-| `sf-research` | Inventory the org for the domains your prompt names (data model, security, automation, UI, integration) and write one `docs/<domain>.md` each for you to review. |
-| `sf-plan` | Turn the reviewed research into a design contract: `docs/solution-design.md`, `docs/CONTEXT.md` and one `docs/contracts/<slug>.md` per story. It asks you the open decisions one at a time. |
+| `sf-research` | Inventory the org for the domains your prompt names (data model, security, automation, UI, integration) and write one `docs/<domain>.md` each. The agent runs it on its own when a task needs it. |
+| `sf-plan` | Turn the research into a design contract: `docs/solution-design.md`, `docs/CONTEXT.md` and one `docs/contracts/<slug>.md` per story. It asks you the open decisions one at a time. |
 | `sf-build` | Optional. Build a large multi-story contract by dispatching the developer agent per work item, then run the review skills as a gate. |
 | `reviewing-apex` | Review Apex for governor limits, trigger design, security, async, error handling and test quality. |
 | `reviewing-lwc` | Review LWC for data sourcing, template and DOM traps, events and errors, performance and Jest. |
@@ -76,7 +76,8 @@ Only the main agent deploys or commits. The full rules are `[no-deploy-without-a
 3. **Build.** Build one story at a time from its `docs/contracts/<slug>.md`, or hand a large contract
    to `/sf-build`.
 
-You review between every stage. `/sf-plan` never starts the build. For ad-hoc fixes, reviews and
+The agent can run research and planning on its own when a task needs them. You review the plan
+before the build: `/sf-plan` never starts the build. For ad-hoc fixes, reviews and
 single config changes, skip the pipeline and use the skills directly.
 
 ### Example

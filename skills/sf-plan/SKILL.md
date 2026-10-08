@@ -1,14 +1,13 @@
 ---
 name: sf-plan
-description: "Salesforce design and planning — turns the reviewed research docs (docs/data-model.md, docs/automation.md, docs/ui-design.md, docs/integration-patterns.md, docs/security-model.md, written by sf-research) into a verified, completeness-checked design contract before any build: docs/solution-design.md, docs/CONTEXT.md (objective, story index, work-item dispatch table, doc pointers), and one docs/contracts/<slug>.md per story. Takes the objective from its own prompt and owns docs/CONTEXT.md; makes the solution-shape and declarative-vs-code calls from the decision packs; does not re-explore the org — research already did. TRIGGER when: planning a feature whose research docs exist, or revising a design before a build. DO NOT TRIGGER when: the feature's research docs don't exist yet (run /sf-research first), a spec already exists and the task is to build (use /sf-build), or a trivial one-line fix."
-allowed-tools: Read, Grep, Glob, Bash, AskUserQuestion
-disable-model-invocation: true
+description: "Salesforce design and planning — turns the research docs (docs/data-model.md, docs/automation.md, docs/ui-design.md, docs/integration-patterns.md, docs/security-model.md, written by sf-research) into a verified, completeness-checked design contract before any build: docs/solution-design.md, docs/CONTEXT.md (objective, story index, work-item dispatch table, doc pointers), and one docs/contracts/<slug>.md per story. Takes the objective from its own prompt and owns docs/CONTEXT.md; makes the solution-shape and declarative-vs-code calls from the decision packs; does not re-explore the org — research already did. TRIGGER when: a feature or change needs more than one work item and has no live plan (the agent may invoke it on its own), or revising a design before a build. DO NOT TRIGGER when: a live plan already exists and the task is to build (build from it, or /sf-build); a single-artifact change or one-line fix (author directly); or a question that needs no design."
+allowed-tools: Read, Grep, Glob, Bash, AskUserQuestion, Skill
 ---
 
 # Salesforce Planning (sf-plan)
 
 Produce a verified, completeness-checked design contract **before any build**, working from the
-**research docs** `sf-research` already wrote and a human reviewed (`docs/data-model.md`,
+**research docs** `sf-research` wrote (`docs/data-model.md`,
 `docs/automation.md`, `docs/ui-design.md`, `docs/integration-patterns.md`, `docs/security-model.md`).
 Output is `docs/solution-design.md` (the design), a lean `docs/CONTEXT.md`, and one
 `docs/contracts/<slug>.md` per user story (see the Output contract below). This skill is **planning
@@ -28,8 +27,8 @@ Planning **consumes** the research stage's output; it does not rediscover the or
 2. **Require the matching research doc for each in-scope domain** — `docs/data-model.md`,
    `docs/automation.md`, `docs/ui-design.md`, `docs/integration-patterns.md`,
    `docs/security-model.md`.
-3. **If a required research doc is missing, stop.** Name the gap and tell the user to run
-   **`/sf-research`** (and review its doc) first — do **not** substitute your own exploration.
+3. **If a required research doc is missing, run `sf-research` for the missing domains first**
+   (via the `Skill` tool), then continue — do **not** substitute your own ad-hoc exploration.
    Planning on un-researched ground is the exact failure this split removed. The research docs are the
    hard gate; `docs/CONTEXT.md` is your output, not a prerequisite (a *prior* CONTEXT.md from an
    earlier `/sf-plan` run triggers Revise mode — see Phase 1).

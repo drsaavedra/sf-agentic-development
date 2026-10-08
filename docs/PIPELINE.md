@@ -16,9 +16,9 @@ A two-skill pipeline for planned feature work:
    `salesforce-developer`, runs the `reviewing-*` battery as the `code-reviewer` gate, and dispatches
    `architect` for the solution-design gate).
 
-`sf-plan` replaces reliance on the CLI agent's native **plan mode**. `sf-build` is
-model-invocable but gated by a tight TRIGGER / DO NOT TRIGGER description so it doesn't fire
-before the spec is reviewed. The two are joined by files on disk (`docs/CONTEXT.md` and the
+`sf-plan` replaces reliance on the CLI agent's native **plan mode**. `sf-research` and `sf-plan`
+are model-invocable, so the agent researches and plans on its own when a task needs it. `sf-build`
+is not (`disable-model-invocation: true`), so it never fires before the spec is reviewed. The two are joined by files on disk (`docs/CONTEXT.md` and the
 per-story `docs/contracts/*.md`), not by conversation context.
 
 ---
