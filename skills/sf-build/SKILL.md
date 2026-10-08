@@ -1,6 +1,6 @@
 ---
 name: sf-build
-description: "Orchestrated Salesforce build-and-review pipeline. Reads the approved design contract at docs/CONTEXT.md (its work-item dispatch table) and the per-story docs/contracts/<slug>.md detail, authors config rows inline and dispatches the salesforce-developer agent per code work item, then runs the reviewing-* battery as a deterministic gate. TRIGGER when: the user asks to build, implement, or execute an existing spec (docs/CONTEXT.md is present) — e.g. 'build the spec', 'implement the plan', 'let's build it'. DO NOT TRIGGER when: no spec exists yet (run /sf-plan first); immediately after /sf-plan unless the user signals to proceed (the spec is meant to be reviewed first); or for ad-hoc edits, fixes, single-artifact config, or review-only tasks (author directly per the project baseline, or use the matching reviewing-* skill). Deploys follow [no-deploy-without-approval] in rules/safety.md."
+description: "Orchestrated Salesforce build-and-review pipeline. Reads the approved design contract at docs/CONTEXT.md (its work-item dispatch table) and the per-story docs/contracts/<slug>.md detail (or, given task-dir:, a task folder's live plan and goal files), authors config rows inline and dispatches the salesforce-developer agent per code work item, then runs the reviewing-* battery as a deterministic gate. TRIGGER when: the user asks to build, implement, or execute an existing spec (docs/CONTEXT.md is present) — e.g. 'build the spec', 'implement the plan', 'let's build it'. DO NOT TRIGGER when: no spec exists yet (run /sf-plan first); immediately after /sf-plan unless the user signals to proceed (the spec is meant to be reviewed first); or for ad-hoc edits, fixes, single-artifact config, or review-only tasks (author directly per the project baseline, or use the matching reviewing-* skill). Deploys follow [no-deploy-without-approval] in rules/safety.md."
 allowed-tools: Agent, Skill, Read, Grep, Glob, Bash
 disable-model-invocation: true
 ---
@@ -16,6 +16,29 @@ forked) so the spec and conversation context stay available.
 skill runs. If you're arriving straight from `/sf-plan`, confirm the user wants to proceed before
 dispatching. This human checkpoint lives in the trigger conditions and this instruction, not a
 frontmatter flag, so it holds across every assistant.
+
+## Task-folder mode — `task-dir: <path>`
+
+When the invocation carries `task-dir: <absolute path>`, build from the plan `sf-plan` wrote into
+that task folder instead of `docs/`. Everything below holds, with these substitutions:
+
+- **The spec.** The plan is the one `<task-dir>/plans/plan-*.md` with `status: live`; if there is
+  none, **stop** and run `sf-plan` with the same `task-dir:` first. Its dispatch table and
+  `Architect review` line replace `docs/CONTEXT.md`'s, and its design sections replace
+  `docs/solution-design.md`. Each row's `Goal` names `<task-dir>/goals/<slug>.md`, which replaces
+  `docs/contracts/<slug>.md`: cut the brief from the goal's NOTES `§N`, and use its ACCEPTANCE boxes
+  as the Validation criteria. Current-state context comes from the findings in the plan's
+  `research:` list.
+- **Order.** Honor each goal's `depends-on:` as well as the table's `Depends on`, and skip a goal
+  whose status is `done`.
+- **Recording**, in place of the Build log and the `Commit` column. After each review-gated commit,
+  tick the goal's STEPS line with the short hash (``1. [x] §1 <work item> `<hash>` ``) and insert
+  ``- <goal> §N <work item> `<hash>`, review passed → plans/<file>`` under `<task-dir>/built.md`'s
+  header paragraph (newest first). Tick an ACCEPTANCE box only when the build holds evidence for it,
+  and leave the rest for the human. When every box is ticked, set the goal to `status: done` and the
+  next goal in build order to `active`. The task folder is outside the repo, so these edits are made
+  at once and never ride along in a commit.
+- **Never** write `docs/CONTEXT.md`, `docs/contracts/`, or `handover.md`.
 
 ## Preconditions
 
@@ -100,7 +123,8 @@ frontmatter flag, so it holds across every assistant.
   in `rules/safety.md`). Each passed review gate commits the work item's artifacts, tests and build
   summary on the **current working branch** (message `<story-slug> §N <work item>`), then records
   the short hash (`git rev-parse --short HEAD`) in the story's `docs/contracts/<slug>.md`
-  **Build log** and the **Commit** column of its `docs/CONTEXT.md` row. The hash lands only after the
+  **Build log** and the **Commit** column of its `docs/CONTEXT.md` row (in task-folder mode, the goal
+  and `built.md` instead, as above). The hash lands only after the
   commit, so those doc edits ride along in the **next** commit and a final **wrap-up commit** flushes
   the last — never `--amend`. Only the main agent commits; **subagents never run git**. Push, PR,
   merge and squash stay explicit user requests. Full rule: `docs/ORCHESTRATION.md` **Commits**.
