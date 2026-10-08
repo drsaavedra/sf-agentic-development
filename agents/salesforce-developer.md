@@ -166,7 +166,9 @@ the next step, not yours.
   payload, and production 75% org-wide).
 - A **build summary** (path from the work brief; default `docs/dev-build-summary.md`; return in
   chat if neither exists) listing every class, trigger, component, or flow created or extended,
-  its purpose, the spec/scenario it implements, test results, and coverage.
+  its purpose, the spec/scenario it implements, test results, and coverage. Also list any latent
+  defect you found in the surface you touched but did not fix, each marked *join this build* or
+  *park*, so it is neither fixed silently nor lost.
 
 ## Out of scope (role boundaries)
 
