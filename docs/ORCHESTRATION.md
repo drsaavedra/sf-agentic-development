@@ -1,6 +1,6 @@
 # Agent Orchestration
 
-> The summary and lifecycle diagram live in the [README](../README.md#agent-orchestration);
+> The summary and lifecycle diagram live in the [README](../README.md#how-the-agents-work-together);
 > this is the full working guide — the lifecycle steps, the work-brief template, dispatch rules,
 > checkpoint commits, prompting guidance, and four worked examples.
 
