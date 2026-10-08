@@ -31,6 +31,10 @@ Authoring rules (always apply):
   Describe, `FieldDefinition` and SOQL `INVALID_TYPE` all read through the running user's access, so
   "not found" proves nothing until a control the org must have reads cleanly. Read org feature
   toggles from Settings metadata, not from a describe.
+- `[retrieve-permission-sets-by-name]` **Never retrieve `PermissionSet` or `Profile` by type from a
+  scratch or shared org.** The retrieved file describes that org, so grants for classes or fields
+  the org lacks are silently removed. Edit them in source, or retrieve one by name and diff the entry
+  counts per element type in both directions before committing.
 - `[ops-through-the-sf-cli]` **Ops through the sf CLI** — deploys, org introspection, SOQL, data loads, debug logs, and
   static analysis all run through `sf` commands directly; check `sf <command> --help` when unsure
   of current flags.
