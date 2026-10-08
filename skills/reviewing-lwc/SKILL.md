@@ -57,6 +57,7 @@ Scan every artifact against this checklist.
 | LWC: LMS subscription leak | `unsubscribe(this._subscription)` in `disconnectedCallback` |
 | LWC: window/document listener leak | `removeEventListener` in `disconnectedCallback` |
 | LWC: cross-shadow DOM access | Communicate via `@api` methods and events |
+| LWC: edited bundle with `apiVersion` behind the orgs' latest | Bump to what `/services/data/` lists last on the org and Dev Hub; prove it with a validate |
 | LWC: hardcoded SLDS tokens | Use SLDS 2 styling hooks (CSS custom properties) |
 | LWC: bubbles+composed by default | Set only when the event must cross component namespace boundaries |
 | LWC: unjustified `setTimeout`/`setInterval` | Lint-restricted; debounce/poll only, with cleanup in `disconnectedCallback` |

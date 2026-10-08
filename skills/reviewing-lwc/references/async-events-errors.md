@@ -29,3 +29,4 @@
   - `notifyRecordUpdateAvailable(recordIds)` (`lightning/uiRecordApi`) — after imperative Apex mutates records that **LDS** adapters (`getRecord`, record forms) hold in cache.
   - RefreshView API (`lightning/refresh`) — coordinated refresh across component boundaries, including Aura and third-party data; containers participate via the `RefreshEvent`.
 - Keep `.js-meta.xml` aligned with the component API: meaningful labels, descriptions, defaults, and targets for Experience Builder.
+- **Flag an edited component whose `apiVersion` is behind the latest stable release.** "Latest" is what the target orgs run, read with `sf api request rest '/services/data/'` (last entry) on the org and the Dev Hub, never the version stamped on a doc page, which can run a release ahead. Jest ignores `apiVersion`, so a bump is proven only by a validate and by reading `LightningComponentBundle.ApiVersion` back through the Tooling API.
