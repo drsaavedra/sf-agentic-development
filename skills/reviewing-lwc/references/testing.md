@@ -24,5 +24,6 @@
 - **Clean up in `afterEach` with `document.body.removeChild(element)`.** A component instance shared across tests lets state from one test corrupt the next.
 - **Emit wire values via `@salesforce/wire-service-jest-util`**, not hand-rolled module mocks — the utility simulates the adapter lifecycle (data and error states) correctly.
 - **Derive LDS mock JSON from a real UI API snapshot** (Workbench or developer console) for `getRecord`/related-list adapters. Hand-crafted mocks with the wrong shape cause silent failures. Store mock data under `__tests__/data/`.
+- **Match the emitted shape to the adapter mock.** The LDS and Apex test adapters wrap an emitted value as `{ data, error }`, while a generic `createTestWireAdapter` passes it through unchanged. A wired function that destructures `{ data, error }` behind a generic mock gets `undefined` from `emit({ fields })`, and the test fails as if the component were wrong; emit `{ data: { fields } }` there, or switch to the LDS adapter.
 - **`await flushPromises()` before asserting** after emitting a wire value — `Promise.resolve()` is insufficient to flush multi-tick async chains.
 - Run via `npm run test:unit`.
