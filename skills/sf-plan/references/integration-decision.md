@@ -59,6 +59,21 @@ trigger.
   Salesforce **record changes** without defining custom events.
 - Both decouple producer from consumer. Choose **CDC** when the trigger is "a record changed";
   choose **Platform Events** when it's "a business event you define."
+- **Neither respects record sharing.** CDC "ignores sharing settings and sends change events for all
+  records of a Salesforce object", and its subscriber needs View All Records on the object (View All
+  Data or View All Users for some objects). Every platform-event subscriber with Read on the event
+  receives every message, so a correlation id in the payload is not authorization: never put data in
+  an event that some subscriber may not see.
+- **Delivery is counted per subscriber, not per event.** For `empApi` the delivery allocation is "per
+  channel and per unique browser session", and each logged-in `empApi` user counts as one concurrent
+  client. Size by concurrent users × channels.
+- **Publish Immediately (the default) publishes even if the transaction rolls back**, so a subscriber
+  can act on data that never committed. Choose Publish After Commit when the subscriber needs the
+  committed record.
+- **Publishing over REST, SOAP or Bulk API also spends daily API requests**; publishing from Pub/Sub
+  API, Apex or Flow does not.
+- **An LWC subscriber hears events only while a browser has it loaded.** A result that must land when
+  nobody is watching needs a server-side subscriber (an Apex trigger on the event).
 
 ## Where it meets the rest of the design
 
