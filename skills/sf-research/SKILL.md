@@ -33,7 +33,7 @@ created), write into that folder instead of `docs/`. Without it, everything in t
 this mode on.
 
 - **Scope from the spec.** Read `<task-dir>/specs/spec-*.md` with `status: live` (the newest, if
-  several). Scope from **REQUIREMENTS > Committed** only: a *Not committed* item is out of scope and
+  several; if there is none, ask for the scope in one question or stop). Scope from **REQUIREMENTS > Committed** only: a *Not committed* item is out of scope and
   is never researched as if agreed. Treat **OPEN QUESTIONS** as questions to answer from the repo
   and org where they can be, and say in the finding which ones research answered.
 - **Write one finding per in-scope domain**, at
