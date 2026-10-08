@@ -27,6 +27,10 @@ Scan every artifact against this checklist.
 | LWC: public `@api` Boolean initialized to `true` | Default it `false` (else `LWC1503`); invert the property name or derive the effective value with a getter |
 | LWC: light DOM on sensitive data | Keep shadow DOM; light DOM only for styling/a11y-linking/analytics/SSR |
 | LWC: `for:each` index key | Use a stable id (`key={item.Id}`), never the loop index |
+| LWC: `lwc:if` sibling beside `for:each` items, or two keyed siblings per iteration | Stable child shape — unconditional sibling, one keyed wrapper per iteration |
+| LWC: `splice(indexOf(obj), 1)` / `includes(obj)` on copied objects | Match by key with `findIndex`; guard `-1` |
+| LWC: `checked={false}` to reset a ticked box | Reset `input.checked` imperatively |
+| LWC: `on*` binding to an undefined method | Silent at compile, deploy and runtime — check each binding resolves |
 | LWC: `if:true`/`if:false` | Superseded, slated for removal — use `lwc:if` / `lwc:elseif` / `lwc:else` |
 | LWC: mutating wire data | Shallow-copy first (`{ ...data }`); wire data is frozen |
 | LWC: `JSON.parse(JSON.stringify())` copy | Shallow-copy the level you edit; never JSON round-trip |
