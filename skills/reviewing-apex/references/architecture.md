@@ -20,6 +20,7 @@ Additional rules:
 - Choose the smallest correct pattern: SOQL in a Selector, SObject behavior in a Domain, orchestration in a Service, pure helpers in a Utility.
 - Design sharing deliberately. Default `with sharing`; treat `without sharing` as an architectural decision, not a quick fix. Declare sharing explicitly even though API v67+ classes without a declaration default to `with sharing` — an explicit keyword survives API bumps and states intent (see `references/security.md` for the v67 baseline).
 - In Selector field lists, prefer compile-time field references (`Schema.Account.Name` or a `Schema.SObjectField` constant) over string literals — field deletion is then caught at deploy time instead of failing at runtime.
+- Flag the same class or LWC bundle at two paths across package directories: `sf project convert source` picks one silently (exit 0) while a `--source-dir` deploy picks the other, so the package and the org diverge.
 - Static analysis is part of the quality gate. Pair with the Code Analyzer CLI (`sf code-analyzer run`): `ApexCRUDViolation`, `ApexSharingViolations`, `ExcessiveClassLength`, `ExcessivePublicCount`, and `AvoidDeeplyNestedIfStmts` should be in the enforced rule set.
 
 ## Managed-package permanence
@@ -28,6 +29,8 @@ Additional rules:
 
 - Flag every `global` class, method, inner class, `@InvocableMethod`, or `@InvocableVariable` that is not deliberately part of the subscriber-facing API. An invocable called only by an in-package Flow — and its Request/Result wrappers and their `@InvocableVariable` members — must be `public`: the Flow can still call it and the shape stays free to change. **The only chance to catch this is before the first package version containing the member.**
 - Flag any rename of a metadata API name arriving without matching destructive members. Renaming does not remove the old component from the org, so the old copy stays deployed, still compiles, and still runs under `RunLocalTests`. For an already-packaged component the rename is not available at all.
+- **Renaming a type used in an Apex method signature** fails the deploy while an old trigger or class in the org still references it, and every class then reads 0% coverage because no test ran. Remove the old referrer with `destructiveChangesPre.xml`, which runs before the deploy, not with a post-destructive manifest.
+- **Namespacing does not rewrite text.** API names inside static-resource JSON, Custom Metadata values, labels, Apex string literals, flow formulas and LWC `targetConfig` values stay as written and break in the namespaced package. Grep for every prefix form (`ns__`, `ns.Class`, `ns:component`), not just `ns__`. In a namespaced scratch org `Organization.NamespacePrefix` returns null (read `ActiveScratchOrg.Namespace` on the Dev Hub), and anonymous Apex reaches only `global` members.
 
 ## Naming conventions
 
