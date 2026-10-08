@@ -14,8 +14,8 @@ forked) so the spec and conversation context stay available.
 **Only run when the user has indicated they want to build.** The spec is meant to be reviewed first
 (by the user, and developer/architect if they chose) — a manual step that happens **before** this
 skill runs. If you're arriving straight from `/sf-plan`, confirm the user wants to proceed before
-dispatching. This human checkpoint lives in the trigger conditions and this instruction, not a
-frontmatter flag, so it holds across every assistant.
+dispatching. The `disable-model-invocation: true` flag keeps the model from starting this skill,
+and this instruction holds the same checkpoint on assistants that ignore the flag.
 
 ## Task-folder mode — `task-dir: <path>`
 
@@ -23,21 +23,28 @@ When the invocation carries `task-dir: <absolute path>`, build from the plan `sf
 that task folder instead of `docs/`. Everything below holds, with these substitutions:
 
 - **The spec.** The plan is the one `<task-dir>/plans/plan-*.md` with `status: live`; if there is
-  none, **stop** and run `sf-plan` with the same `task-dir:` first. Its dispatch table and
+  none, **stop** and tell the user to run `sf-plan` with the same `task-dir:`. Do not run it yourself:
+  the plan is reviewed before any build. Its dispatch table and
   `Architect review` line replace `docs/CONTEXT.md`'s, and its design sections replace
   `docs/solution-design.md`. Each row's `Goal` names `<task-dir>/goals/<slug>.md`, which replaces
-  `docs/contracts/<slug>.md`: cut the brief from the goal's NOTES `§N`, and use its ACCEPTANCE boxes
-  as the Validation criteria. Current-state context comes from the findings in the plan's
+  `docs/contracts/<slug>.md`: cut the brief from the goal as `sf-plan`'s task-folder mode
+  maps it (Objective = OUTCOME, Validation = the `§N` Validation line plus ACCEPTANCE, Constraints
+  include its `### Decisions`). Current-state context comes from the findings in the plan's
   `research:` list.
+- **Briefs and reports.** Give every brief the goal and plan paths as its Spec reference, and set the
+  build summary and review report paths to
+  `<task-dir>/findings/finding-YYYY-MM-DD-<goal>-<build-summary|code-review|architect-review>.md`,
+  so no agent falls back to its `docs/` default.
 - **Order.** Honor each goal's `depends-on:` as well as the table's `Depends on`, and skip a goal
   whose status is `done`.
 - **Recording**, in place of the Build log and the `Commit` column. After each review-gated commit,
   tick the goal's STEPS line with the short hash (``1. [x] §1 <work item> `<hash>` ``) and insert
   ``- <goal> §N <work item> `<hash>`, review passed → plans/<file>`` under `<task-dir>/built.md`'s
   header paragraph (newest first). Tick an ACCEPTANCE box only when the build holds evidence for it,
-  and leave the rest for the human. When every box is ticked, set the goal to `status: done` and the
-  next goal in build order to `active`. The task folder is outside the repo, so these edits are made
-  at once and never ride along in a commit.
+  and leave the rest for the human. When every STEPS line is ticked, make the next goal in build order
+  `active`. Set this one to `done` if every ACCEPTANCE box is ticked; otherwise set it to `next`
+  with a NOTES line `built; ACCEPTANCE waits on <the unticked boxes>`. These task-folder edits are made at once and never ride along in a commit; if the task
+  folder sits inside the repo, leave it unstaged.
 - **Never** write `docs/CONTEXT.md`, `docs/contracts/`, or `handover.md`.
 
 ## Preconditions
@@ -124,8 +131,8 @@ that task folder instead of `docs/`. Everything below holds, with these substitu
   summary on the **current working branch** (message `<story-slug> §N <work item>`), then records
   the short hash (`git rev-parse --short HEAD`) in the story's `docs/contracts/<slug>.md`
   **Build log** and the **Commit** column of its `docs/CONTEXT.md` row (in task-folder mode, the goal
-  and `built.md` instead, as above). The hash lands only after the
-  commit, so those doc edits ride along in the **next** commit and a final **wrap-up commit** flushes
+  and `built.md` instead, as above). In `docs/` mode the hash lands only
+  after the commit, so those doc edits ride along in the **next** commit and a final **wrap-up commit** flushes
   the last — never `--amend`. Only the main agent commits; **subagents never run git**. Push, PR,
   merge and squash stay explicit user requests. Full rule: `docs/ORCHESTRATION.md` **Commits**.
 - Track progress through **build summaries**, not raw diffs.
