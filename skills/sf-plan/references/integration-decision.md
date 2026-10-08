@@ -93,7 +93,12 @@ trigger.
   data changes asynchronously (Platform Event / Queueable). Bulk-safe by construction (reviewed by
   `reviewing-apex`).
 - **Design for failure** — idempotency (safe re-invocation), error handling, and retry/recovery;
-  don't commit Salesforce changes until the remote success is confirmed.
+  don't commit Salesforce changes until the remote success is confirmed. Assume at-least-once
+  delivery: a callout answered `503` has been observed resent from Salesforce's egress, so give every
+  non-idempotent endpoint a client-computed dedupe key.
+- **Grant External Credential principal access** in the same permission set as the entry point; without
+  it the callout fails for every non-admin. Post-install scripts run without it. The token a Named
+  Credential mints never reaches Apex, so no design can forward it to browser code or another service.
 - The integration **build** — the Named Credential / External Credential, External Service,
   Platform Event, or CDC plumbing plus any callout Apex — is authored directly at build time;
   this pack picks the *approach*.
