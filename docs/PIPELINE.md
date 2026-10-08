@@ -6,13 +6,15 @@
 
 ## Summary
 
-A two-skill pipeline for planned feature work:
+A three-skill pipeline for planned feature work:
 
-1. **`sf-plan`** — a Salesforce-native planning/brainstorming skill that interrogates the
+1. **`sf-research`**: a discovery skill that inventories the current org and repo for the domains
+   the request names and writes one reviewable `docs/<domain>.md` each, which `sf-plan` reads.
+2. **`sf-plan`** — a Salesforce-native planning/brainstorming skill that interrogates the
    requirement, makes the declarative-vs-code decisions, verifies the schema, and writes a
    completeness-checked design contract: a shared `docs/CONTEXT.md` (objective, user-story index,
    work-item dispatch table) plus one `docs/contracts/<slug>.md` per user story.
-2. **`sf-build`** — an orchestrator that builds and reviews *against that spec* (dispatches
+3. **`sf-build`** — an orchestrator that builds and reviews *against that spec* (dispatches
    `salesforce-developer`, runs the `reviewing-*` battery as the `code-reviewer` gate, and dispatches
    `architect` for the solution-design gate).
 
@@ -89,8 +91,10 @@ contract.
   no plan mode)   user story)                               instruction)             reads contract ────────────┘
 ```
 
-**Output contract.** The plan is written in **two tiers**:
+**Output contract.** The plan is written in **three tiers**:
 
+- `docs/solution-design.md`: the design narrative the architect reviews, holding the solution
+  shape, the declarative-vs-code triage, a schema design summary and cross-cutting decisions.
 - `docs/CONTEXT.md` — the shared master: objective, a **user-story index**, and a **work-item
   dispatch table** (columns `# | Story | Work item | Metadata type | Config or code | Depends on |
   Commit`), plus the `Architect review` and `Checkpoint commits` flags and cross-cutting decisions.
@@ -115,7 +119,7 @@ The dispatch table tags each item **config vs code**:
 The spec review is a **manual step between `/sf-plan` and `/sf-build`**, owned by the human — not
 automated inside either skill. The flow at the end of `/sf-plan`:
 
-1. `sf-plan` announces: *"Plan generated at `docs/CONTEXT.md`."*
+1. `sf-plan` announces: *"Plan generated at `docs/solution-design.md` + `docs/CONTEXT.md`."*
 2. It prints a **high-level summary to the CLI** — objective, the config-vs-code work-item list,
    key design decisions, and risks — so the user can review without opening the file.
 3. If the summary leaves the user doubtful, that is the cue to open `docs/CONTEXT.md` (and the
@@ -166,6 +170,6 @@ direction safe to pursue.
 - Spec output paths: **`docs/CONTEXT.md`** (shared index + work-item dispatch table) and
   **`docs/contracts/<slug>.md`** (one per user story, holding the detail).
 - Questioning follows the **grill-me pattern**: explore the code/org first to build a candidate
-  solution map, then confirm it one decision at a time **in prose** (not the picker tool), offering
-  the deduced choices with a recommended answer, until shared understanding.
+  solution map, then confirm it one decision at a time through the **`AskUserQuestion` picker**,
+  offering the deduced choices with a recommended answer, until shared understanding.
 - Planning stays **pure design**; `/sf-build` owns all dispatch (config + code).
