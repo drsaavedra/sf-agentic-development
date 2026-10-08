@@ -6,6 +6,8 @@
 - **Hard `@future` restrictions that compile cleanly and only fail at runtime under load:** a `@future` method cannot call another `@future` method (throws `System.AsyncException`), and cannot be called from Batch Apex `execute()`/`finish()`. Queueable chaining is the replacement; from Batch `finish()`, publish a Platform Event or chain the next Batch/Queueable directly.
 - **Async for everything** — adds queue latency, breaks transactional consistency, and complicates error handling. Go async only for genuine long-running work, callouts from a trigger context, or volumes exceeding synchronous limits.
 - **Callouts cannot be made synchronously from a trigger context** — a synchronous callout in trigger execution throws `System.CalloutException`. The trigger must enqueue a Queueable that implements `Database.AllowsCallouts`.
+- **A callout after uncommitted DML throws `You have uncommitted work pending`.** Order the callout before the DML, or move the DML to a separate transaction (a follow-up call from the LWC, a Queueable, a Platform Event).
+- **One `Http.send` is not one request.** Observed in production-like traffic: a callout answered `503` was resent about 1.3 s later from Salesforce's egress (`SFDC-Callout` user agent), and Apex received only the second answer. Any non-idempotent endpoint Apex calls must accept a client-computed dedupe key, or a 503 starts duplicate work.
 
 | Tool | When |
 |---|---|
