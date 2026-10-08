@@ -22,7 +22,7 @@
     // BAD  handleFormError(event){ this.dispatchEvent(new ShowToastEvent({ title: title, message: reduceErrors(error) })); }
     // GOOD handleFormError(event){ this.dispatchEvent(new ShowToastEvent({ title: 'Save failed', message: reduceErrors({ body: event.detail }) })); }
     ```
-  - **A swallowed rejection hides a feature that never worked.** `.catch(() => undefined)`, an empty `catch {}`, or an unhandled fire-and-forget call on a cleanup path makes failure look like success, and nothing ever reports that the cleanup never ran. Surface or log it (`console.error` in the handled path) and drive that path once in a test.
+  - **A swallowed rejection hides a feature that never worked** — flag it as High. `.catch(() => undefined)`, an empty `catch {}`, or an unhandled fire-and-forget call on a cleanup path makes failure look like success, and nothing ever reports that the cleanup never ran. Surface or log it (`console.error` in the handled path) and drive that path once in a test.
   - **A `postMessage` handler must check the sender, not just the origin.** All Visualforce pages in a namespace share one origin, so an origin allow-list accepts messages from any of them. Check `event.source === this.refs.frame.contentWindow` before reading `event.data`.
 - **Three refresh mechanisms — match the one to the stale cache:**
   - `refreshApex(this._wiredResult)` — re-fetch a `@wire`d **Apex** result after an imperative DML changed its data. (Retain the full wired result from the adapter, not just its `.data`.)
