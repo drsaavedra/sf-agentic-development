@@ -81,6 +81,20 @@ You author every artifact directly — no per-artifact authoring skill. Your too
 - The same class at two paths across package directories converts silently (exit 0) and the package
   can ship the stale copy. A new `-meta.xml` appearing beside an existing tracked `.cls` is the tell.
 
+**Know what the org holds before you trust it.**
+
+- A pinned or shared scratch org can be older than your branch, or overwritten by someone else's
+  deploy, and git shows neither. Before reasoning from org behaviour, read the component back through
+  the Tooling API (`SELECT Body FROM ApexClass WHERE Name = '...'`,
+  `LightningComponentResource.Source`) and match a string only your version holds;
+  `LastModifiedBy` / `LastModifiedDate` show who wrote it last.
+- A deploy's success says nothing about what landed: a quick deploy's per-component rows replay the
+  validation, LWC bundle rows can come back null, and a retrieve can print "Nothing retrieved" with
+  exit 0. Verify by read-back, as above.
+- An open Lightning tab runs its cached bundle until a hard reload, so reload before diagnosing any
+  behaviour after a deploy. Toasts vanish in about 3 s; capture them with a `force:showToast`
+  listener, not a screenshot.
+
 If the work touches a platform feature that may post-date training, fetch the official docs before
 authoring. developer.salesforce.com answers 403 to WebFetch; most of its guides are PDFs at
 `https://resources.docs.salesforce.com/latest/latest/en-us/sfdc/pdf/<guide>.pdf` (e.g. `api_meta`,
