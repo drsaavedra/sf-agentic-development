@@ -20,10 +20,10 @@ design it cannot responsibly resolve.
 
 ## 2. The shift: the human moves up the stack
 
-Today the toolkit is a productivity tool with a human **at the wheel**. Priority 1 of `CLAUDE.md`
-gates every consequential action on explicit human confirmation — deploys, the first validate of a
-loop, every commit, checkpoint mode, even reading test results back. That is the correct design for
-a tool a person drives.
+Today the toolkit is a productivity tool with a human **at the wheel**. `rules/safety.md` gates
+most consequential actions on explicit human confirmation — every deploy beyond a scratch org,
+every commit outside checkpoint mode, every push. Validates and scratch-org deploys already run
+without asking. That is the correct design for a tool a person drives.
 
 Autonomy does not *remove* the human. It **moves the human from operator to author**:
 

@@ -139,8 +139,8 @@ Once dispatching, parallel or sequential:
 
 ## Checkpoint commits (opt-in)
 
-The git safety rule (never commit without an explicit grant — see **Deployment & git safety** in
-`CLAUDE.md`) means a long
+The git safety rule (never commit without an explicit grant — see `[no-git-writes-without-a-grant]` in
+`rules/safety.md`) means a long
 multi-brief run normally accumulates everything in the working tree — if work item four goes
 sideways, there is no stable point to roll back to, and a handover has no commit to point at.
 **Checkpoint mode** trades a single explicit grant for rollback safety and a referenceable history,
@@ -180,7 +180,7 @@ the same shape as the TDD validate-loop exception (confirm once, then iterate au
    hash). Rolling back to a checkpoint, merging or squashing into your branch, pushing, and deleting
    any `checkpoint/<task-slug>` branch all remain explicit requests from you.
 
-The full rule lives in `CLAUDE.md`'s **Deployment & git safety** section.
+The full rule is `[no-git-writes-without-a-grant]` in `rules/safety.md`.
 
 ## Prompting a pattern
 
