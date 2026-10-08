@@ -345,8 +345,8 @@ async function main() {
       console.log('installed rule   ' + path.join(assistant.rulesDir, name));
     }
 
-    // Inject CLAUDE.md as a marker-delimited managed block. CLAUDE.md is skill routing only —
-    // safety, conventions, and Commerce rules live in the skills — so it slots in alongside any
+    // Inject CLAUDE.md as a marker-delimited managed block. CLAUDE.md is a short pointer to the
+    // rule files installed above, so it slots in alongside any
     // project instructions the user already keeps in that file, and updates in place on re-runs
     // rather than clobbering it or prompting to overwrite.
     const baselineDest = path.join(target, assistant.baseline);
@@ -362,7 +362,7 @@ async function main() {
     console.log(
       '\nAgent notes: the installed ' +
         assistant.baseline +
-        ' is skill routing only. The salesforce-developer, code-reviewer, and architect agents\n' +
+        ' is a short pointer to the rules in ' + assistant.rulesDir + '.\nThe salesforce-developer, code-reviewer, and architect agents ' +
         'ask for the paths they need at dispatch time — nothing to fill in up front.'
     );
   } finally {
