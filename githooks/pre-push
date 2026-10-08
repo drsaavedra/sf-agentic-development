@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Refuses a push that updates or deletes main: changes reach main only through a PR branch.
+# Git feeds one "<local ref> <local sha> <remote ref> <remote sha>" line per ref on stdin.
+while read -r _ _ remote_ref _; do
+  if [ "$remote_ref" = refs/heads/main ]; then
+    echo "pre-push: no pushes to main in this repo; push a branch and raise a PR"
+    exit 1
+  fi
+done
+exit 0
