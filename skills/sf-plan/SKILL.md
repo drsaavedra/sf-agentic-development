@@ -23,12 +23,17 @@ created), the plan lands in that folder and the story contract **is** the goal f
 tracked in two places. Without it, everything below about `docs/` holds unchanged. Never guess a
 task folder; only an explicit `task-dir:` turns this mode on. Four things change:
 
-1. **Inputs.** The objective is the live spec, `<task-dir>/specs/spec-*.md` with `status: live`:
+1. **Inputs.** The objective is the live spec, `<task-dir>/specs/spec-*.md` with `status: live`
+   (the newest, if several; if there is none, ask for the objective in one question or stop):
    its **REQUIREMENTS > Committed** lines are the requirements. A *Not committed* line never becomes
    a story; list it in the plan under **Out of scope**. Its **OPEN QUESTIONS** are decision points
-   to grill or to resolve as recorded assumptions. Read every `docs/<domain>.md` this skill names as
-   that domain's latest `<task-dir>/findings/finding-*-research-<domain>.md`; if one is missing,
-   run `sf-research` with the same `task-dir:`.
+   to grill or to resolve as recorded assumptions. Read every research doc this skill names as that
+   domain's latest finding, `<task-dir>/findings/finding-*-research-<domain>*.md` (newest date, then
+   highest `-N` suffix), where `docs/data-model.md` → `data-model`, `docs/security-model.md` →
+   `security`, `docs/automation.md` → `automation`, `docs/ui-design.md` → `ui` and
+   `docs/integration-patterns.md` → `integration`. If one is missing, run `sf-research` with the same
+   `task-dir:`. A `docs/CONTEXT.md` in the repo is ignored: only a live plan in `plans/` puts this
+   mode into Revise mode.
 2. **Write nothing under the project's `docs/`.** Where this skill says to refine
    `docs/data-model.md` or `docs/automation.md` in place, record the settled name in the plan's
    schema section instead; findings are immutable.
@@ -48,8 +53,10 @@ task folder; only an explicit `task-dir:` turns this mode on. Four things change
      ```
    - **One goal per story** — `<task-dir>/goals/<story-slug>.md`. It carries everything a
      `docs/contracts/<slug>.md` would, so the build cuts its brief from it alone. The first goal in
-     build order is `active`, the rest `next`. `ticket:` is the spec's `source:` when that is a key,
-     otherwise the task folder's name:
+     build order is `active` unless another goal in `goals/` already is, and the rest are `next`.
+     `ticket:` is the spec's `source:` when that is a key, otherwise the task folder's name. The
+     build briefs from it as: Objective = OUTCOME, Spec reference = the goal's `§N`, Validation
+     criteria = that `§N`'s Validation line plus ACCEPTANCE:
 
      ```markdown
      ---
@@ -73,7 +80,10 @@ task folder; only an explicit `task-dir:` turns this mode on. Four things change
      ## NOTES
      ### §1 <work item>
      Schema context, Test scenarios (given/when/then for every code item), Constraints, Expected
-     outputs. Then the story-local decisions, each with its reason.
+     outputs, and a Validation line (this item's exit conditions).
+
+     ### Decisions
+     <story-local decisions, each with its reason>
      ```
    - **Ledger lines** — one per cross-cutting decision in `<task-dir>/decided.md`
      (`- <decision> — because <one clause> → plans/<file>`) and one per losing alternative in
@@ -84,11 +94,13 @@ task folder; only an explicit `task-dir:` turns this mode on. Four things change
 4. **Revise mode.** With a live plan already in `plans/`, write a **new** dated plan and set the old
    one's frontmatter to `status: superseded-by plans/<new file>`, the only edit a plan ever takes.
    Update affected goals in place (goals are mutable), never unticking a box the build ticked; add a
-   goal for a new story; give a goal for a dropped story a NOTES line naming the plan that dropped
-   it, and never delete it.
+   goal for a new story as `next`; set a dropped story's goal to `status: abandoned` with a NOTES line
+   naming the plan that dropped it, and never delete it. If the dropped goal was `active`, make the
+   next goal in build order `active`.
 
-The hand-off is the same: announce the plan and goal paths, print the summary, and stop before any
-build.
+The hand-off changes only its paths: announce the plan and goal files, print the summary, give the
+build command exactly as `/sf-build task-dir: <path>` (or "build goal `<slug>` with
+`task-dir: <path>`" for one story in a fresh session), and stop before any build.
 
 ## Prerequisite — the research docs must exist
 
@@ -102,7 +114,8 @@ Planning **consumes** the research stage's output; it does not rediscover the or
    `docs/automation.md`, `docs/ui-design.md`, `docs/integration-patterns.md`,
    `docs/security-model.md`.
 3. **If a required research doc is missing, run `sf-research` for the missing domains first**
-   (via the `Skill` tool), then continue — do **not** substitute your own ad-hoc exploration.
+   (via the `Skill` tool), then continue — do **not** substitute your own ad-hoc exploration. If
+   `sf-research` is not installed, stop and name the domains that need research.
    Planning on un-researched ground is the exact failure this split removed. The research docs are the
    hard gate; `docs/CONTEXT.md` is your output, not a prerequisite (a *prior* CONTEXT.md from an
    earlier `/sf-plan` run triggers Revise mode — see Phase 1).
@@ -205,7 +218,7 @@ Proceed to the phases only once every needed research doc is present.
    - no placeholders, contradictions, or unresolved questions remain — a decision the user deferred
      ("you decide") is resolved by you with the recommended option and recorded as an explicit
      assumption, which counts as resolved.
-8. **Hand off** — do this exactly:
+8. **Hand off** — do this exactly (in task-folder mode, with the paths from that section):
    - announce: *"Plan generated at `docs/solution-design.md` + `docs/CONTEXT.md`."*
    - print a **high-level summary to the CLI**: objective, the config-vs-code work-item list, key
      design decisions, and risks — enough to review without opening the file.
