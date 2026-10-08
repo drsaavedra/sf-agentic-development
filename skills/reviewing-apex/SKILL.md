@@ -36,6 +36,12 @@ Scan every artifact against this checklist.
 | Mixed automation on same object | One automation strategy per object |
 | No CRUD/FLS | `WITH USER_MODE` + `AccessLevel.USER_MODE` (the default at API v67+; check the class API version) |
 | `WITH SECURITY_ENFORCED` | Removed at API v67+ — migrate to `WITH USER_MODE` |
+| `WITH USER_MODE` traversing a parent the persona can't read | Grant object Read on every traversed object — else `No such column` |
+| `SYSTEM_MODE` write inside a `with sharing` class | Sharing still applies — private `without sharing` writer, outer class stays `with sharing` |
+| `UserRecordAccess ... RecordId IN` / `OwnerId == UserInfo.getUserId()` | `UserRecordAccess.HasEditAccess` on the row query — no 200-id cap, honours sharing |
+| Removing or renaming a shipped `@AuraEnabled` method | Keep it for a release — open tabs still call the old name |
+| Callout after uncommitted DML | Callout first, or move the DML to another transaction |
+| `bulk` / `from` as identifiers | Reserved words — the compile error points at a different token |
 | Untyped `Object` / `Map<String,Object>` / `List<Object>` as an `@AuraEnabled` **inbound** param or wrapper field | Concrete types (`Map<String,String>`, typed DTO) — JS→Apex JSON can't deserialize `Object` (arg arrives `null`); assemble rich shapes server-side |
 | Raw `SObject` returned from `@AuraEnabled` in a namespaced package | Typed DTO with unprefixed props — packaged custom fields serialize as `ns__Foo__c`, so the LWC reads `undefined` silently |
 | New entry-point class absent from any permission set's `classAccesses` | Ship the grant as metadata in the same changeset — works for the admin, inert for every other persona; no gate catches it |
@@ -67,6 +73,8 @@ Scan every artifact against this checklist.
 | `SeeAllData=true` | `@TestSetup` + `TestDataFactory` |
 | Coverage without assertions | Assert outcomes with `Assert` class |
 | No bulk test | 201+ records for triggers and bulk-facing services |
+| Test that passes with its code deleted | Revert the code once to watch it fail; delete the test if it stays green |
+| Permission logic tested only as admin | `runAs` a Minimum Access user with just the permission set under test |
 | Hand-rolled test doubles / `Test.isRunningTest()` | `System.StubProvider` + `Test.createStub()` |
 | Golden Hammer | Smallest correct pattern: Selector / Domain / Service / Util |
 | Mixed layers | One level of abstraction per method |
