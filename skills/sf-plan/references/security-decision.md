@@ -51,8 +51,10 @@ still resolves through a visible child — each child needs its own rule reading
 through one-level dot notation. Criteria cannot use formulas. They are enforced inside Apex tests, so
 a test persona the rule hides fails on the wrong check. `targetEntity` carries the namespace in a
 packaged org, and when last checked they could not ship in a 2GP managed package — confirm in the
-Metadata Coverage Report before choosing one. Prove each behaviour the design leans on with a probe
-validate and a failing control.
+Metadata Coverage Report before choosing one. User criteria are not limited to `$User` fields: in
+Setup they also accept a permission criteria type, combinable with the record criteria, although the
+Metadata API guide shows only `$User` examples — so a guide's silence is not a "not supported".
+Prove each behaviour the design leans on with a probe validate and a failing control.
 
 ## Experience Cloud / guest access (only when the feature has a public or community surface)
 
