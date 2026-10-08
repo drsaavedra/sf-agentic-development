@@ -81,6 +81,8 @@ test('every skills/*/SKILL.md has valid, complete frontmatter', () => {
     assert.ok(fs.existsSync(file), label + ': missing SKILL.md');
     const fields = topLevelFields(extractBlock(fs.readFileSync(file, 'utf8'), label), label);
     assertRequiredKeys(fields, label);
+    // The Agent Skills spec caps a description at 1024 characters; a model-invoked skill routes on it.
+    assert.ok(fields.description.length <= 1024, label + ': description is ' + fields.description.length + ' characters, over 1024');
   }
 });
 
