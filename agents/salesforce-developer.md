@@ -67,6 +67,20 @@ You author every artifact directly — no per-artifact authoring skill. Your too
 - **LWC** — author directly; for B2B/B2C Commerce storefront components load `generating-b2b-lwc`.
 - **Flow** — author the flow-meta.xml directly and verify via `sf project deploy validate`.
 
+**Validate the delta, and read what it says.**
+
+- Scope `--source-dir` to the dirs you touched plus any dependency the org lacks, never all of
+  `force-app`. Every file under that path deploys, tracked or not (the CLI reads the filesystem, not
+  git), so a throwaway probe class ships unless you delete it or scope below it.
+- Name tests covering every Apex class in the payload: validate enforces 75% coverage per payload
+  class, so a class with no named test fails at 0%.
+- `NoTestRun` is rejected. For an LWC-only payload use `RunRelevantTests` and report its 0/0 result
+  as "no tests ran", never as a pass. Keep `RunLocalTests` for the end of the build.
+- Before calling a validate red, read the test-result block and per-class coverage: a delta validate
+  recompiles dependents, so an org behind your branch fails on code outside your payload.
+- The same class at two paths across package directories converts silently (exit 0) and the package
+  can ship the stale copy. A new `-meta.xml` appearing beside an existing tracked `.cls` is the tell.
+
 If the work touches a platform feature that may post-date training, fetch the official docs before
 authoring. developer.salesforce.com answers 403 to WebFetch; most of its guides are PDFs at
 `https://resources.docs.salesforce.com/latest/latest/en-us/sfdc/pdf/<guide>.pdf` (e.g. `api_meta`,
@@ -107,7 +121,8 @@ the next step, not yours.
 - All metadata under the project's source directories (inspect the project structure first;
   typically `force-app/main/default/classes/`, `triggers/`, `lwc/`, and `flows/` for SFDX
   projects).
-- Apex test coverage ≥ 85% per class (project target; production floor is 75% org-wide).
+- Apex test coverage ≥ 85% per class (project target; validate enforces 75% per class in the
+  payload, and production 75% org-wide).
 - A **build summary** (path from the work brief; default `docs/dev-build-summary.md`; return in
   chat if neither exists) listing every class, trigger, component, or flow created or extended,
   its purpose, the spec/scenario it implements, test results, and coverage.
