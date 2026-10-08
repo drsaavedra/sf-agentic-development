@@ -260,8 +260,9 @@ skill. One domain routes to a skill first:
 | B2B/B2C Commerce storefront LWC (cart, checkout, PDP/PLP, search, quick order, Experience-Builder commerce components) | `generating-b2b-lwc` |
 
 > **TDD for Apex:** failing tests first, then the minimum implementation to pass.
-> **Objective gates:** `sf project deploy validate`, `sf apex run test`, and `sf code-analyzer run`
-> verify every build; `reviewing-*` is the quality review on top.
+> **Objective gates:** `sf project deploy validate` (with the tests that cover the payload) and
+> `sf code-analyzer run` verify every build; `reviewing-*` is the quality review on top.
+> `sf apex run test` runs the code already in the org, so it never proves an uncommitted change.
 
 **Review** is a separate end-of-build pass (not chained onto every edit): run the matching `reviewing-*` skill at the end of a build (typically via the `code-reviewer` agent), on an explicit review request, or as a quality gate. Cross-domain work loads both skills, in the order shown:
 
