@@ -4,7 +4,7 @@ original-file/
 research/
 docs/superpowers/
 
-# Whatever install.sh displaced from ~/.claude-stack or a project's .claude/rules/
+# Whatever install.sh displaced from the Claude config dir or a project's .claude/rules/
 .install-backup/
 
 # OS

@@ -1,23 +1,24 @@
 #!/usr/bin/env bash
-# Points ~/.claude-stack at this repo's skills and agents, and (with --project) a
+# Points your Claude config dir at this repo's skills and agents, and (with --project) a
 # Salesforce project's .claude/rules/ at this repo's rules. Idempotent. Never deletes.
 #
-#   install.sh                        link skills + agents into ~/.claude-stack
+#   install.sh                        link skills + agents into the config dir
 #   install.sh --check                report only; exit 1 if any link is wrong
 #   install.sh --pull                 copy a clobbered real file back over the repo copy
 #   install.sh --project <path>       also link rules/ into <path>/.claude/rules/sf-agentic-development
 #   install.sh --check --project <p>  check the rules link too
 #
-# Skills and agents link per item rather than as whole directories: ~/.claude-stack/skills
+# Skills and agents link per item rather than as whole directories: <config>/skills
 # also holds skills from other sources, so linking the directory would orphan them.
 #
-# Rules link per project, not into ~/.claude-stack/rules. User-level rules load in every
+# Rules link per project, not into <config>/rules. User-level rules load in every
 # project, and Salesforce routing has no business firing in a non-Salesforce repo. The
 # per-project directory symlink is the form documented for sharing rules across projects.
 set -uo pipefail
 
-REPO="$(cd "$(dirname "$0")" && pwd)"
-STACK="${CLAUDE_STACK:-$HOME/.claude-stack}"
+REPO="$(cd -P "$(dirname "$0")" && pwd)"
+# Config dir: $CLAUDE_STACK if set, else Claude Code's own $CLAUDE_CONFIG_DIR, else ~/.claude.
+STACK="${CLAUDE_STACK:-${CLAUDE_CONFIG_DIR:-$HOME/.claude}}"
 RULES_LINK_NAME="sf-agentic-development"
 
 MODE=install
