@@ -8,9 +8,9 @@
 > `docs/contracts/<slug>.md` (it stops and routes back to Research if a needed doc is missing).
 > **Build:** by default, work one story at a time — open its `docs/contracts/<slug>.md` (with the
 > research docs and `docs/solution-design.md` as context; a fresh session per story keeps context
-> lean) and build it under the Authoring rules below. `/sf-build` is an **optional** orchestrated
+> lean) and build it under the rules in `authoring.md`. `/sf-build` is an **optional** orchestrated
 > mode that dispatches subagents per work item — heavier on tokens, worth it only for large
-> multi-story builds. The rules below govern the default build and everything else — ad-hoc
+> multi-story builds. The rules in `authoring.md`, `review-routing.md` and `safety.md` govern the default build and everything else — ad-hoc
 > edits, fixes, reviews, audits, config, and ops.
 
 ---
