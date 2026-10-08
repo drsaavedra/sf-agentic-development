@@ -94,7 +94,9 @@ These hold for every in-scope domain:
   a common wrong design input.
 - **Packaging support is a constraint.** When the repo builds a managed or unlocked package, check
   the Metadata Coverage Report for each metadata type the feature may need, and record unsupported
-  ones under Surprises & constraints.
+  ones under Surprises & constraints. Metadata outside the `packageDirectories` in
+  `sfdx-project.json` (an `mdapi/` folder, for example) never ships in the package, so record which
+  side of that line each piece of the feature must sit on.
 - **Inventory before recommend.** Record what exists — objects, fields, components, credentials,
   permission sets, framework patterns — before naming any gap. Reuse-before-invent throughout: an
   existing field, component, or credential usually beats a new one, and `sf-plan` can only choose
