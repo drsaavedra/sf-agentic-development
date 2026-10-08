@@ -91,6 +91,9 @@ You author every artifact directly — no per-artifact authoring skill. Your too
 - A deploy's success says nothing about what landed: a quick deploy's per-component rows replay the
   validation, LWC bundle rows can come back null, and a retrieve can print "Nothing retrieved" with
   exit 0. Verify by read-back, as above.
+- Create persona test users on the right profile from the start. Changing a user's profile to one
+  on a different licence unassigns every permission set they held, with no prompt, so re-read
+  `PermissionSetAssignment` after any profile change before trusting a persona check.
 - An open Lightning tab runs its cached bundle until a hard reload, so reload before diagnosing any
   behaviour after a deploy. Toasts vanish in about 3 s; capture them with a `force:showToast`
   listener, not a screenshot.
