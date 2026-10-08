@@ -45,3 +45,6 @@ interactivity Screen Flow's standard components don't cover.
   accessibility, Jest). Design to that bar: prefer LDS / `@wire` over imperative Apex where it
   fits, and plan the empty / loading / error states up front.
 - Prefer base Lightning components and SLDS before hand-rolled markup.
+- Settle numeric layout values (height cap, page size, control position) in a prototype with a live
+  readout before the first build, and decide where each control sits after its own click: a pager or
+  "show more" that changes the height of content above it belongs in the header, not the footer.
