@@ -53,3 +53,15 @@
 *Fix:*
 - Collect records into a collection variable **inside** the loop using Assignment elements (or replace the whole mapping loop with a Transform element).
 - Place the Create/Update/Delete Records element **outside and after** the loop, operating on the full collection.
+
+## Filters that return the wrong set silently
+
+*Why it fails:* Three patterns run without error and select the wrong records:
+- Get Records filter conditions cannot traverse a relationship (`RecordType.DeveloperName`), so the condition cannot be expressed as written.
+- An uninitialised Boolean variable is null, not false, so a Decision testing `{!flag} Equals false` never matches.
+- `Not In` against an empty collection excludes nothing, so an upstream lookup that silently returned no rows turns an exclusion into "all records".
+
+*Fix:*
+- Look up the related record's Id in its own Get Records first (e.g. the Record Type by `DeveloperName`), then filter on that Id.
+- Give every Boolean variable an explicit default.
+- Before a `Not In` filter, check the exclusion collection is non-empty whenever empty would mean something went wrong.
