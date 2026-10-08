@@ -139,6 +139,19 @@ combined validate to the main agent at the merge point.
 - Any sweep you report (a permission audit, a grep, a Jest selector) gets a control that must match
   and a "checked N, failed n" count, so a zero is provably a zero.
 
+**Debug by measuring, not guessing.**
+
+- Record the test and lint baseline before changing anything, so a pre-existing failure is not
+  blamed on your change. A broken lint config or a glob that matches nothing reads as a pass: report
+  lint as unavailable, not passed. A Jest path pattern also matches copies in nested worktrees.
+- On a governor-limit failure, measure once before fixing: in the failing test, put
+  `Assert.fail('PROBE ' + Limits.getQueries())` just before the call under test, since setup and
+  triggers may already have spent most of the budget.
+- When a new callout fails with a generic error, call the new endpoint and a known-good one through
+  the same Named Credential in one anonymous-Apex run: a failure on both is environment or auth.
+- After fixing a defect, grep the file and component for the same pattern before reporting; the
+  sibling instance often fails the opposite way and survives the fix.
+
 The `reviewing-*` quality pass over what you built happens **after** you report back — the main
 agent runs it as the end-of-build review (typically the `code-reviewer` agent), not inside this
 loop. Deliver against the brief's validation criteria with the analyzer clean; the review gate is
