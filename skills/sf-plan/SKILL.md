@@ -101,6 +101,8 @@ Proceed to the phases only once every needed research doc is present.
    Apex-trigger-owned domain; configure an existing feature/managed package vs build custom;
    real-time vs event-driven/async as the overall style. The chosen shape frames the triage and
    schema below. Skip this phase when one shape is obviously right — don't manufacture alternatives.
+   Every "why not X" must name a property the recommended shape has and X lacks; a weakness both
+   share is not a reason to reject X.
 4. **Declarative-vs-code triage (per capability)** — within the chosen shape, decide config or code
    for each capability, working from the automation, UI, integration, and security decision packs (see
    *Decision references*). This is the per-piece tool choice (e.g. this rollup → roll-up summary
