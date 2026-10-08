@@ -94,7 +94,8 @@ trigger.
   `reviewing-apex`).
 - **Design for failure** — idempotency (safe re-invocation), error handling, and retry/recovery;
   don't commit Salesforce changes until the remote success is confirmed. Assume at-least-once
-  delivery: a callout answered `503` has been observed resent from Salesforce's egress, so give every
+  delivery: a callout answered `503` has been observed arriving twice (resent by Salesforce or a proxy, not
+  documented), so give every
   non-idempotent endpoint a client-computed dedupe key.
 - **Grant External Credential principal access** in the same permission set as the entry point; without
   it the callout fails for every non-admin. Post-install scripts run without it. The token a Named

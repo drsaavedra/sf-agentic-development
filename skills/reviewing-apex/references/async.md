@@ -7,7 +7,7 @@
 - **Async for everything** — adds queue latency, breaks transactional consistency, and complicates error handling. Go async only for genuine long-running work, callouts from a trigger context, or volumes exceeding synchronous limits.
 - **Callouts cannot be made synchronously from a trigger context** — a synchronous callout in trigger execution throws `System.CalloutException`. The trigger must enqueue a Queueable that implements `Database.AllowsCallouts`.
 - **A callout after uncommitted DML throws `You have uncommitted work pending`.** Order the callout before the DML, or move the DML to a separate transaction (a follow-up call from the LWC, a Queueable, a Platform Event).
-- **One `Http.send` is not one request.** Observed in production-like traffic: a callout answered `503` was resent about 1.3 s later from Salesforce's egress (`SFDC-Callout` user agent), and Apex received only the second answer. Any non-idempotent endpoint Apex calls must accept a client-computed dedupe key, or a 503 starts duplicate work.
+- **One `Http.send` is not one request.** Observed, not documented: a callout answered `503` reached the endpoint a second time about 1.3 s later, and Apex received only the second answer. Whether Salesforce or a proxy in between resent it was never settled. Any non-idempotent endpoint Apex calls must accept a client-computed dedupe key, or a 503 starts duplicate work.
 
 | Tool | When |
 |---|---|
