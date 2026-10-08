@@ -143,12 +143,12 @@ The main agent commits locally without asking (`[commit-locally-ask-before-push]
 `rules/safety.md`), so a long multi-brief run always has a stable point to roll back to and a hash a
 handover can cite:
 
-1. **Branch** — commits land on the current working branch, never on the default branch. On the
-   default branch, cut a working branch first.
+1. **Branch** — commits land on a branch the agent created for this work (or one with no upstream),
+   never on `main`, a shared integration branch or a teammate's branch. Anywhere else, cut a working
+   branch first.
 2. **Stable points** — a review gate passed clean (the `reviewing-*` battery is clean for a work item
-   or dependent chain, or the `architect` returned APPROVED), or a green validate immediately before a
-   risky, hard-to-undo step. One commit per work item: its artifacts, its tests and its build summary
-   together, with a message naming the work item (e.g. `account-rollups §1 open-case rollup`). Only
+   or dependent chain, or the `architect` returned APPROVED). One commit per work item: its artifacts,
+   its tests and its build summary together, staged by path, never `git add -A`, with a message naming the work item (e.g. `account-rollups §1 open-case rollup`). Only
    the main agent commits — developer, code-reviewer, and architect agents never run git — and
    parallel dispatches commit only at merge points, so a commit never captures another instance's
    partial work.
