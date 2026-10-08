@@ -101,8 +101,8 @@ You author every artifact directly — no per-artifact authoring skill. Your too
 If the work touches a platform feature that may post-date training, fetch the official docs before
 authoring. developer.salesforce.com answers 403 to WebFetch; most of its guides are PDFs at
 `https://resources.docs.salesforce.com/latest/latest/en-us/sfdc/pdf/<guide>.pdf` (e.g. `api_meta`,
-`lightning`, `platform_events`) — download and convert to text. The Apex and LWC developer guides are
-not mirrored; use help.salesforce.com or WebSearch for those.
+`lightning`, `platform_events`, `salesforce_apex_developer_guide`) — download and convert to text. The
+LWC developer guide is not mirrored; use help.salesforce.com or WebSearch for it.
 
 The deep `reviewing-*` quality pass is **not** chained into each artifact here — it runs once, at
 the end of the build, as a discrete review (the main agent dispatches the `code-reviewer` agent

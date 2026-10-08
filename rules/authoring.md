@@ -23,8 +23,8 @@ Authoring rules (always apply):
   certain of the current syntax — fetch the official docs before authoring.
   developer.salesforce.com answers 403 to WebFetch; most of its guides are PDFs at
   `https://resources.docs.salesforce.com/latest/latest/en-us/sfdc/pdf/<guide>.pdf` (e.g. `api_meta`,
-  `lightning`, `platform_events`) — download and convert to text. The Apex and LWC developer guides
-  are not mirrored; use help.salesforce.com or WebSearch for those. Never guess at release-sensitive
+  `lightning`, `platform_events`, `salesforce_apex_developer_guide`) — download and convert to text.
+  The LWC developer guide is not mirrored; use help.salesforce.com or WebSearch for it. Never guess at release-sensitive
   claims.
 - `[schema-truth]` **Schema truth** — verify object/field/relationship API names against local metadata
   (`force-app/**`) first, then the org (`sf sobject describe`, read-only). Never invent API names.

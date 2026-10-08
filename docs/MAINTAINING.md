@@ -11,8 +11,9 @@ don't need any of it.
     `docs/platform/…` pages and the legacy `docs/atlas.en-us.*` pages alike (checked 2026-10-08).
     Most of its guides are published as PDFs at
     `https://resources.docs.salesforce.com/latest/latest/en-us/sfdc/pdf/<guide>.pdf` (e.g.
-    `api_meta`, `api_ui`, `lightning`, `platform_events`): download, convert to text, and grep for
-    the anchors. The Apex and LWC developer guides are not mirrored — use WebSearch for those (its
+    `api_meta`, `api_ui`, `lightning`, `platform_events`, `salesforce_apex_developer_guide` — not
+    `apexcode`, which 404s): download, convert to text, and grep for the anchors. The LWC developer
+    guide is not mirrored — use WebSearch for it (its
     indexed snippets carry the article body and the current canonical URL). `help.salesforce.com`
     articles generally fetch fine. Optional: a maintainer who wants a headless-browser
     extractor for stubborn pages can install the upstream `platform-docs-get` skill user-scoped
