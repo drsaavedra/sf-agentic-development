@@ -38,9 +38,10 @@ that task folder instead of `docs/`. Everything below holds, with these substitu
 - **Order.** Honor each goal's `depends-on:` as well as the table's `Depends on`, and skip a goal
   whose status is `done`.
 - **Recording**, in place of the Build log and the `Commit` column. After each review-gated commit,
-  tick the goal's STEPS line with the short hash (``1. [x] §1 <work item> `<hash>` ``) and insert
-  ``- <goal> §N <work item> `<hash>`, review passed → plans/<file>`` under `<task-dir>/built.md`'s
-  header paragraph (newest first). Tick an ACCEPTANCE box only when the build holds evidence for it,
+  tick the goal's STEPS line with the short hash (``1. [x] §1 <work item> `<hash>` ``) and append
+  ``- <goal> §N <work item> `<hash>`, review passed → plans/<file>`` to the end of
+  `<task-dir>/built.md` with a quoted heredoc and `>>`, never a whole-file rewrite, then check it with
+  `grep -c`. Tick an ACCEPTANCE box only when the build holds evidence for it,
   and leave the rest for the human. When every STEPS line is ticked, make the next goal in build order
   `active`. Set this one to `done` if every ACCEPTANCE box is ticked; otherwise set it to `next`
   with a NOTES line `built; ACCEPTANCE waits on <the unticked boxes>`. These task-folder edits are made at once and never ride along in a commit; if the task
