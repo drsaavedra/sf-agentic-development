@@ -87,8 +87,10 @@ task folder; only an explicit `task-dir:` turns this mode on. Four things change
      ```
    - **Ledger lines** — one per cross-cutting decision in `<task-dir>/decided.md`
      (`- <decision> — because <one clause> → plans/<file>`) and one per losing alternative in
-     `<task-dir>/ruled-out.md` (`- <alternative>: <why it lost> → plans/<file>`), inserted under
-     each file's header paragraph, newest first. Never edit an existing line. The reasoning stays in
+     `<task-dir>/ruled-out.md` (`- <alternative>: <why it lost> → plans/<file>`), appended at the
+     end of each file with a quoted heredoc and `>>` (never Write or Edit, which rewrite the whole
+     file and can drop a line another writer just appended), then checked with `grep -c`. Never edit
+     an existing line. The reasoning stays in
      the plan.
    - **Never** `docs/CONTEXT.md`, `handover.md` or anything under `docs/`.
 4. **Revise mode.** With a live plan already in `plans/`, write a **new** dated plan and set the old
