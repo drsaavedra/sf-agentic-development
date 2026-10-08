@@ -38,7 +38,7 @@ Scan every artifact against this checklist.
 | `WITH SECURITY_ENFORCED` | Removed at API v67+ — migrate to `WITH USER_MODE` |
 | `WITH USER_MODE` traversing a parent the persona can't read | Grant object Read on every traversed object — else `No such column` |
 | `SYSTEM_MODE` write inside a `with sharing` class | Sharing still applies — private `without sharing` writer, outer class stays `with sharing` |
-| `UserRecordAccess ... RecordId IN` / `OwnerId == UserInfo.getUserId()` | `UserRecordAccess.HasEditAccess` on the row query — no 200-id cap, honours sharing |
+| `UserRecordAccess ... RecordId IN` / `OwnerId == UserInfo.getUserId()` | `UserRecordAccess.HasEditAccess` on the row query — no 200-id cap, honours sharing (not restriction rules) |
 | Removing or renaming a shipped `@AuraEnabled` method | Keep it for a release — open tabs still call the old name |
 | Callout after uncommitted DML | Callout first, or move the DML to another transaction |
 | `bulk` / `from` as identifiers | Reserved words — the compile error points at a different token |
