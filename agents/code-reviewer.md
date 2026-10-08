@@ -117,5 +117,5 @@ report is append-only history.
 
 - Writing any Apex or generating any metadata — you review, not build.
 - Spec / requirement gap analysis against a design contract — that is the `architect` agent.
-- Deployment — handled by the main agent or developer after review.
+- Deployment — handled by the main agent under `[no-deploy-without-approval]` in `rules/safety.md`.
 - Git operations — never commit, branch, or otherwise run git.

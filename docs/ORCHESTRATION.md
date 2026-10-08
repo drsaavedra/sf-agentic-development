@@ -62,8 +62,10 @@ sequenceDiagram
    `architect`) goes back to `salesforce-developer` as a new brief built from the report's
    Recommended Actions; the same gate re-reviews after the fix and appends a new dated section to
    its report (the reports are append-only history).
-8. **You gate the irreversible steps** — validates and deploys are confirmed per the deployment
-   skill's safety rules, and you can review any brief or report before the next agent acts on it.
+8. **You gate the irreversible steps** — validates run freely, and the main agent deploys to a
+   scratch org without asking and reports what landed; any other deploy, a destructive change, a
+   push or a merge waits for you (`rules/safety.md`). You can review any brief or report before the
+   next agent acts on it.
 
 ## The work brief
 

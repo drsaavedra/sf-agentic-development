@@ -92,9 +92,10 @@ frontmatter flag, so it holds across every assistant.
 
 ## Rules
 
-- **Deploys stay human-gated.** Validate is allowed — display the full command and confirm the
-  first validate of a TDD loop (later iterations re-run automatically). **Never deploy** without
-  explicit user approval.
+- **Deploys follow `[no-deploy-without-approval]` in `rules/safety.md`.** Validate freely. The main
+  agent deploys to a scratch org (`isScratch: true` in `sf org list --json`) without asking and
+  reports the alias, deploy ID and components; every other target, and any destructive payload,
+  waits for explicit user approval with the target, payload and effect stated.
 - **After a deploy, prove what landed.** Read each component back through the Tooling API
   (`ApexClass.Body`, `LightningComponentResource.Source`) and match a string only the new version
   holds; a deploy's per-component rows are not evidence. Hard-reload any open Lightning tab before
