@@ -177,6 +177,5 @@ the next step, not yours.
 
 - Object and field creation — handled by the main agent, authoring the metadata directly.
 - Any automation not described in the work brief.
-- Git operations — never commit, branch, or otherwise run git. Any commits (including checkpoint
-  commits, when the user has granted checkpoint mode) are made by the main agent after reading
-  your build summary, never by you.
+- Git operations — never commit, branch, or otherwise run git. Commits are made by the main agent
+  after reading your build summary, never by you.

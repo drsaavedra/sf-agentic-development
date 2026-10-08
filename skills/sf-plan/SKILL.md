@@ -1,14 +1,13 @@
 ---
 name: sf-plan
-description: "Salesforce design and planning — turns the reviewed research docs (docs/data-model.md, docs/automation.md, docs/ui-design.md, docs/integration-patterns.md, docs/security-model.md, written by sf-research) into a verified, completeness-checked design contract before any build: docs/solution-design.md, docs/CONTEXT.md (objective, story index, work-item dispatch table, doc pointers), and one docs/contracts/<slug>.md per story. Takes the objective from its own prompt and owns docs/CONTEXT.md; makes the solution-shape and declarative-vs-code calls from the decision packs; does not re-explore the org — research already did. TRIGGER when: planning a feature whose research docs exist, or revising a design before a build. DO NOT TRIGGER when: the feature's research docs don't exist yet (run /sf-research first), a spec already exists and the task is to build (use /sf-build), or a trivial one-line fix."
-allowed-tools: Read, Grep, Glob, Bash, AskUserQuestion
-disable-model-invocation: true
+description: "Salesforce design and planning. Turns sf-research's output into a verified, completeness-checked design contract before any build: docs/solution-design.md, docs/CONTEXT.md (objective, story index, dispatch table) and one docs/contracts/<slug>.md per story, or, given task-dir:, a dated plan and one goal file per story in that task folder. Makes the solution-shape and declarative-vs-code calls from its decision packs and runs sf-research first when research is missing; never re-explores the org itself and never starts the build. TRIGGER when: a change spans more than one domain (data model, security, automation, UI, integration) and has no live plan (the agent may invoke it on its own), or revising a design before a build. DO NOT TRIGGER when: a live plan exists and the task is to build (build from it, or /sf-build); a change one domain covers, such as a field, a validation rule or a fix to one class (author directly); or a question that needs no design."
+allowed-tools: Read, Grep, Glob, Bash, AskUserQuestion, Skill
 ---
 
 # Salesforce Planning (sf-plan)
 
 Produce a verified, completeness-checked design contract **before any build**, working from the
-**research docs** `sf-research` already wrote and a human reviewed (`docs/data-model.md`,
+**research docs** `sf-research` wrote (`docs/data-model.md`,
 `docs/automation.md`, `docs/ui-design.md`, `docs/integration-patterns.md`, `docs/security-model.md`).
 Output is `docs/solution-design.md` (the design), a lean `docs/CONTEXT.md`, and one
 `docs/contracts/<slug>.md` per user story (see the Output contract below). This skill is **planning
@@ -16,6 +15,92 @@ only**: it does **not** re-explore the org or author any artifact (Apex, LWC, Fl
 research gathered the current state, and the **build stage** builds. End by handing off to the build
 stage — by default the user (or main agent) builds one story at a time from its contract; `/sf-build`
 is an optional orchestrated mode for large multi-story builds.
+
+## Task-folder mode — `task-dir: <path>`
+
+When the invocation carries `task-dir: <absolute path>` (a task folder a workflow's `/task-init`
+created), the plan lands in that folder and the story contract **is** the goal file, so no story is
+tracked in two places. Without it, everything below about `docs/` holds unchanged. Never guess a
+task folder; only an explicit `task-dir:` turns this mode on. Four things change:
+
+1. **Inputs.** The objective is the live spec, `<task-dir>/specs/spec-*.md` with `status: live`
+   (the newest, if several; if there is none, ask for the objective in one question or stop):
+   its **REQUIREMENTS > Committed** lines are the requirements. A *Not committed* line never becomes
+   a story; list it in the plan under **Out of scope**. Its **OPEN QUESTIONS** are decision points
+   to grill or to resolve as recorded assumptions. Read every research doc this skill names as that
+   domain's latest finding, `<task-dir>/findings/finding-*-research-<domain>*.md` (newest date, then
+   highest `-N` suffix), where `docs/data-model.md` → `data-model`, `docs/security-model.md` →
+   `security`, `docs/automation.md` → `automation`, `docs/ui-design.md` → `ui` and
+   `docs/integration-patterns.md` → `integration`. If one is missing, run `sf-research` with the same
+   `task-dir:`. A `docs/CONTEXT.md` in the repo is ignored: only a live plan in `plans/` puts this
+   mode into Revise mode.
+2. **Write nothing under the project's `docs/`.** Where this skill says to refine
+   `docs/data-model.md` or `docs/automation.md` in place, record the settled name in the plan's
+   schema section instead; findings are immutable.
+3. **Outputs.** In place of the three `docs/` tiers:
+   - **The plan** — `<task-dir>/plans/plan-YYYY-MM-DD-<slug>.md`. It holds everything
+     `docs/solution-design.md` would, plus the `Architect review` line, an **Out of scope** list,
+     and the dispatch table with columns `# | Goal | Work item | Metadata type | Config or code |
+     Depends on` (`Goal` is the goal file's slug). There is no `Commit` column; the build records
+     hashes in `built.md`. Frontmatter:
+
+     ```markdown
+     ---
+     status: live
+     source: specs/<spec file>
+     research: [findings/<file>, ...]
+     ---
+     ```
+   - **One goal per story** — `<task-dir>/goals/<story-slug>.md`. It carries everything a
+     `docs/contracts/<slug>.md` would, so the build cuts its brief from it alone. The first goal in
+     build order is `active` unless another goal in `goals/` already is, and the rest are `next`.
+     `ticket:` is the spec's `source:` when that is a key, otherwise the task folder's name. The
+     build briefs from it as: Objective = OUTCOME, Spec reference = the goal's `§N`, Validation
+     criteria = that `§N`'s Validation line plus ACCEPTANCE:
+
+     ```markdown
+     ---
+     status: next
+     opened: YYYY-MM-DD
+     ticket: XX-0001
+     plan: plans/plan-YYYY-MM-DD-<slug>.md
+     depends-on: [<goal slugs>]
+     ---
+     # <the story as a one-line outcome>
+
+     ## OUTCOME
+     <1-3 sentences: what is true when the story is done>
+
+     ## ACCEPTANCE
+     - [ ] <one checkable box per acceptance or validation criterion>
+
+     ## STEPS
+     1. [ ] §1 <work item> (<metadata type>, config|code)
+
+     ## NOTES
+     ### §1 <work item>
+     Schema context, Test scenarios (given/when/then for every code item), Constraints, Expected
+     outputs, and a Validation line (this item's exit conditions).
+
+     ### Decisions
+     <story-local decisions, each with its reason>
+     ```
+   - **Ledger lines** — one per cross-cutting decision in `<task-dir>/decided.md`
+     (`- <decision> — because <one clause> → plans/<file>`) and one per losing alternative in
+     `<task-dir>/ruled-out.md` (`- <alternative>: <why it lost> → plans/<file>`), inserted under
+     each file's header paragraph, newest first. Never edit an existing line. The reasoning stays in
+     the plan.
+   - **Never** `docs/CONTEXT.md`, `handover.md` or anything under `docs/`.
+4. **Revise mode.** With a live plan already in `plans/`, write a **new** dated plan and set the old
+   one's frontmatter to `status: superseded-by plans/<new file>`, the only edit a plan ever takes.
+   Update affected goals in place (goals are mutable), never unticking a box the build ticked; add a
+   goal for a new story as `next`; set a dropped story's goal to `status: abandoned` with a NOTES line
+   naming the plan that dropped it, and never delete it. If the dropped goal was `active`, make the
+   next goal in build order `active`.
+
+The hand-off changes only its paths: announce the plan and goal files, print the summary, give the
+build command exactly as `/sf-build task-dir: <path>` (or "build goal `<slug>` with
+`task-dir: <path>`" for one story in a fresh session), and stop before any build.
 
 ## Prerequisite — the research docs must exist
 
@@ -28,8 +113,9 @@ Planning **consumes** the research stage's output; it does not rediscover the or
 2. **Require the matching research doc for each in-scope domain** — `docs/data-model.md`,
    `docs/automation.md`, `docs/ui-design.md`, `docs/integration-patterns.md`,
    `docs/security-model.md`.
-3. **If a required research doc is missing, stop.** Name the gap and tell the user to run
-   **`/sf-research`** (and review its doc) first — do **not** substitute your own exploration.
+3. **If a required research doc is missing, run `sf-research` for the missing domains first**
+   (via the `Skill` tool), then continue — do **not** substitute your own ad-hoc exploration. If
+   `sf-research` is not installed, stop and name the domains that need research.
    Planning on un-researched ground is the exact failure this split removed. The research docs are the
    hard gate; `docs/CONTEXT.md` is your output, not a prerequisite (a *prior* CONTEXT.md from an
    earlier `/sf-plan` run triggers Revise mode — see Phase 1).
@@ -115,7 +201,8 @@ Proceed to the phases only once every needed research doc is present.
    choice the research surfaced as still open. Refine `docs/data-model.md` in place when a choice
    settles a name or relationship. This becomes each work item's *Schema context*.
 6. **Write the spec** — `docs/solution-design.md` (the design narrative), a lean `docs/CONTEXT.md`,
-   and the per-story `docs/contracts/<slug>.md` files, per the Output contract below. Scale detail to
+   and the per-story `docs/contracts/<slug>.md` files, per the Output contract below (in task-folder
+   mode, the plan, the goals and the ledger lines instead). Scale detail to
    complexity; do not pad a small change.
 7. **Completeness self-review (the gate)** — refuse to finish if any of these fail; fix and
    re-check:
@@ -131,18 +218,7 @@ Proceed to the phases only once every needed research doc is present.
    - no placeholders, contradictions, or unresolved questions remain — a decision the user deferred
      ("you decide") is resolved by you with the recommended option and recorded as an explicit
      assumption, which counts as resolved.
-8. **Hand off** — do this exactly:
-   - **Settle checkpoint mode first — before the summary.** Detect whether the project folder is a
-     git repo (`git rev-parse --is-inside-work-tree`):
-     - **Git repo present** → **ask once whether to enable checkpoint commits** for the build, via
-       the `AskUserQuestion` picker (Enabled / Disabled, recommended *Enabled* for long or multi-item
-       builds): *"Should the build checkpoint-commit each work item as it passes review (on the
-       current branch), so progress is captured and referenceable in a handover?"*
-     - **No git repo** → offer to initialize one via the picker (*Initialize git* / *Skip*). If the
-       user accepts, run `git init` in the project folder, then ask the checkpoint question above. If
-       the user declines, skip checkpoint entirely — it needs a repo — and move on.
-     - Record the outcome as the `Checkpoint commits: enabled | disabled` line in `docs/CONTEXT.md`
-       (default *disabled* when declined, or when there's no repo and the user skipped init).
+8. **Hand off** — do this exactly (in task-folder mode, with the paths from that section):
    - announce: *"Plan generated at `docs/solution-design.md` + `docs/CONTEXT.md`."*
    - print a **high-level summary to the CLI**: objective, the config-vs-code work-item list, key
      design decisions, and risks — enough to review without opening the file.
@@ -202,7 +278,7 @@ those live in the contract files and `docs/solution-design.md`. It holds:
   - `Story` links to the `docs/contracts/<slug>.md` that holds the row's full detail; `Depends on`
     orders the build — a row builds only after the rows it lists, config or code.
   - `Commit` — leave empty (`—`); the build fills the short commit hash here when the row passes
-    review, but only if checkpoint commits are enabled (below).
+    review.
 - **Doc pointers** — links to the research docs the stories build on (`docs/data-model.md`,
   `docs/automation.md`, `docs/ui-design.md`, `docs/integration-patterns.md`, `docs/security-model.md`
   — those that apply) and to `docs/solution-design.md`. The dispatch table and contracts cite these
@@ -213,11 +289,6 @@ those live in the contract files and `docs/solution-design.md`. It holds:
   itself. Recommend it when the design shows concrete complexity signals — a new or changed data
   model, cross-object automation, callouts / async (governor-limit risk), or a multi-domain or
   many-item build; otherwise mark it *not needed*.
-- **`Checkpoint commits: enabled | disabled`** — one line recording the user's answer to the
-  handoff checkpoint question (Phase 8). On `enabled`, the build commits each work item on the
-  current branch as it passes review and fills the `Commit` column / contract Build log; on
-  `disabled` (the default) it commits nothing. This is the recorded grant — see
-  [`docs/ORCHESTRATION.md`](../../docs/ORCHESTRATION.md) **Checkpoint commits**.
 - **Design rationale** — the chosen solution shape, cross-cutting decisions, and assumptions live in
   `docs/solution-design.md`, not here; story-local decisions live in each contract file. CONTEXT
   stays the index.
@@ -237,8 +308,7 @@ entry. It holds:
   (project-specific rules), **Expected outputs** (artifacts to produce), **Validation criteria**
   (exit conditions). Write each complete enough that the build rediscovers nothing.
 - **Decisions & assumptions (story-specific)** — decisions local to this story, each with its reason.
-- **Build log** — leave a stub heading; the build fills it (only when checkpoint commits are
-  enabled), one line per work item: `§N <work item> — <short hash> · review passed · <date>`. This
+- **Build log** — leave a stub heading; the build fills it, one line per work item: `§N <work item> — <short hash> · review passed · <date>`. This
   is the per-story handover record; the dispatch table's `Commit` column is its index.
 
 A work brief's **Spec reference** is the story's `docs/contracts/<slug>.md` (with optional in-file

@@ -1,6 +1,6 @@
 ---
 name: sf-build
-description: "Orchestrated Salesforce build-and-review pipeline. Reads the approved design contract at docs/CONTEXT.md (its work-item dispatch table) and the per-story docs/contracts/<slug>.md detail, authors config rows inline and dispatches the salesforce-developer agent per code work item, then runs the reviewing-* battery as a deterministic gate. TRIGGER when: the user asks to build, implement, or execute an existing spec (docs/CONTEXT.md is present) — e.g. 'build the spec', 'implement the plan', 'let's build it'. DO NOT TRIGGER when: no spec exists yet (run /sf-plan first); immediately after /sf-plan unless the user signals to proceed (the spec is meant to be reviewed first); or for ad-hoc edits, fixes, single-artifact config, or review-only tasks (author directly per the project baseline, or use the matching reviewing-* skill). Deploys follow [no-deploy-without-approval] in rules/safety.md."
+description: "Orchestrated Salesforce build-and-review pipeline. Reads the approved design contract at docs/CONTEXT.md (its work-item dispatch table) and the per-story docs/contracts/<slug>.md detail (or, given task-dir:, a task folder's live plan and goal files), authors config rows inline and dispatches the salesforce-developer agent per code work item, then runs the reviewing-* battery as a deterministic gate. TRIGGER when: the user asks to build, implement, or execute an existing spec (docs/CONTEXT.md is present) — e.g. 'build the spec', 'implement the plan', 'let's build it'. DO NOT TRIGGER when: no spec exists yet (run /sf-plan first); immediately after /sf-plan unless the user signals to proceed (the spec is meant to be reviewed first); or for ad-hoc edits, fixes, single-artifact config, or review-only tasks (author directly per the project baseline, or use the matching reviewing-* skill). Deploys follow [no-deploy-without-approval] in rules/safety.md."
 allowed-tools: Agent, Skill, Read, Grep, Glob, Bash
 disable-model-invocation: true
 ---
@@ -14,28 +14,53 @@ forked) so the spec and conversation context stay available.
 **Only run when the user has indicated they want to build.** The spec is meant to be reviewed first
 (by the user, and developer/architect if they chose) — a manual step that happens **before** this
 skill runs. If you're arriving straight from `/sf-plan`, confirm the user wants to proceed before
-dispatching. This human checkpoint lives in the trigger conditions and this instruction, not a
-frontmatter flag, so it holds across every assistant.
+dispatching. The `disable-model-invocation: true` flag keeps the model from starting this skill,
+and this instruction holds the same checkpoint on assistants that ignore the flag.
+
+## Task-folder mode — `task-dir: <path>`
+
+When the invocation carries `task-dir: <absolute path>`, build from the plan `sf-plan` wrote into
+that task folder instead of `docs/`. Everything below holds, with these substitutions:
+
+- **The spec.** The plan is the one `<task-dir>/plans/plan-*.md` with `status: live`; if there is
+  none, **stop** and tell the user to run `sf-plan` with the same `task-dir:`. Do not run it yourself:
+  the plan is reviewed before any build. Its dispatch table and
+  `Architect review` line replace `docs/CONTEXT.md`'s, and its design sections replace
+  `docs/solution-design.md`. Each row's `Goal` names `<task-dir>/goals/<slug>.md`, which replaces
+  `docs/contracts/<slug>.md`: cut the brief from the goal as `sf-plan`'s task-folder mode
+  maps it (Objective = OUTCOME, Validation = the `§N` Validation line plus ACCEPTANCE, Constraints
+  include its `### Decisions`). Current-state context comes from the findings in the plan's
+  `research:` list.
+- **Briefs and reports.** Give every brief the goal and plan paths as its Spec reference, and set the
+  build summary and review report paths to
+  `<task-dir>/findings/finding-YYYY-MM-DD-<goal>-<build-summary|code-review|architect-review>.md`,
+  so no agent falls back to its `docs/` default.
+- **Order.** Honor each goal's `depends-on:` as well as the table's `Depends on`, and skip a goal
+  whose status is `done`.
+- **Recording**, in place of the Build log and the `Commit` column. After each review-gated commit,
+  tick the goal's STEPS line with the short hash (``1. [x] §1 <work item> `<hash>` ``) and insert
+  ``- <goal> §N <work item> `<hash>`, review passed → plans/<file>`` under `<task-dir>/built.md`'s
+  header paragraph (newest first). Tick an ACCEPTANCE box only when the build holds evidence for it,
+  and leave the rest for the human. When every STEPS line is ticked, make the next goal in build order
+  `active`. Set this one to `done` if every ACCEPTANCE box is ticked; otherwise set it to `next`
+  with a NOTES line `built; ACCEPTANCE waits on <the unticked boxes>`. These task-folder edits are made at once and never ride along in a commit; if the task
+  folder sits inside the repo, leave it unstaged.
+- **Never** write `docs/CONTEXT.md`, `docs/contracts/`, or `handover.md`.
 
 ## Preconditions
 
 - `docs/CONTEXT.md` exists and contains the work-item dispatch table. If it is missing or has no
   table, **stop** and tell the user to run `/sf-plan` first.
-- Read `docs/CONTEXT.md` — the dispatch table, dependency order, `Architect review` flag, and
-  `Checkpoint commits` flag — in full before dispatching anything. Read each story's
+- Read `docs/CONTEXT.md` — the dispatch table, dependency order, and `Architect review` flag — in full before dispatching anything. Read each story's
   `docs/contracts/<slug>.md` for detail as you reach its rows; you don't need every contract loaded
   up front.
 - The **design rationale and cross-cutting decisions** live in `docs/solution-design.md`, and the
   current-state detail in the research docs (`docs/data-model.md`, `docs/automation.md`, …). Read
   `docs/solution-design.md` for the cross-cutting decisions a brief must honor; pull from a research
   doc only when a brief needs current-state context the contract didn't embed.
-- If `docs/CONTEXT.md` reads `Checkpoint commits: enabled` (or the user grants it in the prompt),
-  first **confirm the project is a git repo** (`git rev-parse --is-inside-work-tree`) — checkpoint
-  commits need one. If it is, **announce once** — *"Checkpoint commits enabled — committing on the
-  current branch at each passed review gate."* — then follow the checkpoint rule below. If there is
-  **no repo**, don't let a raw git error surface mid-build: offer to initialize one (`git init`), and
-  if the user declines, **build without checkpoints** (commit nothing) and say so once. Otherwise
-  (checkpoints not granted) commit nothing.
+- Check git once: `git rev-parse --is-inside-work-tree`, then the current branch. On the default
+  branch, cut a working branch before the first commit. With **no repo**, say so once and build
+  without commits; never `git init` unasked.
 
 ## Orchestration (in order)
 
@@ -69,8 +94,7 @@ frontmatter flag, so it holds across every assistant.
    - `reviewing-apex` for `.cls` / `.trigger`,
    - `reviewing-lwc` for `lwc/**`,
    - `reviewing-flow` for `*.flow-meta.xml`.
-   Feed any findings back to `salesforce-developer` as a fix brief and re-review until clean. **When
-   checkpoint commits are active**, a clean battery for the work item (or dependent chain) is a
+   Feed any findings back to `salesforce-developer` as a fix brief and re-review until clean. A clean battery for the work item (or dependent chain) is a
    stable point: commit the produced/modified artifacts plus the build summary on the current branch
    and record the hash (see *Rules*).
 5. **Architect whole-build inspection (end of sprint) — only when triggered, never by your own
@@ -87,7 +111,7 @@ frontmatter flag, so it holds across every assistant.
    the stories it depends on or that depend on it (per the `Depends on` column), so the whole package
    is verified to still work together; skip stories that already passed and have no dependency to the
    changed work. A **BLOCKED** report re-briefs `salesforce-developer` with its Recommended Actions;
-   re-review afterward. **When checkpoint commits are active**, an **APPROVED** architect review is a
+   re-review afterward. An **APPROVED** architect review is a
    stable point: commit and record the hash like step 4.
 
 ## Rules
@@ -102,20 +126,15 @@ frontmatter flag, so it holds across every assistant.
   (`ApexClass.Body`, `LightningComponentResource.Source`) and match a string only the new version
   holds; a deploy's per-component rows are not evidence. Hard-reload any open Lightning tab before
   checking behaviour in the browser, since it keeps running the cached bundle.
-- **Git is gated by an explicit grant.** Commit nothing unless checkpoint commits are granted — the
-  spec's `Checkpoint commits: enabled` flag, or an explicit in-prompt grant. *When granted*, first
-  verify a git repo exists (`git rev-parse --is-inside-work-tree`); if none, offer `git init` or
-  build without checkpoints (per Preconditions) — never run a commit against a non-existent repo.
-  *When granted and a repo exists*, the
-  passed-review-gate stable points above commit the work item's artifacts + build summary on the
-  **current working branch** (message `checkpoint: <story-slug> §N <work item> — review passed`),
-  then record the short hash (`git rev-parse --short HEAD`) in the story's `docs/contracts/<slug>.md`
-  **Build log** and the **Commit** column of its `docs/CONTEXT.md` row. The hash lands only after the
-  commit, so those doc edits ride along in the **next** milestone commit and a final **wrap-up
-  commit** flushes the last — never `--amend`. Only the main agent commits; **subagents never run
-  git**. Push, branch-merge/squash, and any other git stay explicit user requests. Full rule:
-  `docs/ORCHESTRATION.md` **Checkpoint commits**.
+- **Commit locally at stable points; ask before anything else** (`[commit-locally-ask-before-push]`
+  in `rules/safety.md`). Each passed review gate commits the work item's artifacts, tests and build
+  summary on the **current working branch** (message `<story-slug> §N <work item>`), then records
+  the short hash (`git rev-parse --short HEAD`) in the story's `docs/contracts/<slug>.md`
+  **Build log** and the **Commit** column of its `docs/CONTEXT.md` row (in task-folder mode, the goal
+  and `built.md` instead, as above). In `docs/` mode the hash lands only
+  after the commit, so those doc edits ride along in the **next** commit and a final **wrap-up commit** flushes
+  the last — never `--amend`. Only the main agent commits; **subagents never run git**. Push, PR,
+  merge and squash stay explicit user requests. Full rule: `docs/ORCHESTRATION.md` **Commits**.
 - Track progress through **build summaries**, not raw diffs.
 - **Report at the end:** what was built, modified, or skipped as already-current (config + code),
-  the review-gate results, any BLOCKED items still open, and — if checkpoint commits ran — the
-  checkpoint list (work item → short hash).
+  the review-gate results, any BLOCKED items still open, and the commit list (work item → short hash).

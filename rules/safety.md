@@ -6,16 +6,16 @@
 
 These guardrails are not optional and hold for every task, including work done by dispatched agents:
 
-- `[no-git-writes-without-a-grant]` **Never run `git commit`, `git push`, or any variant** (amend, force-push, rebase, tag push)
-  unless commits are explicitly granted — do not infer from context or plan approval. The one
-  exception is **checkpoint mode**, granted either in the current message (e.g. *"checkpoint as you
-  go"*) or at planning time via `sf-plan`'s checkpoint question, recorded as
-  `Checkpoint commits: enabled` in `docs/CONTEXT.md`. Under it the **main agent** commits at stable
-  points — including each work item as it passes review, which land on the **current working branch**
-  so a handover can reference them by hash; throwaway rollback checkpoints may instead use a
-  dedicated `checkpoint/<task-slug>` branch (full rule: `docs/ORCHESTRATION.md`). Plan approval alone
-  is **not** a grant (approving the plan ≠ answering the checkpoint question), **subagents never
-  commit**, and the grant expires when the task completes.
+- `[commit-locally-ask-before-push]` **Commit locally without asking; ask before anything that leaves the
+  machine or rewrites history.** The main agent commits at stable points (a work item that passed its
+  review gate), one commit per work item with its tests in the same commit. Commit only on a branch you
+  created for this work, or one with no upstream; on any other branch (`main`, `staging`, `develop`, a
+  teammate's branch) cut a working branch first. Stage only the paths this work item touched, by name:
+  never `git add -A` or `git add .`, and leave changes you did not make unstaged and say so. If the
+  folder is not a git repo, say so once and commit nothing; never `git init` unasked. Ask first, naming
+  the branch and the effect, for `git push`, opening or editing a PR, merging, rebasing, amending,
+  `reset`, `clean`, discarding changes, `--no-verify`, deleting a branch, and pushing tags. Plan
+  approval is not approval for any of these. Subagents never run git.
 - `[no-deploy-without-approval]` **Deploy to a scratch org without asking; ask before every other deploy.**
   A scratch org is one that `sf org list --json` reports with `isScratch: true` — never decide by
   alias name — and you always pass `-o <alias>` explicitly. After a scratch deploy, report the alias,

@@ -16,9 +16,9 @@ A two-skill pipeline for planned feature work:
    `salesforce-developer`, runs the `reviewing-*` battery as the `code-reviewer` gate, and dispatches
    `architect` for the solution-design gate).
 
-`sf-plan` replaces reliance on the CLI agent's native **plan mode**. `sf-build` is
-model-invocable but gated by a tight TRIGGER / DO NOT TRIGGER description so it doesn't fire
-before the spec is reviewed. The two are joined by files on disk (`docs/CONTEXT.md` and the
+`sf-plan` replaces reliance on the CLI agent's native **plan mode**. `sf-research` and `sf-plan`
+are model-invocable, so the agent researches and plans on its own when a task needs it. `sf-build`
+is not (`disable-model-invocation: true`), so it never fires before the spec is reviewed. The two are joined by files on disk (`docs/CONTEXT.md` and the
 per-story `docs/contracts/*.md`), not by conversation context.
 
 ---
@@ -84,18 +84,18 @@ contract.
 
 ```
 /sf-plan  →  docs/CONTEXT.md       →  [spec reviewed]  →  [user signals "build it"]  →  dev agent ─┐
- (soft gate,    (+ docs/contracts/    (dev/architect      (soft gate: description                  → architect ─┤→ review battery
-  context kept,   <slug>.md per        review first)        TRIGGER rules + body                                │
-  no plan mode)   user story)                               instruction)             reads contract ────────────┘
+ (auto-runs,    (+ docs/contracts/    (dev/architect      (gate: the frontmatter                   → architect ─┤→ review battery
+  context kept,   <slug>.md per        review first)        flag disable-model-                                 │
+  no plan mode)   user story)                               invocation)              reads contract ────────────┘
 ```
 
 **Output contract.** The plan is written in **two tiers**:
 
 - `docs/CONTEXT.md` — the shared master: objective, a **user-story index**, and a **work-item
   dispatch table** (columns `# | Story | Work item | Metadata type | Config or code | Depends on |
-  Commit`), plus the `Architect review` and `Checkpoint commits` flags and cross-cutting decisions.
+  Commit`), plus the `Architect review` flag and cross-cutting decisions.
   That table *is* the `/sf-build` dispatch list and dependency graph; its `Commit` column is filled
-  by `/sf-build` with each work item's review-gated commit hash when checkpoint commits are enabled
+  by `/sf-build` with each work item's review-gated commit hash
   (the per-story detail lands in that contract's Build log), giving a handover an at-a-glance map of
   what passed and where.
 - `docs/contracts/<slug>.md` — one file per user story, holding that story's work-item detail
@@ -110,6 +110,18 @@ The dispatch table tags each item **config vs code**:
 - **code rows** → `/sf-build` cuts a work brief from the row's contract file and dispatches
   `salesforce-developer`.
 
+### Task-folder mode
+
+Pass `task-dir: <path>` to any of the three skills and the pipeline writes into a task folder
+instead of the project's `docs/`. That folder is the shape a workflow's `/task-init` creates, and
+holds `specs/`, `findings/`, `plans/`, `goals/` and the `decided.md`, `ruled-out.md` and `built.md`
+ledgers. `sf-research` writes one dated `findings/finding-YYYY-MM-DD-research-<domain>.md` per
+domain. `sf-plan` writes a dated `plans/plan-YYYY-MM-DD-<slug>.md` with the design and the dispatch
+table, plus one `goals/<story>.md` per story. That goal is the story's contract, so nothing is
+tracked twice. `sf-build` ticks each goal's steps with the commit hash and adds a `built.md` line.
+Both research and planning read only the spec's committed requirements. Use this mode in a team
+repo, where a per-ticket plan must not rewrite the shared `docs/solution-design.md`.
+
 ### Spec review and hand-off
 
 The spec review is a **manual step between `/sf-plan` and `/sf-build`**, owned by the human — not
@@ -122,8 +134,8 @@ automated inside either skill. The flow at the end of `/sf-plan`:
    relevant `docs/contracts/<slug>.md`) for the full detail, and to have the developer/architect
    review the spec.
 4. Only then does the build proceed — the user signals to build (by typing `/sf-build` or asking
-   in prose). `sf-plan` never chains into a build itself, and `sf-build`'s `DO NOT TRIGGER` rules
-   keep it from auto-firing straight out of planning, so the review checkpoint holds.
+   in prose). `sf-plan` never chains into a build itself, and `sf-build`'s `disable-model-invocation`
+   flag keeps it from auto-firing straight out of planning, so the review checkpoint holds.
 
 ### Architect review — triggered by data, not judgment
 

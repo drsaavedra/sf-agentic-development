@@ -22,7 +22,7 @@ design it cannot responsibly resolve.
 
 Today the toolkit is a productivity tool with a human **at the wheel**. `rules/safety.md` gates
 most consequential actions on explicit human confirmation — every deploy beyond a scratch org,
-every commit outside checkpoint mode, every push. Validates and scratch-org deploys already run
+every push and merge. Validates, scratch-org deploys and local commits already run
 without asking. That is the correct design for a tool a person drives.
 
 Autonomy does not *remove* the human. It **moves the human from operator to author**:

@@ -21,10 +21,10 @@ The rules themselves live in `.claude/rules/sf-agentic-development/`, one file p
 
 | Rule file | Covers | Loads |
 |---|---|---|
-| `pipeline.md` | The three human-gated stages — Research → Plan → Build — and the `/sf-research` domain → doc routing | every session |
+| `pipeline.md` | The three stages — Research → Plan → Build, one human gate before Build — and the `/sf-research` domain → doc routing | every session |
 | `authoring.md` | How Claude authors Apex, LWC, Flows and metadata: TDD, objective gates, knowledge-cutoff guard, schema truth, sf CLI | every session |
 | `review-routing.md` | Which `reviewing-*` skill to run against which artifact, and when a change is too small to need one | when Claude opens a Salesforce artifact |
-| `safety.md` | Deploy and git guardrails — scratch-org deploys run and report, every other deploy asks first; no unsanctioned commits, no secrets | every session |
+| `safety.md` | Deploy and git guardrails — scratch-org deploys run and report, every other deploy asks first; local commits run, push and merge ask; no secrets | every session |
 
 `review-routing.md` carries `paths:` frontmatter so it loads only when Claude touches Salesforce
 files. The other three are unconditional. `safety.md` must stay that way: a path-scoped guardrail

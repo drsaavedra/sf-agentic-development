@@ -27,8 +27,8 @@ Four choices shape the repo:
 
 | Skill | Use it to |
 |---|---|
-| `sf-research` | Inventory the org for the domains your prompt names (data model, security, automation, UI, integration) and write one `docs/<domain>.md` each for you to review. |
-| `sf-plan` | Turn the reviewed research into a design contract: `docs/solution-design.md`, `docs/CONTEXT.md` and one `docs/contracts/<slug>.md` per story. It asks you the open decisions one at a time. |
+| `sf-research` | Inventory the org for the domains your prompt names (data model, security, automation, UI, integration) and write one `docs/<domain>.md` each. The agent runs it on its own when a task needs it. |
+| `sf-plan` | Turn the research into a design contract: `docs/solution-design.md`, `docs/CONTEXT.md` and one `docs/contracts/<slug>.md` per story. It asks you the open decisions one at a time. |
 | `sf-build` | Optional. Build a large multi-story contract by dispatching the developer agent per work item, then run the review skills as a gate. |
 | `reviewing-apex` | Review Apex for governor limits, trigger design, security, async, error handling and test quality. |
 | `reviewing-lwc` | Review LWC for data sourcing, template and DOM traps, events and errors, performance and Jest. |
@@ -60,9 +60,10 @@ Four choices shape the repo:
 |---|---|
 | Validates, tests, the Code Analyzer and read-only org queries | A deploy to a sandbox, production, or any org that is not a scratch org |
 | A deploy to a scratch org (`isScratch: true` in `sf org list --json`), followed by a report of the alias, deploy ID and components | A destructive deploy, or a deploy to a scratch org someone else is using |
-| | Any git commit, unless you grant checkpoint commits, and every push |
+| Local commits on a working branch, one per reviewed work item | A push, a PR, a merge, or rewriting a branch someone else has |
 
-Only the main agent deploys. The full rule is `[no-deploy-without-approval]` in `rules/safety.md`.
+Only the main agent deploys or commits. The full rules are `[no-deploy-without-approval]` and
+`[commit-locally-ask-before-push]` in `rules/safety.md`.
 
 ## Shipping a planned feature
 
@@ -75,8 +76,13 @@ Only the main agent deploys. The full rule is `[no-deploy-without-approval]` in 
 3. **Build.** Build one story at a time from its `docs/contracts/<slug>.md`, or hand a large contract
    to `/sf-build`.
 
-You review between every stage. `/sf-plan` never starts the build. For ad-hoc fixes, reviews and
+The agent can run research and planning on its own when a task needs them. You review the plan
+before the build: `/sf-plan` never starts the build. For ad-hoc fixes, reviews and
 single config changes, skip the pipeline and use the skills directly.
+
+If you keep a task folder per ticket, pass `task-dir: <path>` to all three skills. The findings, the
+plan and one goal file per story then go into that folder, and the repo's `docs/` stays as it is.
+[docs/PIPELINE.md](docs/PIPELINE.md#task-folder-mode) has the layout.
 
 ### Example
 
@@ -187,7 +193,7 @@ One example of what the reviews catch: asked to add address verification against
 `architect` blocked the design before any Apex existed, because a callout per record breaks the
 100-callout limit on a 200-record load.
 
-The work-brief template, dispatch rules, checkpoint commits and four worked examples are in
+The work-brief template, dispatch rules, commit points and four worked examples are in
 [docs/ORCHESTRATION.md](docs/ORCHESTRATION.md).
 
 ## Roadmap

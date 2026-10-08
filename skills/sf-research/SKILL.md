@@ -1,8 +1,7 @@
 ---
 name: sf-research
-description: "Salesforce state-of-the-world discovery — one prompt-driven skill that inventories the current org/repo across five domains (data model, automation, integration, UI, security & licensing) and writes a reviewable docs/<domain>.md per in-scope domain. The request names which domains to look at; only those run. Single-purpose: it researches and writes/refreshes the docs only — it never writes docs/CONTEXT.md (sf-plan owns that, taking the objective straight from its own prompt). Safe to run unattended on a schedule to keep the org docs in sync. Surfaces the constraints that bite at planning time — master-detail on a populated object, order-of-execution conflicts, unsupported auth, the missing license — before sign-off, not mid-build. TRIGGER when: starting research/discovery before a design, or asked to inventory, map, audit, refresh, or persist an org's data model, automation, integrations, UI surfaces, sharing model, or license entitlements. DO NOT TRIGGER when: choosing an approach or designing (use sf-plan); building (authored directly per the project baseline); or reviewing (reviewing-*)."
+description: "Salesforce state-of-the-world discovery. Inventories the current org and repo for the domains the request names (data model, security and licensing, automation, UI, integration) and writes one reviewable docs/<domain>.md each, or, given task-dir:, one dated finding each in that task folder. Discovery only: it never designs and never writes docs/CONTEXT.md. Surfaces what bites at planning time (master-detail on a populated object, unsupported auth, a missing license). TRIGGER when: a change spans more than one domain or adds or changes schema, and no research covers those domains or it predates the change (the agent may invoke it on its own before planning); or asked to inventory, map, audit or refresh an org's data model, automation, integrations, UI, sharing or licenses. DO NOT TRIGGER when: the question is about one artifact and changes no schema (read or describe it directly); current research already covers the domain; designing (sf-plan); building; or reviewing (reviewing-*)."
 allowed-tools: Read, Grep, Glob, Bash, AskUserQuestion
-disable-model-invocation: true
 ---
 
 # Salesforce Research
@@ -16,15 +15,44 @@ One skill, five domains, prompt-driven: **the request names which domains to res
 run.** A feature touching data model, sharing, and automation researches those three and skips UI and
 integration — the prompt never named them.
 
-**It only ever writes `docs/<domain>.md`.** It does **not** write `docs/CONTEXT.md` or any handoff
+**It only ever writes `docs/<domain>.md`** (or, in task-folder mode, one finding per domain). It does **not** write `docs/CONTEXT.md` or any handoff
 file — planning gets its objective straight from the `/sf-plan` prompt, and `sf-plan` owns CONTEXT.md.
 Two ways it gets invoked, both producing the same output (just the domain docs):
 
 - **Before a design** — the prompt names a feature's domains; research those, scoped to the feature,
-  so a human can review the docs before `/sf-plan`.
+  so `sf-plan` (and a human, when they want to) can review the docs before planning.
 - **As a scheduled / unattended refresh** — run with no specific feature to **keep the org docs in
   sync** (e.g. a weekend job). This is the org-survey/refresh use: update the existing `docs/*`
   broadly across the in-scope domains. (See *Org-survey mode is opt-in* below.)
+
+## Task-folder mode — `task-dir: <path>`
+
+When the invocation carries `task-dir: <absolute path>` (a task folder a workflow's `/task-init`
+created), write into that folder instead of `docs/`. Without it, everything in this skill about
+`docs/<domain>.md` holds unchanged. Never guess a task folder; only an explicit `task-dir:` turns
+this mode on.
+
+- **Scope from the spec.** Read `<task-dir>/specs/spec-*.md` with `status: live` (the newest, if
+  several; if there is none, ask for the scope in one question or stop). Scope from **REQUIREMENTS > Committed** only: a *Not committed* item is out of scope and
+  is never researched as if agreed. Treat **OPEN QUESTIONS** as questions to answer from the repo
+  and org where they can be, and say in the finding which ones research answered.
+- **Write one finding per in-scope domain**, at
+  `<task-dir>/findings/finding-YYYY-MM-DD-research-<domain>.md` (`<domain>` is the table's domain
+  name: `data-model`, `security`, `automation`, `ui`, `integration`). It holds the same sections as
+  that domain's output contract below, under this frontmatter:
+
+  ```markdown
+  ---
+  source: specs/<spec file>
+  domain: <domain>
+  org: <alias, or repo-only>
+  ---
+  ```
+- **Findings are immutable.** Never edit an existing one. A re-run writes a new dated file, with a
+  `-2` suffix when today's already exists. Read the domain's latest earlier finding (and the repo's
+  `docs/<domain>.md`, if it keeps one) as starting context, and re-verify any claim you carry forward.
+- **Write nothing else.** No `docs/`, no goals, no ledgers, no `handover.md`; the project repo is
+  untouched.
 
 ## Domain selection (prompt-driven)
 
@@ -131,7 +159,8 @@ before it.
    Salesforce must match; the missing user/feature license; the Experience-Cloud architecture fork),
    and the greenfield-vs-established verdict. Use `AskUserQuestion` **only** for intent the code/org
    can't reveal (expected growth rate, internal-vs-customer audience, whether a Flow is admin-owned).
-3. **Document.** Write each in-scope domain's `docs/<domain>.md` from its output contract below,
+3. **Document.** Write each in-scope domain's `docs/<domain>.md` (or its finding, in task-folder
+   mode) from its output contract below,
    ending with the design-gating **Surprises & constraints** — and nothing else (no `docs/CONTEXT.md`).
    Keep each doc **scoped to the feature** by default — a later feature appends its own in-scope
    findings, so each doc is the union of what features have needed; a scheduled refresh run instead
@@ -140,7 +169,7 @@ before it.
 ## Per-domain output contracts
 
 Write the sections for each in-scope domain (omit one only if genuinely N/A; never pad). Each doc
-ends with **Surprises & constraints** — the design-gating findings a human must see before planning.
+ends with **Surprises & constraints** — the design-gating findings planning must see first.
 
 **Status line** — if no org was reachable, add it as the doc's first line:
 `> **Status: repo-only** — <domain> verified against force-app/** only, not org-confirmed.`
