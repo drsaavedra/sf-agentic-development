@@ -1,6 +1,6 @@
 ---
 name: sf-plan
-description: "Salesforce design and planning — turns the research docs (docs/data-model.md, docs/automation.md, docs/ui-design.md, docs/integration-patterns.md, docs/security-model.md, written by sf-research) into a verified, completeness-checked design contract before any build: docs/solution-design.md, docs/CONTEXT.md (objective, story index, work-item dispatch table, doc pointers), and one docs/contracts/<slug>.md per story. Takes the objective from its own prompt and owns docs/CONTEXT.md; makes the solution-shape and declarative-vs-code calls from the decision packs; does not re-explore the org — research already did. TRIGGER when: a feature or change needs more than one work item and has no live plan (the agent may invoke it on its own), or revising a design before a build. DO NOT TRIGGER when: a live plan already exists and the task is to build (build from it, or /sf-build); a single-artifact change or one-line fix (author directly); or a question that needs no design."
+description: "Salesforce design and planning. Turns sf-research's output into a verified, completeness-checked design contract before any build: docs/solution-design.md, docs/CONTEXT.md (objective, story index, dispatch table) and one docs/contracts/<slug>.md per story, or, given task-dir:, a dated plan and one goal file per story in that task folder. Makes the solution-shape and declarative-vs-code calls from its decision packs and runs sf-research first when research is missing; never re-explores the org itself and never starts the build. TRIGGER when: a feature or change needs more than one work item and has no live plan (the agent may invoke it on its own), or revising a design before a build. DO NOT TRIGGER when: a live plan exists and the task is to build (build from it, or /sf-build); a single-artifact change or one-line fix (author directly); or a question that needs no design."
 allowed-tools: Read, Grep, Glob, Bash, AskUserQuestion, Skill
 ---
 
@@ -15,6 +15,80 @@ only**: it does **not** re-explore the org or author any artifact (Apex, LWC, Fl
 research gathered the current state, and the **build stage** builds. End by handing off to the build
 stage — by default the user (or main agent) builds one story at a time from its contract; `/sf-build`
 is an optional orchestrated mode for large multi-story builds.
+
+## Task-folder mode — `task-dir: <path>`
+
+When the invocation carries `task-dir: <absolute path>` (a task folder a workflow's `/task-init`
+created), the plan lands in that folder and the story contract **is** the goal file, so no story is
+tracked in two places. Without it, everything below about `docs/` holds unchanged. Never guess a
+task folder; only an explicit `task-dir:` turns this mode on. Four things change:
+
+1. **Inputs.** The objective is the live spec, `<task-dir>/specs/spec-*.md` with `status: live`:
+   its **REQUIREMENTS > Committed** lines are the requirements. A *Not committed* line never becomes
+   a story; list it in the plan under **Out of scope**. Its **OPEN QUESTIONS** are decision points
+   to grill or to resolve as recorded assumptions. Read every `docs/<domain>.md` this skill names as
+   that domain's latest `<task-dir>/findings/finding-*-research-<domain>.md`; if one is missing,
+   run `sf-research` with the same `task-dir:`.
+2. **Write nothing under the project's `docs/`.** Where this skill says to refine
+   `docs/data-model.md` or `docs/automation.md` in place, record the settled name in the plan's
+   schema section instead; findings are immutable.
+3. **Outputs.** In place of the three `docs/` tiers:
+   - **The plan** — `<task-dir>/plans/plan-YYYY-MM-DD-<slug>.md`. It holds everything
+     `docs/solution-design.md` would, plus the `Architect review` line, an **Out of scope** list,
+     and the dispatch table with columns `# | Goal | Work item | Metadata type | Config or code |
+     Depends on` (`Goal` is the goal file's slug). There is no `Commit` column; the build records
+     hashes in `built.md`. Frontmatter:
+
+     ```markdown
+     ---
+     status: live
+     source: specs/<spec file>
+     research: [findings/<file>, ...]
+     ---
+     ```
+   - **One goal per story** — `<task-dir>/goals/<story-slug>.md`. It carries everything a
+     `docs/contracts/<slug>.md` would, so the build cuts its brief from it alone. The first goal in
+     build order is `active`, the rest `next`. `ticket:` is the spec's `source:` when that is a key,
+     otherwise the task folder's name:
+
+     ```markdown
+     ---
+     status: next
+     opened: YYYY-MM-DD
+     ticket: XX-0001
+     plan: plans/plan-YYYY-MM-DD-<slug>.md
+     depends-on: [<goal slugs>]
+     ---
+     # <the story as a one-line outcome>
+
+     ## OUTCOME
+     <1-3 sentences: what is true when the story is done>
+
+     ## ACCEPTANCE
+     - [ ] <one checkable box per acceptance or validation criterion>
+
+     ## STEPS
+     1. [ ] §1 <work item> (<metadata type>, config|code)
+
+     ## NOTES
+     ### §1 <work item>
+     Schema context, Test scenarios (given/when/then for every code item), Constraints, Expected
+     outputs. Then the story-local decisions, each with its reason.
+     ```
+   - **Ledger lines** — one per cross-cutting decision in `<task-dir>/decided.md`
+     (`- <decision> — because <one clause> → plans/<file>`) and one per losing alternative in
+     `<task-dir>/ruled-out.md` (`- <alternative>: <why it lost> → plans/<file>`), inserted under
+     each file's header paragraph, newest first. Never edit an existing line. The reasoning stays in
+     the plan.
+   - **Never** `docs/CONTEXT.md`, `handover.md` or anything under `docs/`.
+4. **Revise mode.** With a live plan already in `plans/`, write a **new** dated plan and set the old
+   one's frontmatter to `status: superseded-by plans/<new file>`, the only edit a plan ever takes.
+   Update affected goals in place (goals are mutable), never unticking a box the build ticked; add a
+   goal for a new story; give a goal for a dropped story a NOTES line naming the plan that dropped
+   it, and never delete it.
+
+The hand-off is the same: announce the plan and goal paths, print the summary, and stop before any
+build.
 
 ## Prerequisite — the research docs must exist
 
@@ -114,7 +188,8 @@ Proceed to the phases only once every needed research doc is present.
    choice the research surfaced as still open. Refine `docs/data-model.md` in place when a choice
    settles a name or relationship. This becomes each work item's *Schema context*.
 6. **Write the spec** — `docs/solution-design.md` (the design narrative), a lean `docs/CONTEXT.md`,
-   and the per-story `docs/contracts/<slug>.md` files, per the Output contract below. Scale detail to
+   and the per-story `docs/contracts/<slug>.md` files, per the Output contract below (in task-folder
+   mode, the plan, the goals and the ledger lines instead). Scale detail to
    complexity; do not pad a small change.
 7. **Completeness self-review (the gate)** — refuse to finish if any of these fail; fix and
    re-check:
