@@ -34,6 +34,10 @@ Prefer LDS over Apex for plain record CRUD — the framework manages cache and F
 
 **`@wire` needs a `cacheable=true` method; mutations go imperative.** Wiring to Apex only works when the method is cacheable, and cacheable methods must be read-only (no DML/callouts). Never `@wire` a save — call mutating, non-cacheable Apex imperatively from an event handler, then refresh the wired data (`refreshApex` / `notifyRecordUpdateAvailable`). Reaching for `@wire` on a method that writes is the tell.
 
+**An imperative call to a `cacheable=true` method is cached too.** Repeated identical parameters are served from the client-side Lightning cache, so measure before building a client memo or a server cache — identify requests by Apex class and method, not by counting `/aura` POSTs.
+
+**`@wire` re-emits for the same input on a cache refresh.** Rebuild dependent state only when the input identity changes (remember which input it was built for), never on every emit. Derive saved state from the displayed selection rather than keeping a parallel, index-keyed array that drifts on removal.
+
 **Fetch discipline:**
 
 - **In a namespaced package, data from an `@AuraEnabled` call carries the namespace on custom-field keys.** A raw `SObject` returned from packaged Apex arrives as `ns__Foo__c`, so `record.Foo__c` reads `undefined` with no error and downstream `.filter()`/`.map()` chains render nothing. Require the Apex side to return a typed DTO with unprefixed property names (see `reviewing-apex/references/aura-enabled.md`); flag any `record.Foo__c` in JS where `record` came from an `@AuraEnabled` method. This is the opposite of the `@salesforce/schema` rule above, where the module id must *not* carry the namespace.
