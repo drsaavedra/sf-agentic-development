@@ -211,24 +211,6 @@ it matters. The gaps, in build order:
 
 Rationale: [docs/VISION.md](docs/VISION.md).
 
-## Companion skills
-
-This repo is Salesforce-only. If you also want general coding-behaviour skills, two work alongside
-it without any wiring:
-
-- [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) curbs
-  overcomplication and unstated assumptions.
-  ```
-  /plugin marketplace add forrestchang/andrej-karpathy-skills
-  /plugin install andrej-karpathy-skills@karpathy-skills
-  ```
-- [Superpowers](https://github.com/obra/superpowers) adds brainstorming, plan-writing, TDD and
-  debugging workflows.
-  ```
-  /plugin marketplace add obra/superpowers-marketplace
-  /plugin install superpowers@superpowers-marketplace
-  ```
-
 ## Maintaining
 
 Editing the skills and rules, re-checking the reference packs against Salesforce's docs, and the
