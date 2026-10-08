@@ -80,6 +80,10 @@ The agent can run research and planning on its own when a task needs them. You r
 before the build: `/sf-plan` never starts the build. For ad-hoc fixes, reviews and
 single config changes, skip the pipeline and use the skills directly.
 
+If you keep a task folder per ticket, pass `task-dir: <path>` to all three skills. The findings, the
+plan and one goal file per story then go into that folder, and the repo's `docs/` stays as it is.
+[docs/PIPELINE.md](docs/PIPELINE.md#task-folder-mode) has the layout.
+
 ### Example
 
 A merge console that moves Account children onto a surviving Account touches the data model,

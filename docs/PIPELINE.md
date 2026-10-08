@@ -110,6 +110,18 @@ The dispatch table tags each item **config vs code**:
 - **code rows** → `/sf-build` cuts a work brief from the row's contract file and dispatches
   `salesforce-developer`.
 
+### Task-folder mode
+
+Pass `task-dir: <path>` to any of the three skills and the pipeline writes into a task folder
+instead of the project's `docs/`. That folder is the shape a workflow's `/task-init` creates, and
+holds `specs/`, `findings/`, `plans/`, `goals/` and the `decided.md`, `ruled-out.md` and `built.md`
+ledgers. `sf-research` writes one dated `findings/finding-YYYY-MM-DD-research-<domain>.md` per
+domain. `sf-plan` writes a dated `plans/plan-YYYY-MM-DD-<slug>.md` with the design and the dispatch
+table, plus one `goals/<story>.md` per story. That goal is the story's contract, so nothing is
+tracked twice. `sf-build` ticks each goal's steps with the commit hash and adds a `built.md` line.
+Both research and planning read only the spec's committed requirements. Use this mode in a team
+repo, where a per-ticket plan must not rewrite the shared `docs/solution-design.md`.
+
 ### Spec review and hand-off
 
 The spec review is a **manual step between `/sf-plan` and `/sf-build`**, owned by the human — not
