@@ -69,7 +69,7 @@ Scan every artifact against this checklist.
 | Batch errors vanish | `Database.RaisesPlatformEvents` + `BatchApexErrorEvent` subscriber |
 | Async for everything | Async only for callouts / volume / long-running |
 | Sync path that may exceed 5s | Keep sync work <5s (10–50 concurrent-long-running cap, by license count); offload slow work to async |
-| Publish/email per record | Aggregate — PE = DML/daily budget, email = 5,000/day org cap |
+| Publish/email per record | Aggregate — PE = 150 per transaction + hourly allocation, email = 5,000/day org cap |
 | `SeeAllData=true` | `@TestSetup` + `TestDataFactory` |
 | Coverage without assertions | Assert outcomes with `Assert` class |
 | No bulk test | 201+ records for triggers and bulk-facing services |
