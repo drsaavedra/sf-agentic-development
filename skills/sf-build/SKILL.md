@@ -1,6 +1,6 @@
 ---
 name: sf-build
-description: "Orchestrated Salesforce build-and-review pipeline. Reads the approved design contract at docs/CONTEXT.md (its work-item dispatch table) and the per-story docs/contracts/<slug>.md detail, authors config rows inline and dispatches the salesforce-developer agent per code work item, then runs the reviewing-* battery as a deterministic gate. TRIGGER when: the user asks to build, implement, or execute an existing spec (docs/CONTEXT.md is present) — e.g. 'build the spec', 'implement the plan', 'let's build it'. DO NOT TRIGGER when: no spec exists yet (run /sf-plan first); immediately after /sf-plan unless the user signals to proceed (the spec is meant to be reviewed first); or for ad-hoc edits, fixes, single-artifact config, or review-only tasks (author directly per the project baseline, or use the matching reviewing-* skill). Deploys remain human-gated regardless."
+description: "Orchestrated Salesforce build-and-review pipeline. Reads the approved design contract at docs/CONTEXT.md (its work-item dispatch table) and the per-story docs/contracts/<slug>.md detail, authors config rows inline and dispatches the salesforce-developer agent per code work item, then runs the reviewing-* battery as a deterministic gate. TRIGGER when: the user asks to build, implement, or execute an existing spec (docs/CONTEXT.md is present) — e.g. 'build the spec', 'implement the plan', 'let's build it'. DO NOT TRIGGER when: no spec exists yet (run /sf-plan first); immediately after /sf-plan unless the user signals to proceed (the spec is meant to be reviewed first); or for ad-hoc edits, fixes, single-artifact config, or review-only tasks (author directly per the project baseline, or use the matching reviewing-* skill). Deploys follow [no-deploy-without-approval] in rules/safety.md."
 allowed-tools: Agent, Skill, Read, Grep, Glob, Bash
 disable-model-invocation: true
 ---
@@ -95,7 +95,9 @@ frontmatter flag, so it holds across every assistant.
 - **Deploys follow `[no-deploy-without-approval]` in `rules/safety.md`.** Validate freely. The main
   agent deploys to a scratch org (`isScratch: true` in `sf org list --json`) without asking and
   reports the alias, deploy ID and components; every other target, and any destructive payload,
-  waits for explicit user approval with the target, payload and effect stated.
+  waits for explicit user approval with the target, payload and effect stated. Two cases ask even
+  on a scratch org: one someone else is using or that is a snapshot source, and any deploy step
+  carried in from a plan or handover, which you restate before running.
 - **After a deploy, prove what landed.** Read each component back through the Tooling API
   (`ApexClass.Body`, `LightningComponentResource.Source`) and match a string only the new version
   holds; a deploy's per-component rows are not evidence. Hard-reload any open Lightning tab before
