@@ -59,6 +59,8 @@ Scan every artifact against this checklist.
 | LWC test: wire never emits | Append to `document.body` first; `await flushPromises()` |
 | LWC test: stale state between tests | `document.body.removeChild(element)` in `afterEach` |
 | LWC test: hand-rolled LDS mock | Derive from real UI API snapshot; use wire-service-jest-util |
+| LWC test: `toEqual` on DOM nodes / `clearAllMocks` with `Once` mocks | `toBe` for identity; `mockReset()` drains queued values |
+| LWC test: only 1–3 row fixtures | Add one fixture at production size |
 
 ## Detailed Rules (read the file matching the artifact)
 
