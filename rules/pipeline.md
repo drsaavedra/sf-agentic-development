@@ -2,7 +2,8 @@
 
 > **Three stages for a planned feature — Research → Plan → Build, with one human gate: before Build.**
 > The agent runs `sf-research` and `sf-plan` on its own when a task needs them; it never starts a
-> build from a plan nobody has asked it to build.
+> build from a plan nobody has asked it to build. Approving a plan is not a request to build it: the
+> build starts only when the user says build.
 > **Research:** run `/sf-research` — one prompt-driven skill that reads which domains your prompt
 > names and writes a state-of-the-world `docs/<domain>.md` per in-scope domain. **Plan:** `/sf-plan` turns those docs into a
 > design contract — `docs/solution-design.md` + a lean `docs/CONTEXT.md` + per-story
@@ -35,8 +36,9 @@ integration depends on the automation that drives it). Domain → doc, in that o
 | Existing LWC/Flow/page surfaces & reusable components, placement, internal-vs-Experience-Cloud, design/accessibility constraints | `docs/ui-design.md` |
 | External systems, the auth they support, existing Named/External Credentials, data format & limits, events | `docs/integration-patterns.md` |
 
-`sf-research` only ever writes these `docs/<domain>.md` files — never `docs/CONTEXT.md` (that is
+`sf-research` only ever writes these `docs/<domain>.md` files (or, given `task-dir:`, dated findings in
+that task folder; see `docs/PIPELINE.md#task-folder-mode`) — never `docs/CONTEXT.md` (that is
 `/sf-plan`'s, built from the objective you give `/sf-plan` directly). It can also run on a schedule to
 keep the org docs in sync. The research docs are `/sf-plan`'s required input — it runs research first
 if one a feature needs is missing. `/sf-plan` then refines `docs/data-model.md` and
-`docs/automation.md` in place.
+`docs/automation.md` in place, except in task-folder mode, where it never writes `docs/`.

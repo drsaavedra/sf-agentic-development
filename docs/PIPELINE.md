@@ -84,9 +84,9 @@ contract.
 
 ```
 /sf-plan  →  docs/CONTEXT.md       →  [spec reviewed]  →  [user signals "build it"]  →  dev agent ─┐
- (soft gate,    (+ docs/contracts/    (dev/architect      (soft gate: description                  → architect ─┤→ review battery
-  context kept,   <slug>.md per        review first)        TRIGGER rules + body                                │
-  no plan mode)   user story)                               instruction)             reads contract ────────────┘
+ (auto-runs,    (+ docs/contracts/    (dev/architect      (gate: the frontmatter                   → architect ─┤→ review battery
+  context kept,   <slug>.md per        review first)        flag disable-model-                                 │
+  no plan mode)   user story)                               invocation)              reads contract ────────────┘
 ```
 
 **Output contract.** The plan is written in **two tiers**:
@@ -134,8 +134,8 @@ automated inside either skill. The flow at the end of `/sf-plan`:
    relevant `docs/contracts/<slug>.md`) for the full detail, and to have the developer/architect
    review the spec.
 4. Only then does the build proceed — the user signals to build (by typing `/sf-build` or asking
-   in prose). `sf-plan` never chains into a build itself, and `sf-build`'s `DO NOT TRIGGER` rules
-   keep it from auto-firing straight out of planning, so the review checkpoint holds.
+   in prose). `sf-plan` never chains into a build itself, and `sf-build`'s `disable-model-invocation`
+   flag keeps it from auto-firing straight out of planning, so the review checkpoint holds.
 
 ### Architect review — triggered by data, not judgment
 
