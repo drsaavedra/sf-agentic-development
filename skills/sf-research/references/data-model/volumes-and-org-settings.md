@@ -49,13 +49,18 @@ diverges). CMT is the modern preference for new app config.
 
 ## Org-wide settings that reshape the model
 
-These change the model org-wide; check them before designing.
+These change the model org-wide; check them before designing. Describe and SOQL read through the
+running user's access, so `NOT_FOUND` / `INVALID_TYPE` can mean hidden, not off: pair each probe with
+a control object the org must have (e.g. `Contact`), and read a toggle from Settings metadata where
+one exists.
 
 - **Person Accounts** — enabled? `sf sobject describe --sobject Account` shows
   `IsPersonAccount`/person fields, or query `SELECT IsPersonAccount FROM Account LIMIT 1`. Person
   Accounts merge Account+Contact and change relationship design.
-- **Multi-currency** — `sf data query --query "SELECT IsoCode FROM CurrencyType"` (errors if not
-  enabled). Adds `CurrencyIsoCode` to objects and affects roll-ups/reporting.
+- **Multi-currency** — `sf project retrieve start --metadata "Settings:Currency" --target-metadata-dir
+  <tmp> --unzip` → `enableMultiCurrency`. A `CurrencyType` query error is not proof: it fails the same
+  way when the user cannot see the object. Adds `CurrencyIsoCode` to objects and affects
+  roll-ups/reporting.
 - **State/Country picklists** — affects address fields; note if enabled.
 
 ## What to hand to the doc

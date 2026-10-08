@@ -83,7 +83,20 @@ These hold for every in-scope domain:
   the user to run Developer Console or anonymous Apex for what these answer. **If no org is connected,
   verify against `force-app/**` alone and flag the doc `repo-only`** — never silently assume an
   org-verified name. **Licenses especially must be org-confirmed** — the repo can't show what the org
-  is entitled to; with no org, flag licensing `UNCONFIRMED`.
+  is entitled to; with no org, flag licensing `UNCONFIRMED`. Describe and SOQL read through the
+  connected user's access, so `NOT_FOUND`, `INVALID_TYPE` or a missing field can mean hidden, not
+  absent: pair each probe with a control object the org must have, and read feature toggles from
+  Settings metadata.
+- **Every behaviour claim carries its proof.** A statement about how the platform or existing code
+  behaves ("this status is unused", "the rule covers child records") cites the grep, query or doc
+  that proved it, or is labelled `unverified`. When citing a doc, quote any scope-limit sentence
+  next to the mechanism ("X is intended to include only Y"); a workaround read without its scope is
+  a common wrong design input.
+- **Packaging support is a constraint.** When the repo builds a managed or unlocked package, check
+  the Metadata Coverage Report for each metadata type the feature may need, and record unsupported
+  ones under Surprises & constraints. Metadata outside the `packageDirectories` in
+  `sfdx-project.json` (an `mdapi/` folder, for example) never ships in the package, so record which
+  side of that line each piece of the feature must sit on.
 - **Inventory before recommend.** Record what exists — objects, fields, components, credentials,
   permission sets, framework patterns — before naming any gap. Reuse-before-invent throughout: an
   existing field, component, or credential usually beats a new one, and `sf-plan` can only choose
@@ -91,6 +104,8 @@ These hold for every in-scope domain:
 - **Name the absence too.** "No trigger handler framework; triggers carry logic inline" or "no
   OpenAPI spec" is a finding that shapes the plan as much as a found pattern. Don't fabricate counts —
   record volumes come from a `COUNT()` query; with no org, write "unknown (repo-only)", not a number.
+  A count from a scratch or sandbox org describes that org's population, not production's: name the
+  org beside the number, and never generalise from a smaller set.
 - **Discovery only.** This skill does not choose the automation/UI/integration approach, decide
   standard-vs-custom, or design the sharing model — all of that is `sf-plan`. Surface the constraints
   that gate those decisions; don't make them.

@@ -45,5 +45,11 @@ The recommended hybrid: a Record-Triggered Flow owns the entry criteria and orch
 
 - Name flows consistently: `<Object>_<Purpose>_<TriggerEvent>` (e.g., `Account_SetDefaults_BeforeInsert`, `Opportunity_NotifyOwner_AfterClosedWon`).
 - Label every Decision outcome and every Loop element descriptively. "Outcome 1" is not a label.
-- Deactivate and delete obsolete flow versions. Stale versions accumulate in deployments, complicate debugging, and make change sets unpredictable.
+- **Check `<status>` on every `.flow-meta.xml` in the changeset.** Flow Builder writes `Draft` into a retrieved file whenever the working version is not the active one, and `Draft` renders as **Inactive** in the UI — so deploying that file leaves the automation switched off with no deploy error. A flow intended to run must read `<status>Active</status>` in source; in production, activating on deploy additionally requires the **Deploy Processes and Flows as Active** preference (flows active in a sandbox deploy to production as inactive by default). "It worked yesterday" is not evidence: each deploy creates a new version and obsoletes the previous one, and `sf project retrieve -m Flow:Name` returns the org's **active** version, not the one you deployed.
+- Deactivate and delete obsolete flow versions. Stale versions accumulate in deployments, complicate debugging, and make change sets unpredictable. An obsolete version still holds its metadata references, so deleting something an old version used (a custom permission, a field) fails with "referenced elsewhere … Flow Version" — purge the obsolete versions in an earlier deploy.
 - Treat active flow changes as code changes: version-control the flow-meta.xml, review in a change set or source deploy, do not edit active flows directly in production.
+
+## Formula and visibility traps
+
+- **`$Permission` is rejected in a screen component's visibility rule** (a deploy error), although a Decision accepts it. Evaluate it in a Decision, store the result in a Boolean variable, and key visibility off that variable.
+- **DateTime minus DateTime returns days.** Multiply by 24 for hours; dividing by 24, or rounding the result to a small scale, turns short durations into 0. Check the unit arithmetic in every formula field and flow formula resource that subtracts dates or times.

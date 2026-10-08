@@ -33,12 +33,17 @@ Salesforce's *Integration Patterns and Practices*.)
 
 | Scenario | Pattern | Typical implementation |
 |---|---|---|
-| Outbound; you need the response now (synchronous) | Remote Process Invocation — **Request and Reply** | External Services / Flow HTTP Callout / Apex callout. From a UI action use an **async continuation** to avoid synchronous-callout limits |
+| Outbound; you need the response now (synchronous) | Remote Process Invocation — **Request and Reply** | External Services / Flow HTTP Callout / Apex callout. From a UI action, an Apex **Continuation** keeps the UI responsive but raises no limit (see below) |
 | Outbound; you don't wait for completion | Remote Process Invocation — **Fire and Forget** | **Platform Event** (preferred) or async Apex callout |
 | An external system creates/reads/updates/deletes Salesforce data | **Remote Call-In** | Inbound REST / SOAP / Bulk / Pub-Sub API |
 | Keep data aligned both directions, in bulk | **Batch Data Synchronization** | Bulk API / ETL / middleware on a schedule (off-platform) |
 | The Salesforce UI must update when data changes | **UI Update Based on Data Changes** | **Platform Events / CDC** streamed over the Pub/Sub API (`empApi` in LWC) |
 | Show external data without storing it | **Data Virtualization** | **Salesforce Connect + External Objects** |
+
+**A Continuation is a UX choice, not a limits fix.** Since Winter '20 every callout is excluded from
+the long-running-request limit, so a Continuation gains nothing there; Salesforce still recommends it
+for responsiveness. It caps at 120 s and 3 callouts, and only one can be in progress per client. Work
+longer than ~2 minutes must leave the request: return the result by Platform Event or a polled record.
 
 **Callouts can't run in a trigger's synchronous context.** A fire-and-forget reaction to a data
 change goes through a **Platform Event** or async Apex (Queueable), never a direct callout in the
@@ -54,6 +59,21 @@ trigger.
   Salesforce **record changes** without defining custom events.
 - Both decouple producer from consumer. Choose **CDC** when the trigger is "a record changed";
   choose **Platform Events** when it's "a business event you define."
+- **Neither respects record sharing.** CDC "ignores sharing settings and sends change events for all
+  records of a Salesforce object", and its subscriber needs View All Records on the object (View All
+  Data or View All Users for some objects). Every platform-event subscriber with Read on the event
+  receives every message, so a correlation id in the payload is not authorization: never put data in
+  an event that some subscriber may not see.
+- **Delivery is counted per subscriber, not per event.** For `empApi` the delivery allocation is "per
+  channel and per unique browser session", and each logged-in `empApi` user counts as one concurrent
+  client. Size by concurrent users × channels.
+- **Publish Immediately (the default) publishes even if the transaction rolls back**, so a subscriber
+  can act on data that never committed. Choose Publish After Commit when the subscriber needs the
+  committed record.
+- **Publishing over REST, SOAP or Bulk API also spends daily API requests**; publishing from Pub/Sub
+  API, Apex or Flow does not.
+- **An LWC subscriber hears events only while a browser has it loaded.** A result that must land when
+  nobody is watching needs a server-side subscriber (an Apex trigger on the event).
 
 ## Where it meets the rest of the design
 
@@ -73,7 +93,13 @@ trigger.
   data changes asynchronously (Platform Event / Queueable). Bulk-safe by construction (reviewed by
   `reviewing-apex`).
 - **Design for failure** — idempotency (safe re-invocation), error handling, and retry/recovery;
-  don't commit Salesforce changes until the remote success is confirmed.
+  don't commit Salesforce changes until the remote success is confirmed. Assume at-least-once
+  delivery: a callout answered `503` has been observed arriving twice (resent by Salesforce or a proxy, not
+  documented), so give every
+  non-idempotent endpoint a client-computed dedupe key.
+- **Grant External Credential principal access** in the same permission set as the entry point; without
+  it the callout fails for every non-admin. Post-install scripts run without it. The token a Named
+  Credential mints never reaches Apex, so no design can forward it to browser code or another service.
 - The integration **build** — the Named Credential / External Credential, External Service,
   Platform Event, or CDC plumbing plus any callout Apex — is authored directly at build time;
   this pack picks the *approach*.

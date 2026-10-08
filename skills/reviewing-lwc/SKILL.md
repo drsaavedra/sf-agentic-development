@@ -27,6 +27,10 @@ Scan every artifact against this checklist.
 | LWC: public `@api` Boolean initialized to `true` | Default it `false` (else `LWC1503`); invert the property name or derive the effective value with a getter |
 | LWC: light DOM on sensitive data | Keep shadow DOM; light DOM only for styling/a11y-linking/analytics/SSR |
 | LWC: `for:each` index key | Use a stable id (`key={item.Id}`), never the loop index |
+| LWC: `lwc:if` sibling beside `for:each` items, or two keyed siblings per iteration | Stable child shape — unconditional sibling, one keyed wrapper per iteration |
+| LWC: `splice(indexOf(obj), 1)` / `includes(obj)` on copied objects | Match by key with `findIndex`; guard `-1` |
+| LWC: `checked={false}` to reset a ticked box | Reset `input.checked` imperatively |
+| LWC: `on*` binding to an undefined method | Silent at compile, deploy and runtime — check each binding resolves |
 | LWC: `if:true`/`if:false` | Superseded, slated for removal — use `lwc:if` / `lwc:elseif` / `lwc:else` |
 | LWC: mutating wire data | Shallow-copy first (`{ ...data }`); wire data is frozen |
 | LWC: `JSON.parse(JSON.stringify())` copy | Shallow-copy the level you edit; never JSON round-trip |
@@ -43,9 +47,17 @@ Scan every artifact against this checklist.
 | LWC: object arg into an untyped Apex `Object` / `Map<String,Object>` param | Match the Apex inbound type — send primitives / `Map<String,String>`; untyped `Object` params fail JSON deserialization and the arg arrives `null` |
 | LWC: bare `Event` / object in `detail` | `CustomEvent` with primitive payload; copy objects; pass record Id only |
 | LWC: `window.location` navigation | `NavigationMixin` from `lightning/navigation` |
+| LWC: `NavigationMixin` in a `LightningModal` class | Silent no-op — navigate from a `LightningElement` child or from the launcher after `close()` |
+| LWC: `blob:` / `data:` URI as iframe `src` | LWS allows `http://` / `https://` only — use a relative page URL |
+| LWC: guard/teardown keyed on a value the template never reads | No re-render is scheduled — bind it, use a setter, or dispatch from each mutation site |
+| LWC: own namespace in a `@salesforce/schema` module id | Compile error `LWC1504` — omit the prefix; UI API *string* field names keep it |
+| LWC: error handler referencing an undefined identifier | It throws before reporting, so the failure is silent — lint it and test a failure path |
+| LWC: `.catch(() => undefined)` / empty `catch {}` | Surface or log the failure; test that path once |
+| LWC: `message` listener trusting `event.origin` alone | Check `event.source === iframe.contentWindow` — VF pages in a namespace share an origin |
 | LWC: LMS subscription leak | `unsubscribe(this._subscription)` in `disconnectedCallback` |
 | LWC: window/document listener leak | `removeEventListener` in `disconnectedCallback` |
 | LWC: cross-shadow DOM access | Communicate via `@api` methods and events |
+| LWC: edited bundle with `apiVersion` behind the orgs' latest | Bump to what `/services/data/` lists last on the org and Dev Hub; prove it with a validate |
 | LWC: hardcoded SLDS tokens | Use SLDS 2 styling hooks (CSS custom properties) |
 | LWC: bubbles+composed by default | Set only when the event must cross component namespace boundaries |
 | LWC: unjustified `setTimeout`/`setInterval` | Lint-restricted; debounce/poll only, with cleanup in `disconnectedCallback` |
@@ -54,6 +66,8 @@ Scan every artifact against this checklist.
 | LWC test: wire never emits | Append to `document.body` first; `await flushPromises()` |
 | LWC test: stale state between tests | `document.body.removeChild(element)` in `afterEach` |
 | LWC test: hand-rolled LDS mock | Derive from real UI API snapshot; use wire-service-jest-util |
+| LWC test: `toEqual` on DOM nodes / `clearAllMocks` with `Once` mocks | `toBe` for identity; `mockReset()` drains queued values |
+| LWC test: only 1–3 row fixtures | Add one fixture at production size |
 
 ## Detailed Rules (read the file matching the artifact)
 

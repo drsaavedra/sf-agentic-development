@@ -82,7 +82,10 @@ Proceed to the phases only once every needed research doc is present.
    `docs/security-model.md` — plus the artifacts the prompt names, and from their current-state
    picture form a **candidate solution map**: what likely needs to change, what to reuse, and the
    open decision points — *before* you ask anything. You do **not** re-run org introspection; the
-   research stage did that. The map is what you grill against.
+   research stage did that. The map is what you grill against. Size it to the whole surface: a
+   requirement names the instance someone saw, and often the mechanism they expect to fix it. Check
+   what else that mechanism reaches and how much of the problem the named mechanism actually covers;
+   if it covers only part, say so in your first question.
 2. **Grill the map into shared understanding** — confirm the candidate solution one decision at a
    time, each as a **brief framing line + `AskUserQuestion` picker** (recommended option first,
    tradeoffs in the option descriptions). Resolve the decision tree branch by branch — including
@@ -98,6 +101,8 @@ Proceed to the phases only once every needed research doc is present.
    Apex-trigger-owned domain; configure an existing feature/managed package vs build custom;
    real-time vs event-driven/async as the overall style. The chosen shape frames the triage and
    schema below. Skip this phase when one shape is obviously right — don't manufacture alternatives.
+   Every "why not X" must name a property the recommended shape has and X lacks; a weakness both
+   share is not a reason to reject X.
 4. **Declarative-vs-code triage (per capability)** — within the chosen shape, decide config or code
    for each capability, working from the automation, UI, integration, and security decision packs (see
    *Decision references*). This is the per-piece tool choice (e.g. this rollup → roll-up summary
@@ -117,6 +122,9 @@ Proceed to the phases only once every needed research doc is present.
    - every requirement has a home (a work-item row),
    - every object/field/relationship API name is pinned from the research docs (not guessed); any
      research gap was sent back to `sf-research`, not patched over,
+   - every claim about existing behaviour ("unused, safe to delete", "nothing else writes this
+     field") cites the grep or query that proves it — a premise carried in from the request is not
+     evidence,
    - every **code** item carries concrete given/when/then test scenarios,
    - security is addressed (permission set / FLS / sharing model — from the security decision pack),
    - the design is bulk-safe and scales as data grows (assume it will),

@@ -60,10 +60,9 @@ Fetch with WebFetch/WebSearch; route by URL shape:
 
 | Source URL | How to fetch |
 |---|---|
-| `developer.salesforce.com/docs/platform/…` (LWC, newer dev docs) | WebFetch — renders the article body |
+| `developer.salesforce.com/docs/…` (any path — `platform/…` and `atlas.en-us.*` both answer 403 to WebFetch) | The guide's PDF at `https://resources.docs.salesforce.com/latest/latest/en-us/sfdc/pdf/<guide>.pdf` (e.g. `api_meta`, `api_ui`, `lightning`, `platform_events`, `salesforce_apex_developer_guide`), converted to text and grepped for the anchors; WebSearch for the LWC guide, which is not mirrored |
 | `help.salesforce.com/s/articleView…` | WebFetch; if it returns a shell, WebSearch the article title for the indexed body |
 | `lightningdesignsystem.com/…` | WebFetch |
-| **`developer.salesforce.com/docs/atlas.en-us.*`** (most Apex docs) | **WebSearch against developer.salesforce.com** — these pages are JS shells to direct fetches. Use the indexed snippet + current canonical URL. |
 
 ## Manifest entry reference (`scripts/reference-sources.json`)
 
@@ -98,7 +97,7 @@ Gate outcomes you're clearing: `UNTRACKED` (no entry), `NEVER VALIDATED` (null d
 | Mistake | Why it's wrong |
 |---|---|
 | Bumping `lastValidated` without fetching | The gate trusts the date — this ships stale guidance past a green check. The whole point of the run defeated. |
-| Direct-fetching `atlas.en-us.*` Apex pages | They return a JS shell, not the article. Use WebSearch for those. |
+| Direct-fetching any `developer.salesforce.com/docs` page | It answers 403. Use the PDF mirror, or WebSearch for the unmirrored LWC guide. |
 | Softening a retired feature to "legacy" instead of deleting | Step 3 says cut deprecated claims. Stale guidance kept as prose still misleads. |
 | Deleting a `.md` but leaving its manifest entry (or vice-versa) | Trips `MISSING FILE` / `UNTRACKED`. File and entry move together. |
 | Bumping an `expertise` entry on the doc cadence | Expertise packs have no doc source and are skipped by the gate — there's nothing to reground. |

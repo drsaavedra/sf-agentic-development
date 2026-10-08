@@ -81,6 +81,17 @@ all of them, prioritize the defects that pass a developer sandbox but fail in pr
 - **Security** — CRUD/FLS enforcement, `with sharing`, injection, no secrets or hardcoded IDs.
 - **Architecture & maintainability** — separation of concerns, error handling, no dead code.
 - **Test quality** — meaningful assertions and bulk (251+) coverage, not just a coverage percentage.
+  Ask of each new test whether it would fail if the code it covers were deleted; one that would not
+  is a High finding.
+
+**Triage before raising a finding.** Report only on components the change touched: a pre-existing
+defect in a touched file stays in, while one in an untouched file goes under *Parked*. For each
+finding, say whether a user can reach it, whether this change caused it (compare the base branch's
+copy of the file, not just the diff), and how its fix will be proven.
+
+**Make your own checks falsifiable.** When an analyzer run or sweep reports nothing, state how many
+files it covered and confirm it actually ran on them: a misconfigured analyzer or a glob that
+matches nothing reads as clean.
 
 ## Output artifact
 
@@ -93,6 +104,7 @@ clearly labelled section:
 ### Status: [APPROVED / APPROVED WITH MINOR ISSUES / CHANGES REQUESTED]
 #### Critical / High — [each with file:line, the rule it breaks, and the fix] or None
 #### Medium / Low — [...] or None
+#### Parked — pre-existing, outside the change — [...] or None
 #### Recommended Actions — [numbered, concrete enough to become a fix brief]
 ```
 
@@ -105,5 +117,5 @@ report is append-only history.
 
 - Writing any Apex or generating any metadata — you review, not build.
 - Spec / requirement gap analysis against a design contract — that is the `architect` agent.
-- Deployment — handled by the main agent or developer after review.
+- Deployment — handled by the main agent under `[no-deploy-without-approval]` in `rules/safety.md`.
 - Git operations — never commit, branch, or otherwise run git.

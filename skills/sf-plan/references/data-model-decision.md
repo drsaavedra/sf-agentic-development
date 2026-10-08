@@ -28,6 +28,13 @@ object can't be the detail side**, you **can't add a master-detail relationship 
 already has data** (create it as a lookup, then convert), and converting master-detail → lookup
 first requires removing any roll-up summary fields.
 
+**A lookup's delete option sets its lock contention.** Inserting or updating a record with a lookup
+locks the parent unless the lookup is set to *clear the value of this field* when the parent is
+deleted (Salesforce Record Locking cheat sheet); master-detail always locks the master. On high
+fan-in reference data — a category, a location, a product type that many concurrent writes share —
+the restrictive option becomes `UNABLE_TO_LOCK_ROW` under load. Choose *clear the value* unless
+deletion protection is required, and include shared-parent contention in any load test.
+
 ## Where data and configuration live
 
 | Store in… | For… |
@@ -36,7 +43,7 @@ first requires removing any roll-up summary fields.
 | **Custom Metadata Type** | App configuration and mappings that deploy **with their records** (package/upgrade-safe), read-cached, managed by release/admin — not written per-user at runtime |
 | **Custom Setting (hierarchy)** | Org/profile/user-level defaults read at runtime, cached |
 | **Custom Setting (list)** | Static reusable reference data, cached — though **CMT is the modern preference** for new work |
-| **Platform Cache** | Transient, short-lived computed/session data — never a system of record |
+| **Platform Cache** | Transient, short-lived computed/session data — never a system of record. Not for keys with no fixed set (search terms), which are evicted before reuse; `Cache.Org` is shared by every user, so never put sharing-filtered results there |
 | **Big Object** | Very high volume, append-mostly history (queried by index via SOQL or Async SOQL); no standard triggers/sharing |
 | **External Object** | Data that stays **off-platform**, surfaced on demand via Salesforce Connect (data tiering) |
 

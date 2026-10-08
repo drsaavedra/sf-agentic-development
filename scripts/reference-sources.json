@@ -1,5 +1,5 @@
 {
-  "_comment": "Maintainer manifest for skill/agent reference packs AND each skill's own SKILL.md body (the Quick Reference carries the same release-sensitive claims, so it is audited too). Tracks which are grounded in official Salesforce docs, the sources they were grounded against, and when each was last re-validated. Run `npm run validate:refs` each release; re-ground flagged entries by fetching their sources (WebFetch/WebSearch), update the file, and bump lastValidated. URLs here are audit TARGETS — the grounding pass confirms each one resolves and repairs it if Salesforce moved or retired the page. Prefer the newer /docs/platform/... developer-doc URLs: they fetch cleanly, whereas legacy atlas.en-us.* pages often return only a shell (use WebSearch for those). Pure process/orchestration skills (sf-plan, sf-build) are basis 'expertise' — workflow, not platform facts. See docs/MAINTAINING.md.",
+  "_comment": "Maintainer manifest for skill/agent reference packs AND each skill's own SKILL.md body (the Quick Reference carries the same release-sensitive claims, so it is audited too). Tracks which are grounded in official Salesforce docs, the sources they were grounded against, and when each was last re-validated. Run `npm run validate:refs` each release; re-ground flagged entries by fetching their sources (WebFetch/WebSearch), update the file, and bump lastValidated. URLs here are audit TARGETS — the grounding pass confirms each one resolves and repairs it if Salesforce moved or retired the page. developer.salesforce.com pages answer 403 to WebFetch, so fetch the same guide as a PDF from resources.docs.salesforce.com/latest/latest/en-us/sfdc/pdf/<guide>.pdf (WebSearch for the unmirrored LWC guide). Pure process/orchestration skills (sf-plan, sf-build) are basis 'expertise' — workflow, not platform facts. See docs/MAINTAINING.md.",
   "stalenessDays": 180,
   "references": {
     "skills/reviewing-apex/SKILL.md": {
@@ -86,6 +86,10 @@
         {
           "url": "https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_gov_limits.htm",
           "anchors": ["asynchronous", "concurrent batch", "queueable", "50 million records"]
+        },
+        {
+          "url": "https://resources.docs.salesforce.com/latest/latest/en-us/sfdc/pdf/lightning.pdf",
+          "anchors": ["no longer offer an advantage", "only one continuation in progress", "three callouts"]
         }
       ]
     },
@@ -411,6 +415,10 @@
       "lastValidated": "2026-06-20",
       "sources": [
         {
+          "url": "https://resources.docs.salesforce.com/rel1/doc/en-us/static/pdf/SF_Record-Locking-Cheatsheet_web.pdf",
+          "anchors": ["Locks only occur if lookup", "clear the value of this field"]
+        },
+        {
           "url": "https://help.salesforce.com/s/articleView?id=platform.relationships_considerations.htm&type=5",
           "anchors": ["master-detail", "junction", "lookup", "roll-up summary"]
         },
@@ -483,6 +491,18 @@
         {
           "url": "https://developer.salesforce.com/docs/atlas.en-us.platform_events.meta/platform_events/platform_events_intro.htm",
           "anchors": ["Platform Event", "Change Data Capture", "Pub/Sub API"]
+        },
+        {
+          "url": "https://resources.docs.salesforce.com/latest/latest/en-us/sfdc/pdf/lightning.pdf",
+          "anchors": ["no longer offer an advantage", "only one continuation in progress", "three callouts"]
+        },
+        {
+          "url": "https://resources.docs.salesforce.com/latest/latest/en-us/sfdc/pdf/platform_events.pdf",
+          "anchors": ["per unique browser session", "regardless of whether the transaction succeeds", "API request allocations are consumed"]
+        },
+        {
+          "url": "https://resources.docs.salesforce.com/latest/latest/en-us/sfdc/pdf/salesforce_change_data_capture.pdf",
+          "anchors": ["ignores sharing settings", "View All Records"]
         }
       ]
     },

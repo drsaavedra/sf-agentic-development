@@ -4,6 +4,9 @@ original-file/
 research/
 docs/superpowers/
 
+# Whatever install.sh displaced from the Claude config dir or a project's .claude/rules/
+.install-backup/
+
 # OS
 .DS_Store
 Thumbs.db

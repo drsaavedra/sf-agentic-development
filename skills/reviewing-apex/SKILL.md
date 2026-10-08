@@ -36,10 +36,24 @@ Scan every artifact against this checklist.
 | Mixed automation on same object | One automation strategy per object |
 | No CRUD/FLS | `WITH USER_MODE` + `AccessLevel.USER_MODE` (the default at API v67+; check the class API version) |
 | `WITH SECURITY_ENFORCED` | Removed at API v67+ — migrate to `WITH USER_MODE` |
+| `WITH USER_MODE` traversing a parent the persona can't read | Grant object Read on every traversed object — else `No such column` |
+| `SYSTEM_MODE` write inside a `with sharing` class | Sharing still applies — private `without sharing` writer, outer class stays `with sharing` |
+| `UserRecordAccess ... RecordId IN` / `OwnerId == UserInfo.getUserId()` | `UserRecordAccess.HasEditAccess` on the row query — no 200-id cap, honours sharing (not restriction rules) |
+| Removing or renaming a shipped `@AuraEnabled` method | Keep it for a release — open tabs still call the old name |
+| Callout after uncommitted DML | Callout first, or move the DML to another transaction |
+| `bulk` / `from` as identifiers | Reserved words — the compile error points at a different token |
 | Untyped `Object` / `Map<String,Object>` / `List<Object>` as an `@AuraEnabled` **inbound** param or wrapper field | Concrete types (`Map<String,String>`, typed DTO) — JS→Apex JSON can't deserialize `Object` (arg arrives `null`); assemble rich shapes server-side |
+| Raw `SObject` returned from `@AuraEnabled` in a namespaced package | Typed DTO with unprefixed props — packaged custom fields serialize as `ns__Foo__c`, so the LWC reads `undefined` silently |
+| New entry-point class absent from any permission set's `classAccesses` | Ship the grant as metadata in the same changeset — works for the admin, inert for every other persona; no gate catches it |
+| Elevating `@InvocableMethod` guarded only by the calling Flow | Guard inside the Apex — invocables are reachable from any Flow and the Actions REST API |
+| Setup-object DML mixed with regular DML | `MIXED_DML_OPERATION` at runtime — split the transaction (`System.runAs` in tests, Queueable in prod) |
+| `global` on a member that is not subscriber-facing API | `public` — packaged `global` can never be renamed, narrowed, or removed |
 | State-changing callout from LWC | Initiate from trigger / Platform Event, not a direct `@AuraEnabled` call |
 | State-changing `@HttpGet` / page-load action | CSRF — GET handlers stay read-only; mutate via POST |
 | SOQL injection | Bind variables / `Database.queryWithBinds`; allowlist dynamic names |
+| Unescaped SOSL `FIND` term | Backslash-escape the SOSL reserved characters (listed in `references/security.md`); try/catch the call |
+| External text into a capped `Text(n)` field | `truncate()` to a `*_MAX` constant matching `<length>` in field-meta.xml — `STRING_TOO_LONG` rolls back the whole save |
+| Sync Apex reading `ContentVersion.VersionData` | Peak heap ≈ 2.33× file size vs 6 MB sync — check `ContentSize` first and cap |
 | Hardcoded secrets | Named Credentials / protected CMDT |
 | Hardcoded IDs | `Schema.describe` or CMDT / Custom Label |
 | Magic strings/numbers | `private static final` constants / CMDT |
@@ -54,9 +68,13 @@ Scan every artifact against this checklist.
 | Duplicate async jobs | `QueueableDuplicateSignature` on `AsyncOptions` |
 | Batch errors vanish | `Database.RaisesPlatformEvents` + `BatchApexErrorEvent` subscriber |
 | Async for everything | Async only for callouts / volume / long-running |
+| Sync path that may exceed 5s | Keep sync work <5s (10–50 concurrent-long-running cap, by license count); offload slow work to async |
+| Publish/email per record | Aggregate — PE = 150 per transaction + hourly allocation, email = 5,000/day org cap |
 | `SeeAllData=true` | `@TestSetup` + `TestDataFactory` |
 | Coverage without assertions | Assert outcomes with `Assert` class |
 | No bulk test | 201+ records for triggers and bulk-facing services |
+| Test that passes with its code deleted | Revert the code once to watch it fail; delete the test if it stays green |
+| Permission logic tested only as admin | `runAs` a Minimum Access user with just the permission set under test |
 | Hand-rolled test doubles / `Test.isRunningTest()` | `System.StubProvider` + `Test.createStub()` |
 | Golden Hammer | Smallest correct pattern: Selector / Domain / Service / Util |
 | Mixed layers | One level of abstraction per method |
@@ -74,7 +92,7 @@ Load a reference file when either applies:
 | CRUD/FLS, sharing keywords, dynamic SOQL, secrets, hardcoded IDs | `references/security.md` |
 | Class layering (Service/Selector/Domain), naming, class/method size | `references/architecture.md` |
 | `@AuraEnabled` or `ConnectApi` (also load `reviewing-lwc`) | `references/aura-enabled.md` |
-| Queueable, Batch, Schedulable, `@future`, callouts from trigger context | `references/async.md` |
+| Queueable, Batch, Schedulable, `@future`, callouts from trigger context, concurrent-load / capacity review | `references/async.md` |
 | try/catch, null safety, magic strings/numbers, debug logging, deep nesting | `references/error-handling-maintainability.md` |
 | Test classes (`*Test.cls` / `*_Test.cls`) | `references/testing.md` |
 | B2B Commerce storefront — ConnectApi, CartExtension calculators, cacheable storefront reads, Commerce-object SOQL, buyer/entitlement test data | `references/commerce-b2b.md` | <!-- domain:commerce -->

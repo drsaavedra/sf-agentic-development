@@ -31,3 +31,9 @@
 *Why it fails:* Integration work (HTTP callouts, External Services, long-running actions) on a record-triggered flow's synchronous path delays the save transaction it shares — and Salesforce requires integration messaging to run asynchronously from record-triggered flows.
 
 *Fix:* Put callouts and external-system actions on the **Run Asynchronously** path (or a scheduled path when timing matters). The async path runs outside the triggering transaction — it doesn't delay or abort the save, gets fresh governor limits, and retries on failure. Wire fault handling on the async path too: its failure does not roll back the original save.
+
+## Roll Back Records after the error screen
+
+*Why it fails:* Reaching a Screen element ends the transaction and commits its DML, so a Roll Back Records element placed after a fault path's error screen has nothing left to undo. The flow deploys and runs without error and leaves the partial writes in place.
+
+*Fix:* On every fault path in a screen flow, place Roll Back Records **before** the error screen.

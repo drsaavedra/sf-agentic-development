@@ -17,13 +17,14 @@ const pkgRoot = path.join(__dirname, '..');
 const target = process.cwd();
 const isTTY = Boolean(process.stdin.isTTY && process.stdout.isTTY);
 
-// The installer writes skills and agents into the project's .claude/ directory and injects
+// The installer writes skills, agents and rules into the project's .claude/ directory and injects
 // CLAUDE.md as a managed block alongside the user's own instructions. It deliberately does NOT
 // touch `.gitignore` — whether to track or ignore the installed files is the user's call to make.
 const assistant = {
   name: 'Claude Code',
   skillsDir: '.claude/skills',
   agentsDir: '.claude/agents',
+  rulesDir: '.claude/rules/sf-agentic-development',
   baseline: 'CLAUDE.md',
 };
 
@@ -334,8 +335,18 @@ async function main() {
       console.log('installed agent  ' + path.join(assistant.agentsDir, name + '.md'));
     }
 
-    // Inject CLAUDE.md as a marker-delimited managed block. CLAUDE.md is skill routing only —
-    // safety, conventions, and Commerce rules live in the skills — so it slots in alongside any
+    // Rules are not optional and are never offered as a choice: CLAUDE.md is only a pointer at
+    // them, so skipping them would inject a managed block referencing files that do not exist.
+    const rulesSrc = path.join(pkgRoot, 'rules');
+    for (const name of fs.readdirSync(rulesSrc).filter((f) => f.endsWith('.md'))) {
+      const dest = path.join(target, assistant.rulesDir, name);
+      fs.mkdirSync(path.dirname(dest), { recursive: true });
+      fs.copyFileSync(path.join(rulesSrc, name), dest);
+      console.log('installed rule   ' + path.join(assistant.rulesDir, name));
+    }
+
+    // Inject CLAUDE.md as a marker-delimited managed block. CLAUDE.md is a short pointer to the
+    // rule files installed above, so it slots in alongside any
     // project instructions the user already keeps in that file, and updates in place on re-runs
     // rather than clobbering it or prompting to overwrite.
     const baselineDest = path.join(target, assistant.baseline);
@@ -351,7 +362,7 @@ async function main() {
     console.log(
       '\nAgent notes: the installed ' +
         assistant.baseline +
-        ' is skill routing only. The salesforce-developer, code-reviewer, and architect agents\n' +
+        ' is a short pointer to the rules in ' + assistant.rulesDir + '.\nThe salesforce-developer, code-reviewer, and architect agents ' +
         'ask for the paths they need at dispatch time — nothing to fill in up front.'
     );
   } finally {

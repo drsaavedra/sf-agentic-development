@@ -31,6 +31,11 @@ Scan every flow against this checklist.
 | Flow: Send Email recipient overflow | Validate and chunk to ≤ 150 recipients per action; fault connector on the action |
 | Flow: no fault connector | Fault connector on every faulting element; log `{!$Flow.FaultMessage}` |
 | Flow: blocking a save via generic fault | Custom Error element — inline/window message, rolls back the change |
+| Flow: Roll Back Records after the error screen | Roll back before the screen — a screen commits the transaction |
+| Flow: Get Records filter on `RecordType.DeveloperName` | Look up the Id first; filters cannot traverse relationships |
+| Flow: uninitialised Boolean compared to `false` | Explicit default — null is not false |
+| Flow: `$Permission` in screen-component visibility | Set a Boolean in a Decision; key visibility off it |
+| Flow: DateTime − DateTime used as hours | It returns days — multiply by 24 |
 | Flow: callout on the synchronous path | Run Asynchronously path (or scheduled path); fault handling on that path too |
 | Flow: hardcoded IDs | Get Records by DeveloperName or Custom Metadata resource |
 | Flow: complex branching | Subflows first, then `@InvocableMethod` Apex action |

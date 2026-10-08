@@ -1,6 +1,6 @@
 # The Plan → Build Pipeline
 
-> The summary lives in the [README](../README.md#planning-and-building-a-feature); this is the full
+> The summary lives in the [README](../README.md#shipping-a-planned-feature); this is the full
 > detail — why a custom planning skill (not plan mode, not a generic brainstormer), the grilling
 > pattern, the spec / work-item contract, and how it feeds the agents.
 
