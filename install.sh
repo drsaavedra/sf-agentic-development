@@ -17,8 +17,8 @@
 set -uo pipefail
 
 REPO="$(cd -P "$(dirname "$0")" && pwd)"
-# Config dir: $CLAUDE_STACK if set, else Claude Code's own $CLAUDE_CONFIG_DIR, else ~/.claude.
-STACK="${CLAUDE_STACK:-${CLAUDE_CONFIG_DIR:-$HOME/.claude}}"
+# Config dir: Claude Code's own $CLAUDE_CONFIG_DIR, else ~/.claude.
+CONFIG_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 RULES_LINK_NAME="sf-agentic-development"
 
 MODE=install
@@ -48,13 +48,13 @@ add() { LABELS+=("$1"); SRCS+=("$2"); DSTS+=("$3"); }
 for dir in "$REPO"/skills/*/; do
   [ -d "$dir" ] || continue
   name="$(basename "$dir")"
-  add "skill/$name" "$REPO/skills/$name" "$STACK/skills/$name"
+  add "skill/$name" "$REPO/skills/$name" "$CONFIG_DIR/skills/$name"
 done
 
 for file in "$REPO"/agents/*.md; do
   [ -e "$file" ] || continue
   name="$(basename "$file")"
-  add "agent/$name" "$REPO/agents/$name" "$STACK/agents/$name"
+  add "agent/$name" "$REPO/agents/$name" "$CONFIG_DIR/agents/$name"
 done
 
 if [ -n "$PROJECT" ]; then
